@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Đốt Mỡ 6 Tuần</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Đốt Mỡ">
+<meta name="application-name" content="Đốt Mỡ 6 Tuần">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c0b;--sf:#121614;--sf2:#191e1b;--line:#252c28;--ink:#f3f6f2;--mute:#8e9a91;--lime:#a3ff5b;--lime2:#5fd83a;--gold:#ffc83d;--red:#ff5a5a;--amber:#ffb020;--r:18px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{background:radial-gradient(900px 500px at 50% -200px,#1b2a1e 0%,var(--bg) 60%)}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 100px}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:8px 0 14px}
+.brand{font-weight:900;font-size:26px;letter-spacing:-.5px;line-height:1;text-transform:uppercase}
+.brand b{color:var(--lime)}
+.sub{color:var(--mute);font-size:13px;margin-top:6px}
+.chip{display:inline-block;border:1px solid var(--line);background:var(--sf);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+.chip.lime{background:var(--lime);color:#06130a;border-color:var(--lime)}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:0 0 12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.k{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:12px 0 6px}
+input,textarea,select{width:100%;font:inherit;font-size:16px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--sf2);color:var(--ink);outline:none}
+input:focus,textarea:focus{border-color:var(--lime)}
+textarea{min-height:70px;resize:vertical}
+.btn{display:block;width:100%;font:inherit;font-weight:900;font-size:16px;letter-spacing:.02em;padding:15px;border:0;border-radius:14px;background:var(--lime);color:#06130a;cursor:pointer;margin-top:12px;transition:transform .08s}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.55}
+.btn.ghost{background:var(--sf2);color:var(--ink);border:1px solid var(--line);font-weight:700}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.seg{display:flex;gap:6px}.seg button{flex:1;font:inherit;font-weight:700;font-size:14px;padding:11px 4px;border:1px solid var(--line);background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#06130a;border-color:var(--ink)}
+.pick{display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed #3a463d;border-radius:14px;padding:22px;color:var(--lime);font-weight:800;cursor:pointer;background:#0f1411}
+.pick input{display:none}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}
+.chk input{width:18px;height:18px;margin:0;accent-color:var(--lime)}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,11,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:9}
+.tabs button{flex:1;font:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;border:0;background:none;color:var(--mute);padding:6px 2px;cursor:pointer;border-radius:12px}
+.tabs button.on{color:var(--lime)}.tabs .ic{display:block;font-size:22px;margin-bottom:2px}
+.den{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-weight:900;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.den.xanh{background:rgba(163,255,91,.15);color:var(--lime)}.den.vang{background:rgba(255,176,32,.15);color:var(--amber)}.den.do{background:rgba(255,90,90,.15);color:var(--red)}
+.kq{position:relative;overflow:hidden}.kq:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--line)}
+.kq.xanh:before{background:var(--lime)}.kq.vang:before{background:var(--amber)}.kq.do:before{background:var(--red)}
+.score{font-size:46px;font-weight:900;line-height:1;letter-spacing:-1px}.score small{font-size:16px;color:var(--mute);font-weight:700}
+.quote{font-size:16px;line-height:1.5;margin:12px 0 8px;font-weight:600}
+.thay{background:var(--sf2);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:8px}
+.thay b{color:var(--lime)}
+.uoc{font-size:12px;color:var(--mute);margin-top:10px}
+.stat{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;align-items:center}
+.ring{position:relative;width:104px;height:104px;margin:0 auto}
+.ring svg{transform:rotate(-90deg)}.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .n{font-size:30px;font-weight:900;line-height:1}.ring .l{font-size:10px;color:var(--mute);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.big{text-align:center}.big b{display:block;font-size:34px;font-weight:900;line-height:1}.big span{display:block;font-size:11px;color:var(--mute);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.big .fire{color:var(--gold)}
+.bar{height:10px;background:#202723;border-radius:99px;overflow:hidden;margin:6px 0 2px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--lime2),var(--lime));border-radius:99px;transition:width .5s}
+.bar i.over{background:linear-gradient(90deg,#c43,var(--red))}.bar i.ok{background:linear-gradient(90deg,var(--lime2),var(--lime))}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);font-weight:600}.meta b{color:var(--ink)}
+.tq{display:grid;gap:8px;margin-top:6px;font-size:14px;font-weight:600}.tq span{display:flex;gap:8px;align-items:center}
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin:6px 0 14px}
+.pd{background:var(--sf2);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.pd.first{background:linear-gradient(180deg,#2a2610,#1a1a12);border-color:#5d4b12;padding-top:18px}
+.pd .m{font-size:26px}.pd .t{font-weight:800;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pd .p{font-size:22px;font-weight:900;color:var(--gold);line-height:1.1}.pd .s{font-size:11px;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mute);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+td.r,th.r{text-align:right}tr.me td{background:rgba(163,255,91,.08);font-weight:800}
+.log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:#c9d2cb}
+.muc{font-weight:900;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:#d5ddd6;line-height:1.55}
+.err{background:rgba(255,90,90,.12);color:#ffb3b3;border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600}
+.warn{background:rgba(255,200,61,.12);border:1px solid rgba(255,200,61,.35);color:#ffe28a;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:12px}
+.hide{display:none!important}
+.spin{display:inline-block;width:16px;height:16px;border:3px solid #06130a;border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes s{to{transform:rotate(360deg)}}
+.login-hero{text-align:center;padding:26px 0 10px}.login-hero .h{font-size:34px;font-weight:900;line-height:1.05;letter-spacing:-1px;text-transform:uppercase}.login-hero .h b{color:var(--lime)}.login-hero p{color:var(--mute);margin:10px 0 0;font-weight:600}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.rules div{background:var(--sf2);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;font-size:12px;font-weight:700;color:#c9d2cb}.rules div i{display:block;font-style:normal;font-size:20px;margin-bottom:4px}
+small{color:var(--mute)}
+.g42{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.g42 .d{aspect-ratio:1;border-radius:8px;background:#1b211d;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--mute);border:1px solid transparent}
+.g42 .d b{font-size:14px;color:var(--ink)}.g42 .d.x{background:rgba(163,255,91,.22);border-color:rgba(163,255,91,.5)}.g42 .d.v{background:rgba(255,176,32,.2);border-color:rgba(255,176,32,.5)}.g42 .d.r{background:rgba(255,90,90,.2);border-color:rgba(255,90,90,.5)}
+.g42 .d.tl{opacity:.35}.g42 .d.hn{outline:2px solid var(--lime)}.g42 .d.co{background:#232b26}
+.wk{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mute);margin:10px 0 2px;font-weight:700}.wk b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div><div class="brand" id="ten-game">Đốt Mỡ <b>6 Tuần</b></div><div class="sub" id="sub">Chụp. Gửi. Biết ngay đúng hay sai.</div></div>
+    <span class="chip lime hide" id="chip-ngay"></span>
+  </div>
+
+  <!-- ĐĂNG NHẬP -->
+  <div id="v-login">
+    <div class="login-hero"><div class="h">Vào <b>đường đua</b><br>đốt mỡ</div><p>42 ngày · một chỉ số · một vạch đích</p></div>
+    <div class="card">
+      <label>Tên của bạn (đúng như HLV ghi)</label><input id="in-ten" placeholder="Ví dụ: Anh Tú" autocomplete="off">
+      <label>Mã PIN</label><input id="in-pin" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">
+      <button class="btn" id="btn-login">VÀO GAME →</button>
+      <div id="login-err" class="err hide"></div>
+    </div>
+    <div class="rules"><div><i>📷</i>Chụp mỗi bữa</div><div><i>⚡</i>Chấm trong 15 giây</div><div><i>🔥</i>Giữ chuỗi ngày</div></div>
+  </div>
+
+  <!-- GỬI BỮA -->
+  <div id="xem-bar" class="hide" style="position:sticky;top:0;z-index:8;background:var(--gold);color:#1a1200;border-radius:12px;padding:10px 12px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px"><span id="xem-ten"></span><button id="btn-vehlv" style="font:inherit;font-weight:900;border:0;background:#1a1200;color:var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer">← VỀ HLV</button></div>
+  <div id="v-gui" class="hide">
+    <div id="canh-bao" class="warn hide"></div>
+    <div class="card">
+      <p class="k">Bữa nào?</p>
+      <div class="seg" id="seg-bua">
+        <button data-b="sang">Sáng</button><button data-b="trua">Trưa</button><button data-b="chieu">Chiều</button><button data-b="toi">Tối</button><button data-b="phu">Phụ</button>
+      </div>
+      <label>Ảnh bữa ăn</label>
+      <label class="pick">📷 CHỤP / CHỌN ẢNH <input id="in-anh" type="file" accept="image/*" capture="environment"></label>
+      <img id="preview" alt="">
+      <label>Mô tả + định lượng (gram)</label>
+      <textarea id="in-mota" placeholder="Ví dụ: 4 quả trứng ốp, 100g đỗ đen, 1 bát rau cải luộc"></textarea>
+      <div class="row" style="margin-top:10px"><label class="chk"><input type="checkbox" id="ck-chanh"> 🍋 Có nước chanh</label><label class="chk"><input type="checkbox" id="ck-dibo"> 🚶 Đi bộ 100 bước</label></div>
+      <button class="btn" id="btn-gui">GỬI ĐỂ CHẤM ⚡</button>
+      <div id="gui-err" class="err hide"></div>
+    </div>
+    <div id="ket-qua" class="card kq hide"></div>
+    <div class="card">
+      <p class="k">Ghi nhanh</p>
+      <div class="row"><button class="btn ghost" data-ml="250" style="margin:0">💧 +250ml</button><button class="btn ghost" data-ml="500" style="margin:0">💧 +500ml</button></div>
+      <button class="btn ghost" id="btn-gym">🏋️ Hôm nay đã tập gym</button>
+      <div class="row" style="margin-top:10px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="⚖️ Cân sáng đói (kg), vd 68.5" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">GHI CÂN</button></div>
+      <small id="can-hint" style="display:block;margin-top:6px"></small>
+      <label>😴 Giấc ngủ đêm qua</label>
+      <div class="row"><input id="in-ngu-gio" inputmode="decimal" placeholder="Giờ, vd 7.5"><input id="in-ngu-sau" inputmode="numeric" placeholder="Sâu %"><input id="in-ngu-rem" inputmode="numeric" placeholder="REM %"></div>
+      <button class="btn ghost" id="btn-ngu">GHI GIẤC NGỦ</button><small id="ngu-hint" style="display:block;margin-top:6px">Chuẩn: ≥7 h · sâu ≥20% · REM ≥20%. Không có đồng hồ thì chỉ cần ghi giờ.</small>
+    </div>
+  </div>
+
+  <!-- HÔM NAY -->
+  <div id="v-homnay" class="hide">
+    <div class="card"><div class="stat" id="stat"></div></div>
+    <div class="card" id="can-card"></div>
+    <div class="card" id="tien-do"></div>
+    <div class="card" id="thoiquen"></div>
+    <div class="card"><p class="k">Các bữa hôm nay</p><div id="logs"></div></div>
+  </div>
+
+  <!-- BẢNG ĐUA -->
+  <div id="v-dua" class="hide">
+    <div class="card"><p class="k">Bảng đua · điểm 7 ngày gần nhất</p><div class="podium" id="podium"></div><table id="bang"></table></div>
+  </div>
+
+  <!-- HLV -->
+  <div id="v-hlv" class="hide">
+    <div class="card"><p class="k">Bảng điều khiển HLV · hôm nay</p><div id="hlv-tong" style="font-size:14px;margin-bottom:8px"></div><div style="overflow-x:auto"><table id="hlv-bang"></table></div><small>Bấm vào tên để xem hồ sơ, lộ trình và các bữa của người đó.</small></div>
+    <div class="card hide" id="feed-card"><p class="k">Hôm nay cả nhóm đã gửi</p><div id="feed"></div></div>
+  </div>
+
+  <!-- LỘ TRÌNH -->
+  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="luat"></div></div>
+</div>
+
+<div class="tabs hide" id="tabs">
+  <button data-v="gui" class="on"><span class="ic">📷</span>GỬI BỮA</button>
+  <button data-v="homnay"><span class="ic">📊</span>HÔM NAY</button>
+  <button data-v="dua"><span class="ic">🏁</span>BẢNG ĐUA</button>
+  <button data-v="lotrinh"><span class="ic">📖</span>LỘ TRÌNH</button>
+  <button data-v="hlv" id="tab-hlv" class="hide"><span class="ic">🧑‍🏫</span>HLV</button>
+</div>
+
+<script>
+// ---------- gọi máy chủ: fetch (chạy trong Zalo/Safari/Chrome) → google.script.run → bản giả ----------
+const coGAS = typeof google !== 'undefined' && google.script && google.script.run;
+const EXEC_URL = 'https://script.google.com/macros/s/AKfycbyTb0GyEZgEVe6GWSa-37n-HIFGBKtGnVRqTbON6dylzyFQlgP1Q_CQtVqcCVR-4aUaEQ/exec';
+const coFetch = EXEC_URL.indexOf('http') === 0;
+async function goiFetch(fn, args){
+  const res = await fetch(EXEC_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+function goiGAS(fn, args){ return new Promise((ok, loi) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => loi(e))[fn](...args)); }
+async function goi(fn, ...args){
+  let r = null, err = null;
+  if (coFetch) { try { r = await goiFetch(fn, args); } catch (e) { err = e; } }
+  if (r === null && coGAS) { try { r = await goiGAS(fn, args); } catch (e) { err = e; } }
+  if (r === null && !coFetch && !coGAS) return MOCK[fn](...args);
+  if (r === null) throw new Error(err ? (err.message || String(err)) : 'Máy chủ trả về rỗng. Chụp màn hình gửi HLV.');
+  return r;
+}
+const $ = s => document.querySelector(s);
+const LBL = {sang:'Sáng',trua:'Trưa',chieu:'Chiều',toi:'Tối',phu:'Phụ',nuoc:'Nước',gym:'Gym'};
+let S = null, ten = '', pin = '', bua = 'sang', anhB64 = null, anhMime = 'image/jpeg';
+try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm_pin') || ''; } catch(e){}
+(function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
+
+function hien(v){
+  ['login','gui','homnay','dua','lotrinh','hlv'].forEach(x => $('#v-'+x).classList.toggle('hide', x !== v));
+  $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || v === 'login');
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('#tabs').classList.toggle('hide', v === 'login');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => hien(b.dataset.v));
+document.querySelectorAll('#seg-bua button').forEach(b => { b.classList.toggle('on', b.dataset.b === bua); b.onclick = () => { bua = b.dataset.b; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x === b)); }; });
+
+// ---------- đăng nhập ----------
+$('#in-ten').value = ten; $('#in-pin').value = pin;
+$('#btn-login').onclick = async () => {
+  const t = $('#in-ten').value.trim(), p = $('#in-pin').value.trim();
+  if (!t || !p) return;
+  const b = $('#btn-login'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG VÀO...';
+  $('#login-err').classList.add('hide');
+  try {
+    const r = await goi('dangNhap', t, p);
+    if (r.loi) { $('#login-err').textContent = r.loi; $('#login-err').classList.remove('hide'); }
+    else { ten = t; pin = p; try { localStorage.setItem('dm_ten', t); localStorage.setItem('dm_pin', p); } catch(e){} nhan(r); hien('gui'); }
+  } catch (e) { $('#login-err').textContent = 'Lỗi mạng: ' + (e.message || e); $('#login-err').classList.remove('hide'); }
+  b.disabled = false; b.textContent = 'VÀO GAME →';
+};
+$('#in-pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-login').click(); });
+if (ten && pin) $('#btn-login').click();
+
+// ---------- ảnh: thu nhỏ trước khi gửi ----------
+$('#in-anh').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image(); const url = URL.createObjectURL(f);
+  img.onload = () => {
+    const max = 1024; let w = img.width, h = img.height;
+    if (w > h && w > max) { h = Math.round(h * max / w); w = max; } else if (h > max) { w = Math.round(w * max / h); h = max; }
+    const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+    const d = c.toDataURL('image/jpeg', 0.82); anhB64 = d.split(',')[1]; anhMime = 'image/jpeg';
+    $('#preview').src = d; $('#preview').style.display = 'block'; URL.revokeObjectURL(url);
+  };
+  img.src = url;
+};
+
+// ---------- gửi bữa ----------
+$('#btn-gui').onclick = async () => {
+  const moTa = $('#in-mota').value.trim();
+  $('#gui-err').classList.add('hide');
+  if (!moTa && !anhB64) { $('#gui-err').textContent = 'Chụp ảnh hoặc gõ vài chữ mô tả nhé.'; $('#gui-err').classList.remove('hide'); return; }
+  const b = $('#btn-gui'); b.disabled = true; b.innerHTML = '<span class="spin"></span>HLV MÁY ĐANG CHẤM (10–20 GIÂY)...';
+  try {
+    const r = await goi('guiBua', ten, pin, bua, moTa, anhB64, anhMime, $('#ck-chanh').checked, $('#ck-dibo').checked);
+    if (r.loi) { $('#gui-err').textContent = r.loi; $('#gui-err').classList.remove('hide'); }
+    else {
+      nhan(r); hienKetQua(r.ketQua);
+      $('#in-mota').value = ''; anhB64 = null; $('#preview').style.display = 'none'; $('#in-anh').value = ''; $('#ck-chanh').checked = false; $('#ck-dibo').checked = false;
+    }
+  } catch (e) { $('#gui-err').textContent = 'Lỗi: ' + (e.message || e); $('#gui-err').classList.remove('hide'); }
+  b.disabled = false; b.textContent = 'GỬI ĐỂ CHẤM ⚡';
+};
+document.querySelectorAll('[data-ml]').forEach(b => b.onclick = async () => { const goc = b.textContent; b.disabled = true; try { nhan(await goi('ghiNuoc', ten, pin, b.dataset.ml)); b.textContent = '✓ đã ghi'; } catch(e){} setTimeout(() => { b.textContent = goc; b.disabled = false; }, 1200); });
+$('#btn-can').onclick = async () => { const v = $('#in-can').value.trim(); if (!v) return; const b = $('#btn-can'); b.disabled = true; b.textContent = '...';
+  try { const r = await goi('ghiCan', ten, pin, v); if (r.loi) { $('#can-hint').textContent = r.loi; } else { nhan(r); $('#in-can').value = ''; $('#can-hint').textContent = '✓ Đã ghi ' + v + ' kg'; } } catch(e){ $('#can-hint').textContent = 'Lỗi: ' + (e.message || e); }
+  b.disabled = false; b.textContent = 'GHI CÂN'; };
+$('#btn-ngu').onclick = async () => { const g = $('#in-ngu-gio').value.trim(); if (!g) return; const b = $('#btn-ngu'); b.disabled = true; b.textContent = '...';
+  try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; $('#in-ngu-gio').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
+  b.disabled = false; b.textContent = 'GHI GIẤC NGỦ'; };
+$('#btn-gym').onclick = async () => { const b = $('#btn-gym'); b.disabled = true; try { nhan(await goi('ghiGym', ten, pin)); b.textContent = '✓ Đã ghi buổi gym hôm nay'; } catch(e){ b.disabled = false; } };
+
+function hienKetQua(k){
+  const tenDen = {xanh:'🟢 ĐÚNG LUẬT', vang:'🟡 SỬA NHẸ', do:'🔴 SAI LUẬT', xa:'🎉 NGÀY XẢ'}[k.den] || k.den;
+  const el = $('#ket-qua'); el.className = 'card kq ' + k.den; el.classList.remove('hide');
+  el.innerHTML = `<div class="row" style="align-items:center;justify-content:space-between"><span class="den ${k.den}">${tenDen}</span><span class="score" style="text-align:right;flex:0">${k.diem === null ? '' : k.diem + '<small>/10</small>'}</span></div>
+  <div style="margin-top:12px;font-weight:900;font-size:17px">${esc(k.mon)}</div>
+  <div class="quote">${esc(k.nhanXet)}</div>
+  ${k.thayThe ? `<div class="thay"><b>THAY BẰNG:</b> ${esc(k.thayThe)}</div>` : ''}
+  ${k.conThieu ? `<div class="thay"><b>CÒN THIẾU HÔM NAY:</b> ${esc(k.conThieu)}</div>` : ''}
+  <div class="uoc">Ước lượng: ${k.kcal ? k.kcal + ' kcal · ' : ''}protein ${k.protein}g (từ ${k.dam}g thực phẩm đạm) · đậu ${k.dau}g · rau ${k.rau}g · tinh bột ${k.tinhBot}g${k.may && S && S.hv.vaiTro === 'HLV' ? ' · ' + esc(k.may) : ''}</div>`;
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ---------- vẽ trạng thái ----------
+function ngayThu(r){ const bd = new Date(r.ngayBatDau + 'T00:00:00+07:00'); const d = Math.floor((new Date(r.homNay + 'T12:00:00+07:00') - bd) / 86400000) + 1; return isFinite(d) ? Math.max(1, Math.min(42, d)) : 1; }
+function ring(diem){ const p = diem === null ? 0 : diem / 10; const C = 2 * Math.PI * 44; const col = diem === null ? '#3a463d' : diem >= 8 ? 'var(--lime)' : diem >= 5 ? 'var(--amber)' : 'var(--red)';
+  return `<div class="ring"><svg width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="44" stroke="#202723" stroke-width="10" fill="none"/><circle cx="52" cy="52" r="44" stroke="${col}" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg><div class="c"><div class="n">${diem === null ? '–' : diem}</div><div class="l">điểm nay</div></div></div>`; }
+$('#btn-vehlv').onclick = async () => { const r = await goi('layTrangThai', ten, pin); if (!r.loi) { nhan(r); hien('hlv'); } };
+async function xemHV(tenHV){ const r = await goi('xemHocVien', ten, pin, tenHV); if (r.loi) { alert(r.loi); return; } nhan(r); hien('homnay'); }
+function nhan(r){
+  S = r; const h = r.hv, tk = r.thongKe, t = tk.homNay;
+  if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
+  $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
+  if (r.hlv) {
+    const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;
+    $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
+    $('#hlv-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th></tr>' +
+      r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td></tr>`).join('');
+  }
+  $('#sub').textContent = `${h.ten} · Chặng ${r.tuan}/6`;
+  $('#chip-ngay').textContent = `NGÀY ${ngayThu(r)}/42`; $('#chip-ngay').classList.remove('hide');
+  const cb = $('#canh-bao'); const gio = new Date().getHours();
+  if (!r.coKhoa) { cb.textContent = 'HLV chưa bật máy chấm (chưa dán khoá Gemini).'; cb.classList.remove('hide'); }
+  else if (gio >= 20 && t.soBua < 3) { cb.textContent = `⏰ Mới ${t.soBua}/3 bữa hôm nay. Gửi nốt trước khi ngủ để giữ chuỗi 🔥${tk.streak} ngày!`; cb.classList.remove('hide'); }
+  else cb.classList.add('hide');
+
+  $('#stat').innerHTML = ring(t.diem) + `<div class="big"><b class="fire">🔥${tk.streak}</b><span>ngày liên tiếp</span></div><div class="big"><b>${t.soBua}<small style="font-size:16px;color:var(--mute)">/3</small></b><span>bữa đã gửi</span></div>`;
+  const canTxt = tk.canMoi ? `<b>${tk.canMoi} kg</b> · xuất phát ${tk.canDau || '?'} kg · <b style="color:${tk.giam > 0 ? 'var(--lime)' : 'var(--amber)'}">${tk.giam > 0 ? '−' : '+'}${Math.abs(tk.giam)} kg</b>${h.mucTieu ? ` / mục tiêu ${h.mucTieu} kg` : ''}${tk.ngayCanMoi ? ` · cân ${tk.ngayCanMoi.slice(5).replace('-', '/')}` : ''}` : `<b>Chưa có số cân.</b> Sáng mai cân đói rồi ghi ở tab Gửi bữa.`;
+  $('#can-card').innerHTML = `<p class="k">Cân nặng</p><div style="font-size:15px">${canTxt}</div>`;
+  $('#can-hint').textContent = tk.canMoi ? `Lần cân gần nhất: ${tk.canMoi} kg (${tk.ngayCanMoi})` : 'Cân mỗi sáng thứ 2, lúc đói, sau khi đi vệ sinh.';
+  const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
+    return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
+  $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + thanh('Tinh bột', t.tinhBot, h.tinhBot, 'g', true) + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
+  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${t.ngu.gio} h · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.thamHut ? `<span>🎯 Thâm hụt mục tiêu ${h.thamHut} kcal/ngày</span>` : ''}</div>`;
+  $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
+
+  const bd = r.bangDua; const medal = ['🥇','🥈','🥉'];
+  const kg = x => x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) + ' kg' : '';
+  const pd = i => bd[i] ? `<div class="pd ${i===0?'first':''}"><div class="m">${medal[i]}</div><div class="p">${bd[i].diemTuan}</div><div class="t">${esc(bd[i].ten)}</div><div class="s">🔥${bd[i].streak}${kg(bd[i]) ? ' · ' + kg(bd[i]) : ''}</div></div>` : '<div></div>';
+  $('#podium').innerHTML = pd(1) + pd(0) + pd(2);
+  $('#bang').innerHTML = '<tr><th>#</th><th>Tên</th><th class="r">Điểm</th><th class="r">Chuỗi</th><th class="r">Kg</th><th class="r">Nay</th></tr>' +
+    bd.map((x, i) => `<tr class="${x.ten === h.ten ? 'me' : ''}"><td>${i+1}</td><td>${esc(x.ten)}</td><td class="r">${x.diemTuan}</td><td class="r">🔥${x.streak}</td><td class="r">${kg(x) || '–'}</td><td class="r">${x.buaHomNay}/3</td></tr>`).join('');
+  if (r.feedHomNay) { $('#feed-card').classList.remove('hide'); $('#feed').innerHTML = r.feedHomNay.length ? r.feedHomNay.map(dongLog).join('') : '<p><small>Chưa ai gửi.</small></p>'; }
+
+  const thieu = !(h.canNang && h.cao && h.namSinh && (h.phanTramMo || h.moNhap));
+  const ho = thieu ? `<div class="warn" style="margin:8px 0 0">Hồ sơ chưa đủ (cần cân nặng, chiều cao, năm sinh, % mỡ). Nhắn HLV để cập nhật.</div>` : '';
+  const so = (n, dv, nhan) => `<div class="pd"><div class="p" style="color:var(--ink)">${n}<small style="font-size:12px;color:var(--mute)">${dv}</small></div><div class="s">${nhan}</div></div>`;
+  const mocHtml = r.loTrinh && r.loTrinh.length && tk.canDau ? `<table style="margin-top:10px"><tr><th>Tuần</th><th>Cân ngày</th><th class="r">Mốc</th><th class="r">Thực tế</th><th class="r"></th></tr>` +
+    r.loTrinh.map(m => `<tr class="${m.tuan === r.tuan ? 'me' : ''}"><td>${m.tuan}</td><td>${m.ngay.slice(5).replace('-', '/')}</td><td class="r">≤ ${m.moc} kg</td><td class="r">${m.thucTe ? m.thucTe + ' kg' : '–'}</td><td class="r">${m.dat === null ? (m.daQua ? '⬜' : '') : (m.dat ? '✅' : '❌')}</td></tr>`).join('') + '</table>' : '';
+  $('#hoso').innerHTML = `<p class="k">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${ho}
+    <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
+    <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
+    <div style="font-size:14px;line-height:1.7;color:#d5ddd6"><div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g · 🍚 tinh bột ≤ ${h.tinhBot} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}`;
+  veBieuDo(r); veLuoi(r);
+  const nhom = {}; r.luat.forEach(l => { (nhom[l.muc] = nhom[l.muc] || []).push(l); });
+  $('#luat').innerHTML = `<p class="k">Luật & nội quy · chặng ${r.tuan}/6</p>` + Object.keys(nhom).map(m => `<div class="muc">${esc(m)}</div>` + nhom[m].map(l => `<div class="nd">${esc(l.noiDung)}</div>`).join('')).join('');
+}
+// ---------- biểu đồ đường cân nặng (SVG) ----------
+function veBieuDo(r){
+  const tk = r.thongKe, h = r.hv; const el = $('#bieudo');
+  const cans = (tk.cans || []).slice(); const bd = new Date(r.ngayBatDau + 'T00:00:00+07:00');
+  const idx = ngay => Math.round((new Date(ngay + 'T00:00:00+07:00') - bd) / 86400000);
+  if (!tk.canDau) { el.innerHTML = `<p class="k">Đường đua cân nặng</p><small>Chưa có cân xuất phát. Ghi cân ở tab Gửi bữa.</small>`; return; }
+  const W = 340, H = 170, L = 34, R = 10, T = 14, B = 24;
+  const pts = cans.map(c => ({ x: Math.max(0, Math.min(42, idx(c.ngay))), y: c.kg }));
+  if (!pts.length || pts[0].x > 0) pts.unshift({ x: 0, y: tk.canDau });
+  const mocs = [{ x: 0, y: tk.canDau }].concat((r.loTrinh || []).map(m => ({ x: m.tuan * 7, y: m.moc })));
+  const ys = pts.map(p => p.y).concat(mocs.map(m => m.y)); let yMin = Math.min(...ys) - 1, yMax = Math.max(...ys) + 1; if (yMax - yMin < 4) { yMax = yMin + 4; }
+  const sx = x => L + x / 42 * (W - L - R), sy = y => T + (yMax - y) / (yMax - yMin) * (H - T - B);
+  const path = a => a.map((p, i) => (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ');
+  let grid = ''; for (let k = 0; k <= 6; k++) grid += `<line x1="${sx(k*7)}" y1="${T}" x2="${sx(k*7)}" y2="${H-B}" stroke="#232b26"/><text x="${sx(k*7)}" y="${H-8}" fill="#8e9a91" font-size="9" text-anchor="middle">T${k}</text>`;
+  const yt = []; for (let v = Math.ceil(yMin); v <= Math.floor(yMax); v += Math.max(1, Math.round((yMax - yMin) / 4))) yt.push(v);
+  grid += yt.map(v => `<line x1="${L}" y1="${sy(v)}" x2="${W-R}" y2="${sy(v)}" stroke="#232b26"/><text x="${L-4}" y="${sy(v)+3}" fill="#8e9a91" font-size="9" text-anchor="end">${v}</text>`).join('');
+  const last = pts[pts.length - 1];
+  el.innerHTML = `<p class="k">Đường đua cân nặng · 42 ngày</p>
+  <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${grid}
+    <path d="${path(mocs)}" fill="none" stroke="#ffc83d" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <path d="${path(pts)}" fill="none" stroke="#a3ff5b" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.map(p => `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="3.5" fill="#a3ff5b"/>`).join('')}
+    <text x="${Math.min(sx(last.x), W-R-30)}" y="${sy(last.y)-8}" fill="#f3f6f2" font-size="11" font-weight="800">${last.y} kg</text>
+  </svg>
+  <small>— xanh: cân thực tế · - - vàng: mốc chặn theo lộ trình${h.mucTieu ? ` (đích ${(tk.canDau + h.mucTieu).toFixed(1)} kg)` : ''}</small>`;
+}
+// ---------- lưới 42 ngày + tổng kết tuần ----------
+function veLuoi(r){
+  const ls = r.lichSu || []; const el = $('#luoi'); if (!ls.length) { el.innerHTML = ''; return; }
+  let html = `<p class="k">Bảng theo dõi 42 ngày</p>`;
+  for (let w = 0; w < 6; w++) {
+    const ds = ls.slice(w * 7, w * 7 + 7);
+    const coDiem = ds.filter(d => d.diem !== null); const tb = coDiem.length ? (coDiem.reduce((a, d) => a + d.diem, 0) / coDiem.length).toFixed(1) : '–';
+    const bua = ds.reduce((a, d) => a + d.soBua, 0); const canCuoi = ds.filter(d => d.can).slice(-1)[0];
+    const moc = (r.loTrinh || [])[w];
+    html += `<div class="wk"><span>TUẦN ${w+1} <small>${ds[0].ngay.slice(5).replace('-', '/')}–${ds[6].ngay.slice(5).replace('-', '/')}</small></span><span>điểm <b>${tb}</b> · bữa <b>${bua}</b>/21${canCuoi ? ` · cân <b>${canCuoi.can}</b> kg` : ''}${moc && moc.dat !== null ? (moc.dat ? ' ✅' : ' ❌') : ''}</span></div><div class="g42">` +
+      ds.map(d => { const cls = d.tuongLai ? 'tl' : d.diem === null ? 'co' : d.diem >= 8 ? 'x' : d.diem >= 5 ? 'v' : 'r';
+        return `<div class="d ${cls} ${d.homNay ? 'hn' : ''}" title="${d.ngay}"><b>${d.diem === null ? (d.tuongLai ? '' : '·') : d.diem}</b><span>${d.tuongLai ? d.ngay.slice(8) : d.soBua + ' bữa'}</span></div>`; }).join('') + `</div>`;
+  }
+  html += `<small style="display:block;margin-top:8px">Ô = 1 ngày: số to là điểm, dưới là số bữa đã gửi. Xanh ≥8 · vàng 5–7 · đỏ &lt;5 · viền sáng = hôm nay.</small>`;
+  el.innerHTML = html;
+}
+function dongLog(l){
+  const gio = l.thoiGian ? new Date(l.thoiGian).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ho_Chi_Minh'}) : '';
+  const ai = S && S.feedHomNay ? ' · <b>' + esc(l.ten) + '</b>' : '';
+  if (l.bua === 'ngu') return `<div class="log"><div class="ic">😴</div><div><div class="t">${gio}${ai}</div><div class="n">${esc(l.moTa)}</div><div class="x">${esc(l.nhanXet)}</div></div></div>`;
+  if (l.den === 'xa') return `<div class="log"><div class="ic">🎉</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai} · ngày xả</div><div class="n">${esc(l.moTa || 'Bữa ngày xả')}</div></div></div>`;
+  if (l.bua === 'can') return `<div class="log"><div class="ic">⚖️</div><div><div class="t">${gio}${ai}</div><div class="n">${l.can} kg</div></div></div>`;
+  if (l.bua === 'gym') return `<div class="log"><div class="ic">🏋️</div><div><div class="t">${gio}${ai}</div><div class="n">Buổi tập gym</div></div></div>`;
+  if (l.bua === 'nuoc') return `<div class="log"><div class="ic">💧</div><div><div class="t">${gio}${ai}</div><div class="n">${l.nuoc} ml nước</div></div></div>`;
+  const ic = {xanh:'🟢', vang:'🟡', do:'🔴'}[l.den] || '⚪';
+  return `<div class="log"><div class="ic">${ic}</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai}${l.diem === null ? '' : ' · ' + l.diem + '/10'}</div><div class="n">${esc(l.mon || l.moTa)}</div><div class="x">${esc(l.nhanXet)}</div></div></div>`;
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ---------- bản giả để xem thử ngoài Google (không gọi AI) ----------
+const MOCK = (() => {
+  const hv = {ten:'Anh Tú', pin:'1002', vaiTro:'HV', gioiTinh:'Nam', canNang:74, mucTieu:-5, dam:163, dau:150, rau:400, tinhBot:60, nuoc:3, luuY:'', mo:18.5, moNhap:0, cao:170, namSinh:1992, phanTramMo:25, thamHut:1258, bmr:1637, tdee:2292, kcalMucTieu:1637, giamTuanDuKien:1.14, giamTuanMucTieu:0.83, bmi:25.6};
+  let logs = [{thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'sang', moTa:'2 trứng, 200g đậu đũa, 200g đu đủ', den:'do', mon:'Trứng + đậu đũa + đu đủ', nhanXet:'Đu đủ là hoa quả ngọt b ơi, insulin lên cao là mỡ bị khoá lại. Trứng với đậu đũa ổn.', thayThe:'Bỏ đu đủ, thêm 2 trứng hoặc 100g ức gà. Muốn ngọt thì dưa chuột, cà chua.', dam:110, dau:0, rau:200, tinhBot:0, nuoc:0, viPham:'hoa quả ngọt', diem:3, protein:14}];
+  const st = (kq) => { const t = {ngu:null,kcal:0,dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,soBua:0,diem:null,damSang:0,nuocChanh:0,diBo:0,gym:0,suaChua:false}; const ds=[]; logs.forEach(l=>{t.dam+=l.dam;t.protein+=(l.protein||0);t.dau+=l.dau;t.rau+=l.rau;t.tinhBot+=l.tinhBot;t.nuoc+=l.nuoc; if(l.bua==='gym'){t.gym++;return;} if(l.bua==='ngu'){t.ngu={gio:l.nguGio,sau:l.nguSau,rem:l.nguRem,den:l.den};return;} if(l.bua!=='nuoc'){t.soBua++; if(l.diem!=null) ds.push(l.diem); if(l.bua==='sang') t.damSang+=(l.protein||0); if(l.nuocChanh) t.nuocChanh++; if(l.diBo) t.diBo++;}}); if(ds.length) t.diem=Math.round(ds.reduce((a,b)=>a+b,0)/ds.length*10)/10;
+    return {hv, tuan:1, homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
+      luat:[{muc:'5 quy tắc',tuan:0,noiDung:'1) Hạn chế tinh bột trắng. 2) Lặp lại bữa ăn phù hợp. 3) Không uống calo. 4) Không hoa quả ngọt. 5) Một ngày ăn xả mỗi 7–10 ngày.'},{muc:'Nội quy tuần',tuan:1,noiDung:'Tuần 1: nói KHÔNG với đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu.'}],
+      bangDua:[{ten:'Thái Hưng',diemTuan:26,streak:3,buaHomNay:2,giam:4},{ten:'Anh Tú',diemTuan:14.5,streak:2,buaHomNay:t.soBua,giam:1.4},{ten:'Tiến Dũng',diemTuan:12,streak:1,buaHomNay:2},{ten:'Chị Ngát',diemTuan:0,streak:0,buaHomNay:0}], ketQua:kq}; };
+  const cham = (bua, moTa) => { const x = /kfc|xúc xích|chiên xù|cơm|bún|phở|trà sữa|bánh ngọt/i.test(moTa); const kq = x ? {den:'do',diem:2,mon:'Đồ chiên/tinh bột trắng',nhanXet:'Cái này dính luật đạm rồi b: chiên xù + tinh bột, dầu chiên lại. Ăn xong insulin lên, mỡ không đốt được.',thayThe:'Gà luộc hoặc áp chảo dầu oliu 150g + 100g đỗ đen + rau cải.',conThieu:'đạm 110g, đậu 150g, rau 200g',dam:80,protein:18,dau:0,rau:0,tinhBot:60,may:'mock · 1s'} : {den:'xanh',diem:9,mon:'Đạm + đậu + rau',nhanXet:'Chuẩn đĩa rồi b. Đạm đủ, có đậu, có rau.',thayThe:'',conThieu:'đạm 60g',dam:150,protein:35,dau:100,rau:200,tinhBot:0,may:'mock · 1s'};
+    logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua, moTa, den:kq.den, mon:kq.mon, nhanXet:kq.nhanXet, thayThe:kq.thayThe, dam:kq.dam, protein:kq.protein, dau:kq.dau, rau:kq.rau, tinhBot:kq.tinhBot, nuoc:0, viPham:'', diem:kq.diem}); return kq; };
+  const wait = v => new Promise(ok => setTimeout(() => ok(v), 600));
+  const hlvSt = () => { const x = st(); x.hv = Object.assign({}, hv, {ten:'Dũng', vaiTro:'HLV'}); x.feedHomNay = [...logs].reverse(); x.hlv = [{ten:'Chị Ngát',canDau:0,canMoi:0,giam:0,mucTieu:-4,streak:0,buaHomNay:0,diemHomNay:null,diemTuan:0,gymTuan:0,ngayCuoi:'',co:['chưa gửi gì','hồ sơ thiếu','chưa cân']},{ten:'Anh Tú',canDau:74,canMoi:72.6,giam:1.4,mucTieu:-5,streak:2,buaHomNay:2,diemHomNay:6,diemTuan:14.5,gymTuan:1,ngayCuoi:'2026-09-03',co:[]},{ten:'Thái Hưng',canDau:100,canMoi:96,giam:4,mucTieu:-4,streak:3,buaHomNay:2,diemHomNay:9,diemTuan:26,gymTuan:2,ngayCuoi:'2026-09-03',co:[]}]; return x; };
+  return { dangNhap:(t,p) => wait(p === '2468' ? hlvSt() : p === '1002' ? st() : {loi:'Sai tên hoặc mã PIN (bản thử: Anh Tú / 1002, HLV Dũng / 2468).'}), xemHocVien:(t,p,ai) => wait(Object.assign(st(), {xemBoi:'Dũng'})), layTrangThai:() => wait(st()),
+    guiBua:(t,p,b,m,a,mi,nc,db) => { const kq = cham(b, m || 'ảnh'); logs[logs.length-1].nuocChanh = nc; logs[logs.length-1].diBo = db; return wait(st(kq)); },
+    ghiCan:(t,p,kg) => wait(st()),
+    ghiNgu:(t,p,g,sa,re) => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'ngu', moTa:'Ngủ '+g+' h · sâu '+sa+'% · REM '+re+'%', nhanXet:'', den: g>=7?'xanh':'vang', nguGio:Number(g), nguSau:Number(sa), nguRem:Number(re), dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,kcal:0, diem:null}); return wait(st()); },
+    ghiGym:() => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'gym', dam:0,dau:0,rau:0,tinhBot:0,nuoc:0, diem:null}); return wait(st()); },
+    ghiNuoc:(t,p,ml) => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'nuoc', nuoc:Number(ml), dam:0,dau:0,rau:0,tinhBot:0, diem:null}); return wait(st()); } };
+})();
+</script>
+</body>
+</html>
