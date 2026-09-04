@@ -291,6 +291,17 @@ let S = null, ten = '', pin = '', bua = 'sang', anhB64 = null, anhMime = 'image/
 try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm_pin') || ''; } catch(e){}
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
+// ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
+const APP_VER = '20260904-165608';
+async function kiemTraCapNhat(){
+  if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
+  try {
+    const v = (await fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.text())).trim();
+    if (v && v !== APP_VER && !sessionStorage.getItem('dm_reload_' + v)) { sessionStorage.setItem('dm_reload_' + v, '1'); location.replace(location.pathname + '?v=' + v); }
+  } catch(e){}
+}
+kiemTraCapNhat();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kiemTraCapNhat(); });
 function dangXuat(){
   if (!confirm('Đăng xuất để vào tài khoản khác?')) return;
   try { localStorage.removeItem('dm_ten'); localStorage.removeItem('dm_pin'); } catch(e){}
