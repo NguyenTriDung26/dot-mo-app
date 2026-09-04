@@ -243,8 +243,8 @@ small{color:var(--mute)}
       <div class="row" style="margin-top:10px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="⚖️ Cân sáng đói (kg), vd 68.5" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">GHI CÂN</button></div>
       <small id="can-hint" style="display:block;margin-top:6px"></small>
       <label>😴 Giấc ngủ đêm qua</label>
-      <div class="row"><input id="in-ngu-gio" inputmode="decimal" placeholder="Giờ, vd 7.5"><input id="in-ngu-sau" inputmode="numeric" placeholder="Sâu (phút)"><input id="in-ngu-rem" inputmode="numeric" placeholder="REM (phút)"></div>
-      <button class="btn ghost" id="btn-ngu">GHI GIẤC NGỦ</button><small id="ngu-hint" style="display:block;margin-top:6px">Ghi số PHÚT ngủ sâu và REM trên đồng hồ, máy tự quy ra % và chấm chất lượng. Chuẩn: ≥7 h · sâu ≥20% (≈85 phút) · REM ≥20%. Không có đồng hồ thì chỉ cần ghi giờ.</small>
+      <div class="row"><input id="in-ngu-gio" inputmode="numeric" placeholder="Ngủ: giờ"><input id="in-ngu-phut" inputmode="numeric" placeholder="Ngủ: phút"></div><div class="row" style="margin-top:6px"><input id="in-ngu-sau" inputmode="numeric" placeholder="Ngủ sâu (phút)"><input id="in-ngu-rem" inputmode="numeric" placeholder="REM (phút)"></div>
+      <button class="btn ghost" id="btn-ngu">GHI GIẤC NGỦ</button><small id="ngu-hint" style="display:block;margin-top:6px">Ghi giờ + phút ngủ (vd 7 giờ 30 phút) và số PHÚT ngủ sâu, REM trên đồng hồ. Máy tự quy ra % và chấm chất lượng. Chuẩn: ≥7 h · sâu ≥20% (≈85 phút) · REM ≥20%. Không có đồng hồ thì chỉ cần ghi giờ.</small>
     </div>
   </div>
 
@@ -317,7 +317,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-171413';
+const APP_VER = '20260904-172106';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -670,8 +670,8 @@ document.querySelectorAll('[data-ml]').forEach(b => b.onclick = async () => { co
 $('#btn-can').onclick = async () => { const v = $('#in-can').value.trim(); if (!v) return; const b = $('#btn-can'); b.disabled = true; b.textContent = '...';
   try { const r = await goi('ghiCan', ten, pin, v); if (r.loi) { $('#can-hint').textContent = r.loi; } else { nhan(r); $('#in-can').value = ''; $('#can-hint').textContent = '✓ Đã ghi ' + v + ' kg'; } } catch(e){ $('#can-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI CÂN'; };
-$('#btn-ngu').onclick = async () => { const g = $('#in-ngu-gio').value.trim(); if (!g) return; const b = $('#btn-ngu'); b.disabled = true; b.textContent = '...';
-  try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; $('#in-ngu-gio').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
+$('#btn-ngu').onclick = async () => { const gioN = Number($('#in-ngu-gio').value.trim()) || 0, phutN = Number($('#in-ngu-phut').value.trim()) || 0; if (!gioN && !phutN) return; const g = String(Math.round((gioN + phutN / 60) * 100) / 100); const b = $('#btn-ngu'); b.disabled = true; b.textContent = '...';
+  try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; $('#in-ngu-gio').value = $('#in-ngu-phut').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI GIẤC NGỦ'; };
 $('#btn-gym').onclick = async () => { const b = $('#btn-gym'); b.disabled = true; try { nhan(await goi('ghiGym', ten, pin)); b.textContent = '✓ Đã ghi buổi gym hôm nay'; } catch(e){ b.disabled = false; } };
 
@@ -725,7 +725,7 @@ function nhan(r){
   const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
     return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
   $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + `<div class="meta"><span>Tinh bột</span><span><b style="color:${t.tinhBot ? 'var(--red)' : 'inherit'}">${t.tinhBot}g</b> / 0g — bỏ hẳn ${t.tinhBot ? '⚠️' : '✅'}</span></div>` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
-  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${t.ngu.gio} h · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.thamHut ? `<span>🎯 Thâm hụt mục tiêu ${h.thamHut} kcal/ngày</span>` : ''}</div>`;
+  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h${Math.round(t.ngu.gio % 1 * 60) ? ' ' + Math.round(t.ngu.gio % 1 * 60) + ' phút' : ''} · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.thamHut ? `<span>🎯 Thâm hụt mục tiêu ${h.thamHut} kcal/ngày</span>` : ''}</div>`;
   $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
 
   const bd = r.bangDua; const medal = ['🥇','🥈','🥉'];
