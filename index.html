@@ -318,7 +318,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-172916';
+const APP_VER = '20260904-191056';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -330,7 +330,7 @@ kiemTraCapNhat();
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kiemTraCapNhat(); });
 function dangXuat(){
   if (!confirm('Đăng xuất để vào tài khoản khác?')) return;
-  try { localStorage.removeItem('dm_ten'); localStorage.removeItem('dm_pin'); } catch(e){}
+  try { localStorage.removeItem('dm_ten'); localStorage.removeItem('dm_pin'); localStorage.removeItem('dm_state'); } catch(e){}
   S = null; ten = ''; pin = ''; $('#in-ten').value = ''; $('#in-pin').value = ''; hien('login'); toast('Đã đăng xuất');
 }
 // ---------- điều hướng: màn chính (tab) / màn phụ (có nút ← và nút back của máy) ----------
@@ -358,7 +358,7 @@ $('#btn-back').onclick = quayLai;
 async function lamMoi(im){
   if (!S || !ten) return;
   try { const r = S.xemBoi ? await goi('xemHocVien', ten, pin, S.hv.ten) : await goi('layTrangThai', ten, pin);
-    if (r.loi) { if (!im) toast('⚠️ ' + r.loi); return; } nhan(r); if (!im) toast('✅ Đã cập nhật dữ liệu mới nhất');
+    if (r.loi) { if (/Phiên hết hạn|đăng nhập lại/i.test(r.loi)) { try { localStorage.removeItem('dm_state'); } catch(e){} S = null; hien('login'); $('#login-err').textContent = r.loi; $('#login-err').classList.remove('hide'); } else if (!im) toast('⚠️ ' + r.loi); return; } nhan(r); if (!im) toast('✅ Đã cập nhật dữ liệu mới nhất');
   } catch (e) { if (!im) toast('⚠️ Không có mạng, thử lại sau'); }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
@@ -397,7 +397,15 @@ $('#btn-login').onclick = async () => {
   b.disabled = false; b.textContent = 'VÀO GAME →';
 };
 $('#in-pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-login').click(); });
-if (ten && pin) $('#btn-login').click();
+// Mở app: có dữ liệu lần trước thì hiện ngay (0 giây), rồi tải bản mới ở nền; không có thì đăng nhập như cũ
+(function(){
+  if (!ten || !pin) return;
+  let cu = null; try { cu = JSON.parse(localStorage.getItem('dm_state') || 'null'); } catch(e){}
+  if (cu && cu.hv && cu.hv.ten && cu.hv.ten.toLowerCase() === ten.toLowerCase() && cu.thongKe) {
+    try { nhan(cu); dieuHuong(cu); lamMoi(true); return; } catch(e){}
+  }
+  $('#btn-login').click();
+})();
 
 // ---------- bước 1: hướng dẫn ghim + dùng app ----------
 const APP_URL = 'https://nguyentridung26.github.io/dot-mo-app/';
@@ -703,7 +711,8 @@ function ganThu(id, tomTat, macDinhThu){
   k.onclick = () => { const t = !el.classList.contains('thu'); el.classList.toggle('thu', t); try { localStorage.setItem(key, t ? '1' : '0'); } catch(e){} };
 }
 function nhan(r){
-  S = r; lanCapNhat = Date.now(); const h = r.hv, tk = r.thongKe, t = tk.homNay;
+  S = r; lanCapNhat = Date.now();
+  if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } // nhớ để lần sau mở là hiện ngay const h = r.hv, tk = r.thongKe, t = tk.homNay;
   if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
   $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
   if (r.hlv) {
