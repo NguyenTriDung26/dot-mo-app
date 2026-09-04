@@ -327,7 +327,7 @@ function veHuongDan(){
   if (inApp) b.push(['1', `Bạn đang mở trong ${zalo ? 'Zalo' : 'ứng dụng'}. Bấm dấu <b>⋯</b> (góc trên phải) → <b>${iOS ? 'Mở bằng Safari' : 'Mở bằng trình duyệt'}</b>.`]);
   if (iOS) { b.push([inApp ? '2' : '1', `Trong Safari, bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên ↑ ở thanh dưới).`]); b.push([inApp ? '3' : '2', `Kéo xuống, chọn <b>Thêm vào MH chính</b> (Add to Home Screen) → <b>Thêm</b>.`]); }
   else { b.push([inApp ? '2' : '1', `Trong Chrome, bấm dấu <b>⋮</b> (góc trên phải).`]); b.push([inApp ? '3' : '2', `Chọn <b>Thêm vào màn hình chính</b> hoặc <b>Cài đặt ứng dụng</b> → <b>Cài đặt</b>.`]); }
-  b.push(['✓', `Ra màn hình chính, thấy icon <b>Đốt Mỡ</b> màu xanh là xong. Từ nay mở app từ icon đó.`]);
+  b.push(['✓', `Ra màn hình chính, thấy icon <b>Đốt Mỡ</b> màu đỏ là xong. Từ nay mở app từ icon đó.`]);
   $('#hd-ghim').innerHTML = b.map(st).join('');
 }
 $('#btn-hd').onclick = () => hien('huongdan');
