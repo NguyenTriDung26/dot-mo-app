@@ -319,7 +319,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-191829';
+const APP_VER = '20260904-192030';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -399,14 +399,14 @@ $('#btn-login').onclick = async () => {
 };
 $('#in-pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-login').click(); });
 // Mở app: có dữ liệu lần trước thì hiện ngay (0 giây), rồi tải bản mới ở nền; không có thì đăng nhập như cũ
-(function(){
+setTimeout(function(){ // chạy sau khi cả script nạp xong (các const phía dưới đã có)
   if (!ten || !pin) return;
   let cu = null; try { cu = JSON.parse(localStorage.getItem('dm_state') || 'null'); } catch(e){}
   if (cu && cu.hv && cu.hv.ten && cu.hv.ten.toLowerCase() === ten.toLowerCase() && cu.thongKe) {
-    try { nhan(cu); dieuHuong(cu); lamMoi(true); return; } catch(e){}
+    try { nhan(cu); dieuHuong(cu); lamMoi(true); return; } catch(e){ console.error('khởi động từ bộ nhớ lỗi', e); }
   }
   $('#btn-login').click();
-})();
+}, 0);
 
 // ---------- bước 1: hướng dẫn ghim + dùng app ----------
 const APP_URL = 'https://nguyentridung26.github.io/dot-mo-app/';
