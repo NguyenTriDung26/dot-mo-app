@@ -114,6 +114,20 @@ small{color:var(--mute)}
     <div class="rules"><div><i>📷</i>Chụp mỗi bữa</div><div><i>⚡</i>Chấm trong 15 giây</div><div><i>🔥</i>Giữ chuỗi ngày</div></div>
   </div>
 
+  <!-- ĐỔI PIN (bắt buộc khi còn PIN chung) -->
+  <div id="v-doipin" class="hide">
+    <div class="login-hero" style="padding-top:10px"><div class="h">Đặt <b>PIN riêng</b></div><p id="doipin-sub">Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.</p></div>
+    <div class="card">
+      <label>PIN hiện tại</label><input id="dp-cu" inputmode="numeric" maxlength="6" placeholder="••••">
+      <label>PIN mới (4–6 số)</label><input id="dp-moi" inputmode="numeric" maxlength="6" placeholder="Ví dụ: 2609">
+      <label>Nhập lại PIN mới</label><input id="dp-moi2" inputmode="numeric" maxlength="6" placeholder="Nhập lại">
+      <button class="btn" id="btn-dp">ĐỔI PIN →</button>
+      <button class="btn ghost hide" id="btn-dp-huy">← Quay lại</button>
+      <div id="dp-err" class="err hide"></div>
+      <small style="display:block;margin-top:10px">Quên PIN thì nhắn HLV, HLV đặt lại được ngay.</small>
+    </div>
+  </div>
+
   <!-- BƯỚC 1: HƯỚNG DẪN GHIM + DÙNG APP -->
   <div id="v-huongdan" class="hide">
     <div class="login-hero" style="padding-top:10px"><div class="h">Chào <b id="hd-ten">bạn</b>!</div><p>2 phút chuẩn bị trước khi vào đường đua</p></div>
@@ -218,6 +232,7 @@ small{color:var(--mute)}
   <!-- HLV -->
   <div id="v-hlv" class="hide">
     <div class="card"><p class="k">Bảng điều khiển HLV · hôm nay</p><div id="hlv-tong" style="font-size:14px;margin-bottom:8px"></div><div style="overflow-x:auto"><table id="hlv-bang"></table></div><small>Bấm vào tên để xem hồ sơ, lộ trình và các bữa của người đó.</small></div>
+    <div class="card"><p class="k">Thêm học viên mới</p><div class="row"><input id="th-ten" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="th-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div><button class="btn" id="btn-them">＋ TẠO TÀI KHOẢN (PIN chung)</button><div id="th-kq" class="thay hide"></div></div>
     <div class="card hide" id="feed-card"><p class="k">Hôm nay cả nhóm đã gửi</p><div id="feed"></div></div>
   </div>
 
@@ -259,12 +274,13 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 function hien(v){
-  ['login','huongdan','hoso','gui','homnay','dua','lotrinh','hlv'].forEach(x => $('#v-'+x).classList.toggle('hide', x !== v));
-  const khoa = v === 'login' || v === 'huongdan' || v === 'hoso';
+  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv'].forEach(x => $('#v-'+x).classList.toggle('hide', x !== v));
+  const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || khoa);
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   $('#tabs').classList.toggle('hide', khoa);
-  $('#btn-hd').classList.toggle('hide', v === 'login' || v === 'huongdan');
+  $('#btn-hd').classList.toggle('hide', v === 'login' || v === 'huongdan' || v === 'doipin');
+  if (v === 'doipin') { $('#btn-dp-huy').classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; $('#dp-err').classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
   window.scrollTo(0,0);
 }
@@ -294,6 +310,7 @@ function daGhim(){ try { return !!(window.navigator.standalone || (window.matchM
 function daXemHD(){ try { return localStorage.getItem('dm_hd_xong') === '1'; } catch(e){ return false; } }
 function dieuHuong(r){
   if (r.xemBoi) { hien('homnay'); return; }
+  if (r.hv.phaiDoiPin) { hien('doipin'); return; }
   if (r.hv.vaiTro === 'HLV') { hien('gui'); return; }
   if (!daXemHD() && !daGhim()) { hien('huongdan'); return; }
   if (!r.hv.hoSoDu) { hien('hoso'); return; }
@@ -315,6 +332,33 @@ function veHuongDan(){
 }
 $('#btn-hd').onclick = () => hien('huongdan');
 $('#btn-hd-xong').onclick = () => { try { localStorage.setItem('dm_hd_xong', '1'); } catch(e){} if (S && !S.hv.hoSoDu && S.hv.vaiTro !== 'HLV' && !S.xemBoi) hien('hoso'); else hien('gui'); };
+
+// ---------- đổi PIN ----------
+$('#btn-dp-huy').onclick = () => hien('lotrinh');
+$('#btn-dp').onclick = async () => {
+  const cu = $('#dp-cu').value.trim(), m1 = $('#dp-moi').value.trim(), m2 = $('#dp-moi2').value.trim(); const err = $('#dp-err'); err.classList.add('hide');
+  if (!/^\d{4,6}$/.test(m1)) { err.textContent = 'PIN mới phải là 4–6 chữ số.'; err.classList.remove('hide'); return; }
+  if (m1 !== m2) { err.textContent = 'Hai lần nhập không khớp.'; err.classList.remove('hide'); return; }
+  const b = $('#btn-dp'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG ĐỔI...';
+  try { const r = await goi('doiPin', ten, cu, m1);
+    if (r.loi) { err.textContent = r.loi; err.classList.remove('hide'); }
+    else { pin = m1; try { localStorage.setItem('dm_pin', m1); } catch(e){} $('#in-pin').value = m1; nhan(r); if (r.hv.vaiTro === 'HLV') hien('gui'); else if (!daXemHD() && !daGhim()) hien('huongdan'); else if (!r.hv.hoSoDu) hien('hoso'); else hien('lotrinh'); }
+  } catch (e) { err.textContent = 'Lỗi mạng: ' + (e.message || e); err.classList.remove('hide'); }
+  b.disabled = false; b.textContent = 'ĐỔI PIN →';
+};
+// ---------- HLV: thêm học viên, đặt lại PIN ----------
+let thGioi = 'Nam';
+document.querySelectorAll('#th-gioi button').forEach(b => b.onclick = () => { thGioi = b.dataset.g; document.querySelectorAll('#th-gioi button').forEach(x => x.classList.toggle('on', x === b)); });
+$('#btn-them').onclick = async () => {
+  const t = $('#th-ten').value.trim(); const kq = $('#th-kq'); if (!t) return;
+  const b = $('#btn-them'); b.disabled = true; b.textContent = '...';
+  try { const r = await goi('themHocVien', ten, pin, t, thGioi); kq.classList.remove('hide');
+    if (r.loi) kq.innerHTML = '<span style="color:var(--red)">' + esc(r.loi) + '</span>';
+    else { nhan(r); $('#th-ten').value = ''; kq.innerHTML = '<b>✓ ' + esc(r.thongBao) + '</b><div style="margin-top:6px">Tin nhắn gửi khách:<br><span id="th-msg">Mở link ' + APP_URL + ' — tên đăng nhập: ' + esc(t) + ' · PIN: ' + esc(r.pinCap) + '. Vào app đổi PIN riêng, ghim ra màn hình, điền hồ sơ.</span></div>'; }
+  } catch (e) { kq.classList.remove('hide'); kq.textContent = 'Lỗi: ' + (e.message || e); }
+  b.disabled = false; b.textContent = '＋ TẠO TÀI KHOẢN (PIN chung)';
+};
+async function datLaiPinHV(tenHV){ if (!confirm('Đặt lại PIN của ' + tenHV + ' về PIN chung?')) return; const r = await goi('datLaiPin', ten, pin, tenHV); if (r.loi) { alert(r.loi); return; } nhan(r); alert(r.thongBao); }
 
 // ---------- bước 2: hồ sơ cá nhân → máy tự tính lộ trình ----------
 let hsGioi = 'Nam';
@@ -433,8 +477,8 @@ function nhan(r){
   if (r.hlv) {
     const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;
     $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
-    $('#hlv-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th></tr>' +
-      r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td></tr>`).join('');
+    $('#hlv-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th><th></th></tr>' +
+      r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`).join('');
   }
   $('#sub').textContent = `${h.ten} · Chặng ${r.tuan}/6`;
   $('#chip-ngay').textContent = `NGÀY ${ngayThu(r)}/42`; $('#chip-ngay').classList.remove('hide');
@@ -470,7 +514,7 @@ function nhan(r){
   $('#hoso').innerHTML = `<p class="k">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${ho}
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
-    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''} → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g · 🍚 tinh bột ≤ ${h.tinhBot} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button><button class="btn ghost sm" onclick="hien('huongdan')">❓ Hướng dẫn dùng app</button>` : ''}`;
+    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''} → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g · 🍚 tinh bột ≤ ${h.tinhBot} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button><button class="btn ghost sm" onclick="hien('huongdan')">❓ Hướng dẫn dùng app</button><button class="btn ghost sm" onclick="hien('doipin')">🔑 Đổi PIN</button>` : ''}`;
   veDinhMuc(r); veBieuDo(r); veLuoi(r);
   const nhom = {}; r.luat.forEach(l => { (nhom[l.muc] = nhom[l.muc] || []).push(l); });
   $('#luat').innerHTML = `<p class="k">Luật & nội quy · chặng ${r.tuan}/6</p>` + Object.keys(nhom).map(m => `<div class="muc">${esc(m)}</div>` + nhom[m].map(l => `<div class="nd">${esc(l.noiDung)}</div>`).join('')).join('');
@@ -533,7 +577,7 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&'
 
 // ---------- bản giả để xem thử ngoài Google (không gọi AI) ----------
 const MOCK = (() => {
-  const hv = {ten:'Anh Tú', pin:'1002', vaiTro:'HV', gioiTinh:'Nam', canNang:74, mucTieu:-5, dam:163, dau:150, rau:400, tinhBot:60, nuoc:3, luuY:'', mo:18.5, moNhap:0, cao:170, namSinh:1992, phanTramMo:25, thamHut:1258, bmr:1637, tdee:2292, kcalMucTieu:1637, giamTuanDuKien:1.14, giamTuanMucTieu:0.83, bmi:25.6, canDich:69, hoSoDu:false, vongEo:0, bapTay:0, bapDui:0, hoTen:'', dinhMuc:null};
+  const hv = {ten:'Anh Tú', pin:'1002', vaiTro:'HV', gioiTinh:'Nam', canNang:74, mucTieu:-5, dam:163, dau:150, rau:400, tinhBot:60, nuoc:3, luuY:'', mo:18.5, moNhap:0, cao:170, namSinh:1992, phanTramMo:25, thamHut:1258, bmr:1637, tdee:2292, kcalMucTieu:1637, giamTuanDuKien:1.14, giamTuanMucTieu:0.83, bmi:25.6, canDich:69, hoSoDu:false, vongEo:0, bapTay:0, bapDui:0, hoTen:'', dinhMuc:null, phaiDoiPin:false};
   let logs = [{thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'sang', moTa:'2 trứng, 200g đậu đũa, 200g đu đủ', den:'do', mon:'Trứng + đậu đũa + đu đủ', nhanXet:'Đu đủ là hoa quả ngọt b ơi, insulin lên cao là mỡ bị khoá lại. Trứng với đậu đũa ổn.', thayThe:'Bỏ đu đủ, thêm 2 trứng hoặc 100g ức gà. Muốn ngọt thì dưa chuột, cà chua.', dam:110, dau:0, rau:200, tinhBot:0, nuoc:0, viPham:'hoa quả ngọt', diem:3, protein:14}];
   const st = (kq) => { const t = {ngu:null,kcal:0,dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,soBua:0,diem:null,damSang:0,nuocChanh:0,diBo:0,gym:0,suaChua:false}; const ds=[]; logs.forEach(l=>{t.dam+=l.dam;t.protein+=(l.protein||0);t.dau+=l.dau;t.rau+=l.rau;t.tinhBot+=l.tinhBot;t.nuoc+=l.nuoc; if(l.bua==='gym'){t.gym++;return;} if(l.bua==='ngu'){t.ngu={gio:l.nguGio,sau:l.nguSau,rem:l.nguRem,den:l.den};return;} if(l.bua!=='nuoc'){t.soBua++; if(l.diem!=null) ds.push(l.diem); if(l.bua==='sang') t.damSang+=(l.protein||0); if(l.nuocChanh) t.nuocChanh++; if(l.diBo) t.diBo++;}}); if(ds.length) t.diem=Math.round(ds.reduce((a,b)=>a+b,0)/ds.length*10)/10;
     return {hv, tuan:1, homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
@@ -543,9 +587,12 @@ const MOCK = (() => {
     logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua, moTa, den:kq.den, mon:kq.mon, nhanXet:kq.nhanXet, thayThe:kq.thayThe, dam:kq.dam, protein:kq.protein, dau:kq.dau, rau:kq.rau, tinhBot:kq.tinhBot, nuoc:0, viPham:'', diem:kq.diem}); return kq; };
   const wait = v => new Promise(ok => setTimeout(() => ok(v), 600));
   const hlvSt = () => { const x = st(); x.hv = Object.assign({}, hv, {ten:'Dũng', vaiTro:'HLV'}); x.feedHomNay = [...logs].reverse(); x.hlv = [{ten:'Chị Ngát',canDau:0,canMoi:0,giam:0,mucTieu:-4,streak:0,buaHomNay:0,diemHomNay:null,diemTuan:0,gymTuan:0,ngayCuoi:'',co:['chưa gửi gì','hồ sơ thiếu','chưa cân']},{ten:'Anh Tú',canDau:74,canMoi:72.6,giam:1.4,mucTieu:-5,streak:2,buaHomNay:2,diemHomNay:6,diemTuan:14.5,gymTuan:1,ngayCuoi:'2026-09-03',co:[]},{ten:'Thái Hưng',canDau:100,canMoi:96,giam:4,mucTieu:-4,streak:3,buaHomNay:2,diemHomNay:9,diemTuan:26,gymTuan:2,ngayCuoi:'2026-09-03',co:[]}]; return x; };
-  return { dangNhap:(t,p) => wait(p === '2468' ? hlvSt() : p === '1002' ? st() : {loi:'Sai tên hoặc mã PIN (bản thử: Anh Tú / 1002, HLV Dũng / 2468).'}), xemHocVien:(t,p,ai) => wait(Object.assign(st(), {xemBoi:'Dũng'})), layTrangThai:() => wait(st()),
+  return { dangNhap:(t,p) => wait(p === '2468' ? hlvSt() : p === '1234' ? Object.assign(st(), {hv: Object.assign({}, hv, {phaiDoiPin:true})}) : p === '1002' ? st() : {loi:'Sai tên hoặc mã PIN (bản thử: Anh Tú / 1002, HLV Dũng / 2468).'}), xemHocVien:(t,p,ai) => wait(Object.assign(st(), {xemBoi:'Dũng'})), layTrangThai:() => wait(st()),
     guiBua:(t,p,b,m,a,mi,nc,db) => { const kq = cham(b, m || 'ảnh'); logs[logs.length-1].nuocChanh = nc; logs[logs.length-1].diBo = db; return wait(st(kq)); },
     ghiCan:(t,p,kg) => wait(st()),
+    doiPin:(t,c,m) => { hv.phaiDoiPin = false; const x = st(); x.daDoiPin = true; return wait(x); },
+    datLaiPin:(t,p,ai) => { const x = hlvSt(); x.thongBao = 'Đã đặt lại PIN của ' + ai + ' về 1234.'; return wait(x); },
+    themHocVien:(t,p,tm,g) => { const x = hlvSt(); x.thongBao = 'Đã thêm ' + tm + '.'; x.pinCap = '1234'; return wait(x); },
     capNhatHoSo:(t,p,hs) => { Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
       hv.thamHut = Math.round(68*hv.mo); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · tinh bột ≤ 60 g · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 1 hộp sữa chua không đường + 100 g rau',protein:32,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Nước chanh loãng. Đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'1 quả chuối + 100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'Tối đa 60 g/ngày, chỉ yến mạch / bánh mì đen / khoai lang.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
       const x = st(); x.hoSoVuaLuu = true; return wait(x); },
