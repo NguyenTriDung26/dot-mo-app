@@ -266,7 +266,8 @@ small{color:var(--mute)}
   <!-- HLV -->
   <div id="v-hlv" class="hide">
     <div class="card"><p class="k">Bảng điều khiển HLV · hôm nay</p><div id="hlv-tong" style="font-size:14px;margin-bottom:8px"></div><div style="overflow-x:auto"><table id="hlv-bang"></table></div><small>Bấm vào tên để xem hồ sơ, lộ trình và các bữa của người đó.</small></div>
-    <div class="card"><p class="k">Thêm học viên mới</p><div class="row"><input id="th-ten" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="th-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div><button class="btn" id="btn-them">＋ TẠO TÀI KHOẢN (PIN chung)</button><div id="th-kq" class="thay hide"></div></div>
+    <div class="card"><p class="k">Thêm học viên mới</p><div class="row"><input id="th-ten" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="th-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div><div class="seg" id="th-khoa" style="flex:1"><button data-k="K1" class="on">K1</button><button data-k="K2">K2</button></div></div><button class="btn" id="btn-them">＋ TẠO TÀI KHOẢN (PIN chung)</button><div id="th-kq" class="thay hide"></div></div>
+    <div class="card"><p class="k">🌙 Bản tin 21h cho nhóm Zalo K1 / K2</p><small style="display:block;margin-bottom:8px">Máy tự tổng kết <b>21:00 mỗi ngày</b>: ai chưa xong hồ sơ · ăn uống đạt/thiếu gì · khen ai làm tốt. Tự ghi tab TongKet + gửi email cho HLV. Ở đây xem ngay và <b>sao chép dán vào nhóm Zalo</b>.</small><div class="row"><button class="btn ghost sm" id="btn-bt-xem" style="flex:1">👁 XEM BẢN TIN HÔM NAY</button><button class="btn ghost sm" id="btn-bt-gui" style="flex:1">📧 TẠO & GỬI EMAIL</button></div><div id="bt-kq" class="hide" style="margin-top:8px"></div></div>
     <div class="card hide" id="feed-card"><p class="k">Hôm nay cả nhóm đã gửi</p><div id="feed"></div></div>
   </div>
 
@@ -318,7 +319,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-191056';
+const APP_VER = '20260904-191829';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -449,17 +450,32 @@ $('#btn-dp').onclick = async () => {
   b.disabled = false; b.textContent = 'ĐỔI PIN →';
 };
 // ---------- HLV: thêm học viên, đặt lại PIN ----------
-let thGioi = 'Nam';
+let thGioi = 'Nam', thKhoa = 'K1';
+document.querySelectorAll('#th-khoa button').forEach(b => b.onclick = () => { thKhoa = b.dataset.k; document.querySelectorAll('#th-khoa button').forEach(x => x.classList.toggle('on', x === b)); });
 document.querySelectorAll('#th-gioi button').forEach(b => b.onclick = () => { thGioi = b.dataset.g; document.querySelectorAll('#th-gioi button').forEach(x => x.classList.toggle('on', x === b)); });
 $('#btn-them').onclick = async () => {
   const t = $('#th-ten').value.trim(); const kq = $('#th-kq'); if (!t) return;
   const b = $('#btn-them'); b.disabled = true; b.textContent = '...';
-  try { const r = await goi('themHocVien', ten, pin, t, thGioi); kq.classList.remove('hide');
+  try { const r = await goi('themHocVien', ten, pin, t, thGioi, false, thKhoa); kq.classList.remove('hide');
     if (r.loi) kq.innerHTML = '<span style="color:var(--red)">' + esc(r.loi) + '</span>';
     else { nhan(r); $('#th-ten').value = ''; kq.innerHTML = '<b>✓ ' + esc(r.thongBao) + '</b><div style="margin-top:6px">Tin nhắn gửi khách:<br><span id="th-msg">Mở link ' + APP_URL + ' — tên đăng nhập: ' + esc(t) + ' · PIN: ' + esc(r.pinCap) + '. Vào app đổi PIN riêng, ghim ra màn hình, điền hồ sơ.</span></div>'; }
   } catch (e) { kq.classList.remove('hide'); kq.textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = '＋ TẠO TÀI KHOẢN (PIN chung)';
 };
+// Bản tin 21h (HLV): xem ngay hoặc tạo + lưu sổ + gửi email; sao chép dán vào nhóm Zalo
+async function banTinHLV(luu){
+  const kq = $('#bt-kq'); kq.classList.remove('hide'); kq.innerHTML = '<span class="spin"></span> Đang tổng hợp cả nhóm (10–30 giây)...';
+  try { const r = await goi('banTin', ten, pin, !!luu);
+    if (r.loi) { kq.innerHTML = '<span style="color:var(--red)">' + esc(/không tồn tại/i.test(r.loi) ? 'HLV đang cập nhật máy chủ, thử lại sau ít phút.' : r.loi) + '</span>'; return; }
+    const ks = Object.keys(r.khoa || {});
+    if (!ks.length) { kq.innerHTML = 'Chưa có học viên nào để tổng kết.'; return; }
+    kq.innerHTML = (r.daLuu ? '<div class="ok-ghim" style="margin:0 0 8px">✅ Đã ghi tab TongKet' + (r.guiEmail ? ' · email → ' + esc(r.guiEmail) : '') + (r.guiTelegram ? ' · ' + esc(r.guiTelegram) : '') + '</div>' : '') +
+      ks.map(k => `<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center"><b>NHÓM ${esc(k)}</b><button class="chipbtn" onclick="saoChepBT('${esc(k)}')">📋 Sao chép ${esc(k)}</button></div><textarea id="bt-${esc(k)}" readonly style="width:100%;box-sizing:border-box;min-height:240px;margin-top:6px;font-family:inherit;font-size:13px;line-height:1.5;background:var(--sf2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px">${esc(r.khoa[k])}</textarea></div>`).join('');
+  } catch (e) { kq.innerHTML = 'Lỗi: ' + esc(e.message || String(e)); }
+}
+async function saoChepBT(k){ const ta = $('#bt-' + k); if (!ta) return; try { await navigator.clipboard.writeText(ta.value); toast('📋 Đã sao chép bản tin ' + k + ' — dán vào nhóm Zalo', 3000); } catch(e) { ta.select(); document.execCommand('copy'); toast('📋 Đã sao chép ' + k, 3000); } }
+$('#btn-bt-xem').onclick = () => banTinHLV(false);
+$('#btn-bt-gui').onclick = () => { if (confirm('Tạo bản tin hôm nay, ghi vào sổ và gửi email cho HLV?')) banTinHLV(true); };
 async function datLaiPinHV(tenHV){ if (!confirm('Đặt lại PIN của ' + tenHV + ' về PIN chung?')) return; const r = await goi('datLaiPin', ten, pin, tenHV); if (r.loi) { toast('⚠️ ' + r.loi, 4000); return; } nhan(r); toast('✅ ' + r.thongBao, 4000); }
 
 // ---------- bước 2: hồ sơ cá nhân → máy tự tính lộ trình ----------
@@ -712,14 +728,15 @@ function ganThu(id, tomTat, macDinhThu){
 }
 function nhan(r){
   S = r; lanCapNhat = Date.now();
-  if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } // nhớ để lần sau mở là hiện ngay const h = r.hv, tk = r.thongKe, t = tk.homNay;
+  if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } /* nhớ để lần sau mở là hiện ngay */
+  const h = r.hv, tk = r.thongKe, t = tk.homNay;
   if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
   $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
   if (r.hlv) {
     const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;
     $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
     $('#hlv-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th><th>✍️</th><th></th></tr>' +
-      r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td style="font-size:12px;max-width:140px" title="${esc(x.camKet || '')}">${x.camKet ? esc(x.camKet).slice(0, 60) + (x.camKet.length > 60 ? '…' : '') : '<span style="color:var(--mute)">–</span>'}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`).join('');
+      r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.khoa ? x.khoa + ' · ' : ''}${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td style="font-size:12px;max-width:140px" title="${esc(x.camKet || '')}">${x.camKet ? esc(x.camKet).slice(0, 60) + (x.camKet.length > 60 ? '…' : '') : '<span style="color:var(--mute)">–</span>'}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`).join('');
   }
   $('#sub').textContent = `${h.ten} · Chặng ${r.tuan}/6`;
   $('#chip-ngay').textContent = `NGÀY ${ngayThu(r)}/42`; $('#chip-ngay').classList.remove('hide');
@@ -903,6 +920,7 @@ const MOCK = (() => {
     doiPin:(t,c,m) => { hv.phaiDoiPin = false; const x = st(); x.daDoiPin = true; return wait(x); },
     datLaiPin:(t,p,ai) => { const x = hlvSt(); x.thongBao = 'Đã đặt lại PIN của ' + ai + ' về 1234.'; return wait(x); },
     themHocVien:(t,p,tm,g) => { const x = hlvSt(); x.thongBao = 'Đã thêm ' + tm + '.'; x.pinCap = '1234'; return wait(x); },
+    banTin:(t,p,l) => wait({ngay:'2026-09-03', khoa:{K1:'🌙 TỔNG KẾT NGÀY 03/09 · K1 · Tuần 1/6 — Game Đốt Mỡ 6 Tuần\n\n🏆 KHEN HÔM NAY\n🏆 Thái Hưng — 3/3 bữa, 9 điểm, protein đủ 🔥 chuỗi 3 ngày · đã giảm 4 kg\n\n🍽 ĂN UỐNG HÔM NAY\n• Thái Hưng — ✅ 3/3 bữa · 9 điểm · protein đủ 220 g · không tinh bột\n• Anh Tú — ⚠️ không tinh bột\n   → Cần sửa: mới ghi 2/3 bữa; thiếu 60 g protein (94/154 g); chưa ghi giấc ngủ\n• Chị Ngát — ❌ chưa ghi bữa nào hôm nay. Mai gửi ảnh ngay từ bữa sáng nhé!\n\n📋 CHƯA XONG HỒ SƠ — làm ngay tối nay (2 phút)\n• Chị Ngát: chưa vào app lần nào, chưa điền hồ sơ, chưa chụp 3 ảnh body, chưa ghi cân, chưa viết cam kết tuần 1\n\n👉 App: https://dotmo6tuan.com — Sáng mai: cân lúc dậy, ghi giấc ngủ, gửi ảnh bữa sáng.', K2:'🌙 TỔNG KẾT NGÀY 03/09 · K2 · Tuần 1/6 — Game Đốt Mỡ 6 Tuần\n\n🏆 KHEN HÔM NAY\nHôm nay chưa ai đạt chuẩn ngày (đủ 3 bữa + 8 điểm). Mai ai lấy huy chương đầu tiên?\n\n🍽 ĂN UỐNG HÔM NAY\n• Tiến Dũng — ❌ chưa ghi bữa nào hôm nay. Mai gửi ảnh ngay từ bữa sáng nhé!\n\n📋 Hồ sơ: cả nhóm đã xong ✅'}, daLuu: !!l, guiEmail: l ? 'tridungtb26@gmail.com' : '', guiTelegram: ''}),
     guiAnhTuan:(t,p,anh) => { MOCK_ANH[1] = anh; const x = st(); x.anhVuaLuu = 1; return wait(x); },
     layAnhTienDo:(t,p) => wait({ ten: hv.ten, tuanHienTai: 1, ds: Object.keys(MOCK_ANH).map(k => ({ tuan: Number(k), ngay: '2026-09-04', thumb: { truoc: 'data:image/jpeg;base64,' + MOCK_ANH[k].truoc.thumb, nghieng: 'data:image/jpeg;base64,' + MOCK_ANH[k].nghieng.thumb, sau: 'data:image/jpeg;base64,' + MOCK_ANH[k].sau.thumb }, url: {} })) }),
     capNhatHoSo:(t,p,hs) => { if (hs.anh) MOCK_ANH[0] = hs.anh; Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anh ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
