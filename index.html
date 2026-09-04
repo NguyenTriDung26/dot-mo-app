@@ -71,7 +71,7 @@ textarea{min-height:70px;resize:vertical}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mute);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 td.r,th.r{text-align:right}tr.me td{background:rgba(163,255,91,.08);font-weight:800}
 .log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:#c9d2cb}
-.muc{font-weight:900;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:#d5ddd6;line-height:1.55}
+.lg{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--sf2)}.lg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:900;font-size:14px;color:var(--lime);letter-spacing:.03em}.lg summary::-webkit-details-marker{display:none}.lg summary span{font-size:11px;color:var(--mute);font-weight:700}.lg summary::after{content:'▾';color:var(--mute);margin-left:8px}.lg[open] summary::after{content:'▴'}.lm{padding:0 14px 12px}.lt{font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;color:var(--ink)}.ld{margin:0;padding-left:20px;font-size:15px;color:#d5ddd6;line-height:1.55}.ld li{margin:2px 0}.muc{font-weight:900;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:#d5ddd6;line-height:1.55}
 .err{background:rgba(255,90,90,.12);color:#ffb3b3;border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600}
 .warn{background:rgba(255,200,61,.12);border:1px solid rgba(255,200,61,.35);color:#ffe28a;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:12px}
 .hide{display:none!important}
@@ -429,13 +429,61 @@ $('#btn-hs-luu').onclick = async () => {
   } catch (e) { err.textContent = 'Lỗi mạng: ' + (e.message || e); err.classList.remove('hide'); }
   b.disabled = false; b.textContent = 'LƯU HỒ SƠ & NHẬN LỘ TRÌNH ⚡';
 };
+function veLuatHtml(luat, laHLV){
+  const NHOM = [
+    { ten: '🍽️ ĂN GÌ · KHÔNG ĂN GÌ', muc: ['5 quy tắc', 'Đĩa ăn đúng', 'Luật đạm'], mo: true },
+    { ten: '🔁 4 THÓI QUEN MỖI NGÀY', muc: ['Thói quen 1 · Bữa sáng', 'Thói quen 2 · Sau ăn', 'Thói quen 3 · Tập luyện', 'Thói quen 4 · Giấc ngủ'] },
+    { ten: '🎮 CÁCH CHƠI · CÁCH CHẤM', muc: ['Cách ghi', 'Ngày xả', 'Cam kết tuần'] },
+  ];
+  const AN = ['Định mức', 'Thực đơn mẫu', 'Công thức cá nhân'].concat(laHLV ? [] : ['Giọng phản hồi']);
+  const daXep = new Set(NHOM.flatMap(n => n.muc).concat(AN));
+  const khac = luat.filter(l => !daXep.has(l.muc)).map(l => l.muc);
+  if (khac.length) NHOM.push({ ten: '📌 KHÁC', muc: [...new Set(khac)] });
+  const noiDung = t => {
+    t = String(t || '').trim();
+    if (/\b1\)\s/.test(t) && /\b2\)\s/.test(t)) { const it = t.split(/\s*(?=\d\)\s)/).filter(Boolean).map(x => x.replace(/^\d\)\s*/, '')); return `<ol class="ld">${it.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`; }
+    const reNhan = /(?<=^|\.\s|;\s)(?=\p{Lu}[\p{Lu} ]{1,14}:\s)/u;
+    const phan = t.split(reNhan).filter(x => x.trim());
+    if (phan.length >= 2 && phan.every(x => /^\p{Lu}[\p{Lu} ]{1,14}:\s/u.test(x))) return `<ul class="ld">${phan.map(x => { const m = x.match(/^(\p{Lu}[\p{Lu} ]{1,14}):\s*([\s\S]*)$/u); return `<li><b>${esc(m[1])}:</b> ${esc(m[2].trim())}</li>`; }).join('')}</ul>`;
+    const cau = t.split(/(?<=[.!])\s+(?=\p{Lu})/u).filter(x => x.trim());
+    if (cau.length >= 3) return `<ul class="ld">${cau.map(x => `<li>${esc(x.trim())}</li>`).join('')}</ul>`;
+    return `<div class="nd">${esc(t)}</div>`;
+  };
+  return NHOM.map((n, i) => {
+    const ds = n.muc.flatMap(m => luat.filter(l => l.muc === m));
+    if (!ds.length) return '';
+    return `<details class="lg"${n.mo ? ' open' : ''}><summary>${n.ten}<span>${ds.length} mục</span></summary>` +
+      ds.map(l => `<div class="lm"><div class="lt">${esc(l.muc.replace(/^Thói quen \d · /, ''))}</div>${noiDung(l.noiDung)}</div>`).join('') + `</details>`;
+  }).join('');
+}
 function veDinhMuc(r){
   const h = r.hv, d = h.dinhMuc, el = $('#dinhmuc');
   if (!d) { el.innerHTML = `<p class="k">Định mức thức ăn mỗi ngày</p><small>Chưa có vì hồ sơ thiếu cân nặng.</small><br><button class="btn sm" onclick="hien('hoso')">ĐIỀN HỒ SƠ →</button>`; return; }
-  el.innerHTML = `<p class="k">Định mức thức ăn mỗi ngày của ${esc(h.ten)}</p><div style="font-size:14px;color:#d5ddd6;margin-bottom:6px">${esc(d.tomTat)}</div>` +
-    d.bua.map(b => `<div class="dm"><div class="h">${esc(b.ten)} <span>${esc(b.gio)}${b.kcal ? ' · ~' + b.kcal + ' kcal' : ''} · ${b.protein} g protein</span></div><div class="m">${esc(b.mon)}</div><div class="g">${esc(b.ghiChu)}</div></div>`).join('') +
-    `<div class="dm"><div class="h">🍚 Tinh bột</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.tinhBot)}</div></div><div class="dm"><div class="h">💧 Nước</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.nuoc)}</div></div><div class="dm"><div class="h" style="color:var(--red)">⛔ Cấm</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.khong)}</div></div>
-    <small style="display:block;margin-top:8px">Tổng thịt/cá nạc cả ngày ~${d.thitTong} g (ước 23 g protein/100 g). Ăn no, không nhịn — đói làm giảm trao đổi chất.</small>`;
+  const P = h.dam, dauN = h.dau, rauN = h.rau, nuoc = h.nuoc, kcal = h.kcalMucTieu || 0;
+  const pSang = 32, pDau = Math.round(dauN * 0.08);
+  const thitTong = Math.round(Math.max(0, P - pSang - pDau) / 0.23 / 10) * 10;
+  const thit = Math.round(thitTong / 2 / 10) * 10, dauBua = Math.round(dauN / 2 / 10) * 10, rauBua = Math.max(100, Math.round((rauN - 100) / 2 / 50) * 50);
+  const ly = Math.max(6, Math.round(nuoc / 0.25));
+  const o = (n, dv, t) => `<div style="background:var(--sf2);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center"><div style="font-size:22px;font-weight:900;line-height:1">${n}<span style="font-size:12px;font-weight:700;color:var(--mute)"> ${dv}</span></div><div style="font-size:11px;color:var(--mute);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">${t}</div></div>`;
+  const bua = (gio, ten, mon, ghi) => `<div class="dm"><div class="h">${gio} · ${ten}</div><div class="m">${mon}</div>${ghi ? `<div class="g">${ghi}</div>` : ''}</div>`;
+  const qt = ['Không tinh bột: cơm, bún, phở, bánh mì, yến mạch, khoai.', 'Không đồ ngọt, không hoa quả ngọt.', 'Không uống calo: bia rượu, nước ngọt, trà sữa, nước ép.', 'Lặp lại đúng thực đơn mẫu, không sáng tạo món.', 'Chủ nhật là ngày xả, còn lại 6 ngày đúng luật.'];
+  el.innerHTML = `<p class="k">Định mức thức ăn mỗi ngày của ${esc(h.ten)}</p>
+    <div class="dm"><div class="h">1 · TỔNG NẠP HÀNG NGÀY</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0">${o(P, 'g', 'Protein')}${o(dauN, 'g', 'Đậu')}${o(rauN, 'g', 'Rau')}${o(nuoc, 'L', 'Nước')}</div>
+      ${kcal ? `<div style="text-align:center;font-size:15px;font-weight:900;margin:4px 0">= ${kcal} kcal</div>` : ''}
+      <div class="warn" style="margin:6px 0 0;font-size:13px">⚠️ Đây là NGƯỠNG THẤP NHẤT. Ăn hơn được, không được ăn thấp hơn — thấp hơn là mất cơ, tụt trao đổi chất.</div></div>
+    <div class="dm"><div class="h">2 · ĐƠN VỊ QUY ĐỔI <span>thay cho nhau được</span></div>
+      <div class="m" style="font-weight:800">25 g protein = 4 quả trứng gà = 100 g thịt nạc = 1 muỗng whey isolate</div>
+      <div class="g">Tuỳ bạn chọn. Cả ngày cần ~${thitTong} g thịt/cá nạc nếu chỉ dùng thịt (ước 23 g protein/100 g).</div></div>
+    <div class="dm"><div class="h">3 · THỰC ĐƠN MẪU</div>
+      ${bua('8h', 'Sáng', '4 quả trứng (luộc/ốp la) + 1 hộp sữa chua không đường + 100 g rau', 'Ăn sau khi thức dậy 30 phút – 1 giờ. ~' + pSang + ' g protein.')}
+      ${bua('12h', 'Trưa', thit + ' g thịt nạc/cá + ' + dauBua + ' g đậu + ' + rauBua + ' g rau', 'Đậu: đỗ đen/đỏ/lăng/xanh. Sau ăn: 1 ly nước chanh loãng + đi bộ 100 bước.')}
+      ${bua('20h', 'Tối', thit + ' g thịt nạc/cá + ' + dauBua + ' g đậu + ' + rauBua + ' g rau', 'Xong trước 20h. Sau ăn: 1 ly nước chanh loãng + đi bộ 100 bước.')}
+      <div class="g" style="margin-top:6px">🏋️ Ngày đi tập: ăn thêm 1 bữa chiều (17h) giống bữa trưa/tối. Không tập thì bỏ.</div></div>
+    <div class="dm"><div class="h">4 · NƯỚC UỐNG <span>400 ml mỗi 10 kg cân nặng</span></div>
+      <div class="m">${nuoc} L ≈ ${ly} ly 250 ml, uống rải đều cả ngày.</div></div>
+    <div class="dm"><div class="h" style="color:var(--red)">5 · TUÂN THỦ 5 QUY TẮC</div>
+      <ol style="margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.6">${qt.map(x => `<li>${x}</li>`).join('')}</ol></div>`;
 }
 
 
@@ -614,8 +662,7 @@ function nhan(r){
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
     <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button><button class="btn ghost sm" onclick="hien('huongdan')">❓ Hướng dẫn dùng app</button><button class="btn ghost sm" onclick="hien('doipin')">🔑 Đổi PIN</button>` : ''}`;
   veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r); veAnhTienDo(r);
-  const nhom = {}; r.luat.forEach(l => { (nhom[l.muc] = nhom[l.muc] || []).push(l); });
-  $('#luat').innerHTML = `<p class="k">Luật & nội quy · chặng ${r.tuan}/6</p>` + Object.keys(nhom).map(m => `<div class="muc">${esc(m)}</div>` + nhom[m].map(l => `<div class="nd">${esc(l.noiDung)}</div>`).join('')).join('');
+  $('#luat').innerHTML = `<p class="k">Luật & nội quy · chặng ${r.tuan}/6</p>` + veLuatHtml(r.luat, r.hv.vaiTro === 'HLV');
 }
 // ---------- biểu đồ đường cân nặng (SVG) ----------
 function veBieuDo(r){
