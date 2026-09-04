@@ -319,7 +319,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-192106';
+const APP_VER = '20260904-204626';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -660,7 +660,7 @@ function thuNhoAnh(f, max, cb){
 }
 $('#in-anh').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 1024, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; });
+  thuNhoAnh(f, 900, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; });
 };
 // ---------- 3 ảnh body: chọn → thu nhỏ bản gốc 1400px + bản nhỏ 360px ----------
 function ganAnh3(rootSel, store){
@@ -691,14 +691,14 @@ $('#btn-gui').onclick = async () => {
   } catch (e) { $('#gui-err').textContent = 'Lỗi: ' + (e.message || e); $('#gui-err').classList.remove('hide'); }
   b.disabled = false; b.textContent = 'GỬI ĐỂ CHẤM ⚡';
 };
-document.querySelectorAll('[data-ml]').forEach(b => b.onclick = async () => { const goc = b.textContent; b.disabled = true; try { nhan(await goi('ghiNuoc', ten, pin, b.dataset.ml)); b.textContent = '✓ đã ghi'; } catch(e){} setTimeout(() => { b.textContent = goc; b.disabled = false; }, 1200); });
+document.querySelectorAll('[data-ml]').forEach(b => b.onclick = () => { const goc = b.textContent; b.disabled = true; b.textContent = '✓ đã ghi'; setTimeout(() => { b.textContent = goc; b.disabled = false; }, 1200); goi('ghiNuoc', ten, pin, b.dataset.ml).then(r => { if (r.loi) toast('⚠️ ' + r.loi, 4000); else nhan(r); }).catch(() => toast('⚠️ Chưa ghi được nước, kiểm tra mạng rồi bấm lại', 4000)); });
 $('#btn-can').onclick = async () => { const v = $('#in-can').value.trim(); if (!v) return; const b = $('#btn-can'); b.disabled = true; b.textContent = '...';
   try { const r = await goi('ghiCan', ten, pin, v); if (r.loi) { $('#can-hint').textContent = r.loi; } else { nhan(r); $('#in-can').value = ''; $('#can-hint').textContent = '✓ Đã ghi ' + v + ' kg'; } } catch(e){ $('#can-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI CÂN'; };
 $('#btn-ngu').onclick = async () => { const gioN = Number($('#in-ngu-gio').value.trim()) || 0, phutN = Number($('#in-ngu-phut').value.trim()) || 0; if (!gioN && !phutN) return; const g = String(Math.round((gioN + phutN / 60) * 100) / 100); const b = $('#btn-ngu'); b.disabled = true; b.textContent = '...';
   try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; $('#in-ngu-gio').value = $('#in-ngu-phut').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI GIẤC NGỦ'; };
-$('#btn-gym').onclick = async () => { const b = $('#btn-gym'); b.disabled = true; try { nhan(await goi('ghiGym', ten, pin)); b.textContent = '✓ Đã ghi buổi gym hôm nay'; } catch(e){ b.disabled = false; } };
+$('#btn-gym').onclick = () => { const b = $('#btn-gym'); const goc = b.textContent; b.disabled = true; b.textContent = '✓ Đã ghi buổi gym hôm nay'; goi('ghiGym', ten, pin).then(r => { if (r.loi) { toast('⚠️ ' + r.loi, 4000); b.textContent = goc; b.disabled = false; } else nhan(r); }).catch(() => { toast('⚠️ Chưa ghi được, kiểm tra mạng rồi bấm lại', 4000); b.textContent = goc; b.disabled = false; }); };
 
 function hienKetQua(k){
   const tenDen = {xanh:'🟢 ĐÚNG LUẬT', vang:'🟡 SỬA NHẸ', do:'🔴 SAI LUẬT', xa:'🎉 NGÀY XẢ'}[k.den] || k.den;
