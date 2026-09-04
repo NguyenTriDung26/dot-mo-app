@@ -286,7 +286,7 @@ async function goi(fn, ...args){
   return r;
 }
 const $ = s => document.querySelector(s);
-const LBL = {sang:'Sáng',trua:'Trưa',chieu:'Chiều',toi:'Tối',phu:'Phụ',nuoc:'Nước',gym:'Gym'};
+const LBL = {sang:'Sáng',trua:'Trưa',chieu:'Chiều',toi:'Tối',nuoc:'Nước',gym:'Gym'};
 let S = null, ten = '', pin = '', bua = 'sang', anhB64 = null, anhMime = 'image/jpeg';
 try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm_pin') || ''; } catch(e){}
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
