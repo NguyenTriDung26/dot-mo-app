@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../icons/favicon-32.png">
+<title>Vào Đường Đua Đốt Mỡ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+</head>
+<body>
+<style>
+:root{
+  --bg:#F3F6F4; --paper:#FFFFFF; --ink:#16211C; --muted:#5F6B65; --line:#D9E0DC;
+  --accent:#1E6E48; --accent-ink:#FFFFFF; --soft:#E3F0E8;
+  --warn:#B5680A; --warn-soft:#FBEFD9;
+  --font-d:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --font-b:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101614; --paper:#182220; --ink:#EEF3F0; --muted:#9BA8A1; --line:#2A3632;
+    --accent:#5FC78F; --accent-ink:#0E1A13; --soft:#1E3328;
+    --warn:#F0B453; --warn-soft:#3A2A10;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101614; --paper:#182220; --ink:#EEF3F0; --muted:#9BA8A1; --line:#2A3632;
+  --accent:#5FC78F; --accent-ink:#0E1A13; --soft:#1E3328;
+  --warn:#F0B453; --warn-soft:#3A2A10;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.55}
+.wrap{max-width:640px;margin:0 auto;padding:28px 18px 80px}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+h1{font-size:2.1rem;font-weight:800;line-height:1.1;letter-spacing:-.01em}
+h2{font-size:1.35rem;font-weight:700;margin-bottom:12px}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0 0 10px}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px}
+.lead{color:var(--muted);font-size:1.02rem;margin-top:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0 6px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 10px;text-align:center}
+.stat b{display:block;font-family:var(--font-d);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;color:var(--muted)}
+section{margin-top:36px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 16px}
+.todo{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.todo li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 14px}
+.todo input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent)}
+.todo label{cursor:pointer}
+.todo li.done{opacity:.55}
+.todo li.done label{text-decoration:line-through}
+.todo b{display:block;font-weight:600}
+.todo small{color:var(--muted);display:block;margin-top:2px}
+.btn{display:block;text-align:center;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;padding:14px;border-radius:12px;margin-top:12px;font-family:var(--font-d);font-size:1.05rem}
+.btn:focus-visible,.todo input:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);font-family:var(--font-d);font-weight:800;font-size:1.2rem;color:var(--accent);width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center}
+.day{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.day:last-child{border-bottom:0}
+.day time{font-family:var(--font-d);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+td.n{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.tbl{overflow-x:auto}
+.warn{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px}
+.warn b{color:var(--warn)}
+.faq details{border-bottom:1px solid var(--line);padding:10px 0}
+.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.faq summary::after{content:"+";color:var(--accent);font-weight:700}
+.faq details[open] summary::after{content:"–"}
+.faq details p{margin:8px 0 0;color:var(--muted)}
+.rule{list-style:none;padding:0;margin:0}
+.rule li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.rule li:last-child{border-bottom:0}
+.rule li::before{content:"✓";color:var(--accent);font-weight:700}
+.rule li.no::before{content:"✕";color:var(--warn)}
+footer{margin-top:44px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.todo li{transition:opacity .2s}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Game Đốt Mỡ 6 Tuần</div>
+  <h1>Bạn đã vào đường đua. Đây là toàn bộ việc cần làm.</h1>
+  <p class="lead">Chỉ một chỉ số: số kg mỡ giảm sau 42 ngày. Chỉ một thói quen: chụp ảnh mỗi bữa. Mọi thứ khác máy và huấn luyện viên lo.</p>
+
+  <div class="stats">
+    <div class="stat"><b>42</b><span>ngày đua</span></div>
+    <div class="stat"><b>3</b><span>ảnh bữa ăn / ngày</span></div>
+    <div class="stat"><b>15s</b><span>máy chấm xong</span></div>
+  </div>
+
+  <section>
+    <div class="eyebrow">Hôm nay · ngày 0</div>
+    <h2>5 việc làm trước khi đi ngủ</h2>
+    <ul class="todo" id="todo">
+      <li><input type="checkbox" id="t1"><label for="t1"><b>Mở app và đăng nhập</b><small>Bấm nút xanh bên dưới. Tên đăng nhập và mã PIN huấn luyện viên đã gửi riêng cho bạn.</small></label></li>
+      <li><input type="checkbox" id="t2"><label for="t2"><b>Lưu app ra màn hình chính</b><small>Làm trong Safari hoặc Chrome, <b>không làm trong Zalo</b> (đang ở Zalo thì bấm ⋮ rồi "Mở bằng trình duyệt"). iPhone: bấm nút Chia sẻ ở thanh dưới rồi chọn "Thêm vào MH chính". Android: bấm ⋮ góc trên rồi "Thêm vào màn hình chính".</small></label></li>
+      <li><input type="checkbox" id="t3"><label for="t3"><b>Gửi huấn luyện viên 5 con số</b><small>Chiều cao · năm sinh · cân nặng sáng đói · vòng eo · mục tiêu giảm mấy kg. Có 5 số này app mới vẽ được lộ trình riêng cho bạn.</small></label></li>
+      <li><input type="checkbox" id="t4"><label for="t4"><b>Chụp 1 ảnh toàn thân hôm nay</b><small>Đứng thẳng, mặc đồ bó hoặc đồ tập, ánh sáng đủ. Gửi riêng cho huấn luyện viên. Đây là ảnh "trước", 6 tuần sau bạn sẽ rất cần nó.</small></label></li>
+      <li><input type="checkbox" id="t5"><label for="t5"><b>Đặt báo thức cân sáng mai</b><small>Cân ngay sau khi dậy, đi vệ sinh xong, chưa ăn uống gì.</small></label></li>
+    </ul>
+    <a class="btn" href="https://dotmo6tuan.com/">Mở app Đốt Mỡ →</a>
+  </section>
+
+  <section>
+    <div class="eyebrow">Từ ngày mai</div>
+    <h2>Một ngày của bạn trong app</h2>
+    <div class="card">
+      <div class="day"><time>Sáng</time><div>Cân lúc đói, ghi vào ô <b>Cân sáng đói</b>. Ghi giấc ngủ đêm qua nếu có đồng hồ, không có thì chỉ ghi số giờ.</div></div>
+      <div class="day"><time>Mỗi bữa</time><div>Chụp ảnh đĩa ăn <b>trước khi ăn</b>, chọn bữa Sáng / Trưa / Tối, ghi vài chữ mô tả rồi bấm Gửi. Máy chấm và nhận xét ngay.</div></div>
+      <div class="day"><time>Cả ngày</time><div>Uống nước thì bấm +250ml hoặc +500ml. Tập gym thì bấm một nút. Đi bộ 100 bước sau bữa thì tích vào.</div></div>
+      <div class="day"><time>Tối</time><div>Mở tab <b>Hôm nay</b> xem đủ 3 bữa chưa. Thiếu bữa nào gửi bù trước 23h.</div></div>
+      <div class="day"><time>Thứ 2</time><div>Cân tuần. Số này là số tính điểm đua, các ngày khác chỉ để theo dõi.</div></div>
+      <div class="day"><time>Chủ nhật</time><div>Ngày xả. Ăn gì cũng được, không chấm. Vẫn chụp để tự nhìn lại.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Hướng dẫn chi tiết</div>
+    <h2>Cách gửi một bữa ăn</h2>
+    <div class="card">
+      <ol class="steps">
+        <li><div>Mở app, vào tab <b>Gửi bữa</b> ở thanh dưới cùng.</div></li>
+        <li><div>Chọn bữa: <b>Sáng, Trưa, Chiều, Tối</b> hoặc <b>Phụ</b> nếu ăn vặt.</div></li>
+        <li><div>Bấm <b>Chụp / chọn ảnh</b>. Chụp từ trên xuống, thấy rõ cả đĩa. Một ảnh là đủ.</div></li>
+        <li><div>Ghi mô tả có số lượng. Ví dụ: <i>4 quả trứng ốp, 100g đỗ đen, 1 bát rau cải luộc</i>. Ghi càng rõ máy chấm càng đúng.</div></li>
+        <li><div>Tích <b>Có nước chanh</b> và <b>Đi bộ 100 bước</b> nếu bạn làm. Mỗi cái được cộng điểm.</div></li>
+        <li><div>Bấm <b>Gửi để chấm</b>. Chờ khoảng 15 giây, đọc nhận xét. Xanh là đạt, vàng là sửa bữa sau, đỏ là sai luật.</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Luật chơi</div>
+    <h2>Ăn gì để được điểm xanh</h2>
+    <div class="card">
+      <ul class="rule">
+        <li>Mỗi bữa có <b>đạm</b> (trứng, thịt, cá, đậu phụ), <b>đậu</b> (đỗ đen, đỗ đỏ, đậu lăng) và <b>rau</b>. Nhớ 3 chữ: đạm, đậu, rau.</li>
+        <li>Lặp lại vài bữa quen thuộc. Không cần sáng tạo, cần đều.</li>
+        <li>Uống nước lọc, trà không đường, cà phê đen. Nước chanh không đường được cộng điểm.</li>
+        <li>Chủ nhật ăn xả thoải mái. Một ngày, không kéo sang thứ 2.</li>
+        <li class="no">Tinh bột trắng: cơm, bún, phở, bánh mì, bánh ngọt.</li>
+        <li class="no">Uống calo: nước ngọt, trà sữa, nước ép, rượu bia.</li>
+        <li class="no">Hoa quả ngọt trong tuần. Được ăn bơ, cà chua, dưa chuột.</li>
+      </ul>
+      <div class="warn"><b>Phạt 100.000đ</b> mỗi ngày không gửi đủ ảnh. Tiền phạt gom vào quỹ thưởng người về đích. Thiếu ảnh là mất điểm, ăn sai chỉ bị nhắc. Vậy nên cứ chụp, kể cả bữa ăn sai.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Cách tính điểm</div>
+    <h2>Bảng đua tính thế nào</h2>
+    <div class="card tbl">
+      <table>
+        <tr><th>Việc</th><th>Điểm / ngày</th></tr>
+        <tr><td>Gửi đủ 3 ảnh bữa ăn</td><td class="n">60</td></tr>
+        <tr><td>Không đường, không tinh bột trắng</td><td class="n">20</td></tr>
+        <tr><td>Không rượu bia, nước ngọt</td><td class="n">20</td></tr>
+        <tr><td>Nước chanh, đi bộ 100 bước, đủ nước, ngủ đủ</td><td class="n">cộng thêm</td></tr>
+      </table>
+      <p style="margin-top:10px;color:var(--muted)">Tab <b>Bảng đua</b> xếp hạng theo điểm 7 ngày gần nhất và số kg giảm. Ai chuỗi ngày dài nhất được ghi tên.</p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="eyebrow">Hỏi nhanh</div>
+    <h2>Câu hỏi hay gặp</h2>
+    <details><summary>Quên chụp trước khi ăn thì sao?</summary><p>Chụp đĩa đã ăn dở cũng được, ghi mô tả đầy đủ. Có ảnh là có điểm.</p></details>
+    <details><summary>Đi ăn ngoài, ăn cỗ, tiếp khách?</summary><p>Vẫn chụp. Chọn món có đạm và rau, bỏ cơm bún. Máy sẽ nhận xét, huấn luyện viên sẽ góp ý riêng.</p></details>
+    <details><summary>App mở trong Zalo bị lỗi?</summary><p>Copy link, mở bằng Safari hoặc Chrome. Lưu ra màn hình chính thì lần sau không cần Zalo.</p></details>
+    <details><summary>Cân sáng nay tăng hơn hôm qua?</summary><p>Bình thường. Nước, muối, đi ngoài làm cân lệch 1 đến 2kg mỗi ngày. Chỉ nhìn số cân thứ 2 hàng tuần.</p></details>
+    <details><summary>Đói giữa buổi?</summary><p>Uống 500ml nước, chờ 15 phút. Vẫn đói thì ăn trứng luộc hoặc một nắm đỗ, chụp gửi bữa Phụ.</p></details>
+    <details><summary>Huấn luyện viên không trả lời?</summary><p>Từ 9 đến 20 tháng 9 huấn luyện viên đi khoá thiền, cắt liên lạc hoàn toàn. Người trực sẽ chấm điểm và nhắc thay. App vẫn chạy bình thường.</p></details>
+  </section>
+
+  <footer>Huấn luyện viên: Nguyễn Trí Dũng · Game Đốt Mỡ 6 Tuần · Cam kết hoàn tiền nếu làm đủ mà không giảm.</footer>
+</div>
+
+<script>
+(function(){
+  var KEY='dotmo-ngay0';
+  var boxes=document.querySelectorAll('#todo input');
+  var saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+  boxes.forEach(function(b){
+    if(saved[b.id]){b.checked=true;b.closest('li').classList.add('done')}
+    b.addEventListener('change',function(){
+      b.closest('li').classList.toggle('done',b.checked);
+      saved[b.id]=b.checked;
+      try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}
+    });
+  });
+})();
+</script>
+</body>
+</html>
