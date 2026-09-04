@@ -39,7 +39,7 @@ textarea{min-height:70px;resize:vertical}
 .seg{display:flex;gap:6px}.seg button{flex:1;font:inherit;font-weight:700;font-size:14px;padding:11px 4px;border:1px solid var(--line);background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
 .seg button.on{background:var(--ink);color:#06130a;border-color:var(--ink)}
 .pick{display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed #3a463d;border-radius:14px;padding:22px;color:var(--lime);font-weight:800;cursor:pointer;background:#0f1411}
-.pick input{display:none}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
+.pick input{display:none}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:12px;flex-direction:column;gap:6px;position:relative;overflow:hidden;min-height:96px}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{border-style:solid;border-color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;accent-color:var(--lime)}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,11,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:9}
@@ -172,20 +172,20 @@ small{color:var(--mute)}
         <div class="fld"><label>Bắp đùi</label><input id="hs-dui" inputmode="decimal" placeholder="55"></div>
       </div>
       <small>Đo qua rốn (eo), điểm to nhất bắp tay và bắp đùi, thước dây sát da không siết.</small>
-      <p class="k" style="margin-top:16px">Ảnh body hiện tại — mốc trước / sau</p>
-      <div class="row" style="align-items:flex-start">
-        <div class="fld" style="flex:0 0 46%"><img src="https://dotmo6tuan.com/anh-mau-body.jpg" alt="Ảnh mẫu tư thế chụp" style="width:100%;max-width:190px;display:block;margin:0 auto;border-radius:12px;border:2px solid var(--red)"><small style="display:block;text-align:center;margin-top:4px">Ảnh mẫu: chụp đúng thế này, thấy cả đầu tới bàn chân</small></div>
-        <div class="fld" style="font-size:13px;line-height:1.7;color:#d5ddd6">
-          ✅ Đứng thẳng, nhìn thẳng, tay hơi dang, chân rộng bằng vai<br>
-          ✅ Mặc đồ bó / quần đùi (nam cởi trần, nữ áo bra thể thao)<br>
-          ✅ Nền tường trơn, đủ sáng, thấy cả đầu tới bàn chân<br>
-          ✅ Nhờ người chụp hoặc dựng máy ngang tầm rốn, cách 2–3 m<br>
-          ⛔ Không hóp bụng, không gồng, không dùng filter
-        </div>
+      <p class="k" style="margin-top:16px">Ảnh body 3 góc — mốc tuần 0, mỗi tuần chụp lại để so</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px"><div style="text-align:center"><img src="https://dotmo6tuan.com/anh-mau-body.jpg" alt="Trước" onerror="this.style.display='none'" style="width:100%;border-radius:10px;border:2px solid var(--red);display:block"><small style="display:block;margin-top:3px">Trước</small></div><div style="text-align:center"><img src="https://dotmo6tuan.com/anh-mau-nghieng.jpg" alt="Nghiêng trái" onerror="this.style.display='none'" style="width:100%;border-radius:10px;border:2px solid var(--red);display:block"><small style="display:block;margin-top:3px">Nghiêng trái</small></div><div style="text-align:center"><img src="https://dotmo6tuan.com/anh-mau-sau.jpg" alt="Sau lưng" onerror="this.style.display='none'" style="width:100%;border-radius:10px;border:2px solid var(--red);display:block"><small style="display:block;margin-top:3px">Sau lưng</small></div></div>
+      <div style="font-size:13px;line-height:1.7;color:#d5ddd6">
+        ✅ Đứng thẳng, tay hơi dang, chân rộng bằng vai · thấy cả đầu tới bàn chân<br>
+        ✅ Mặc đồ bó / quần đùi (nam cởi trần, nữ áo bra thể thao) · tường trơn, đủ sáng<br>
+        ✅ Nhờ người chụp hoặc dựng máy ngang tầm rốn, cách 2–3 m · <b>cùng chỗ đứng, cùng giờ sáng</b> cho mọi tuần<br>
+        ⛔ Không hóp bụng, không gồng, không filter
       </div>
-      <label class="pick" style="margin-top:8px">📸 CHỤP / CHỌN ẢNH BODY <input id="hs-anh" type="file" accept="image/*"></label>
-      <img id="hs-preview" alt="" style="width:100%;border-radius:14px;margin-top:10px;display:none;max-height:320px;object-fit:contain;border:1px solid var(--line);background:#0f1411">
-      <small id="hs-anh-note">Chỉ HLV xem được ảnh này. 6 tuần sau chụp lại đúng tư thế để so.</small>
+      <div class="anh3" id="hs-anh3">
+        <label class="pick sm"><span>📸 TRƯỚC</span><input type="file" accept="image/*" data-goc="truoc"><img alt=""></label>
+        <label class="pick sm"><span>📸 NGHIÊNG</span><input type="file" accept="image/*" data-goc="nghieng"><img alt=""></label>
+        <label class="pick sm"><span>📸 SAU</span><input type="file" accept="image/*" data-goc="sau"><img alt=""></label>
+      </div>
+      <small id="hs-anh-note">Chỉ HLV xem được ảnh này. Mỗi tuần app sẽ nhắc bạn chụp lại đúng 3 góc để so.</small>
       <p class="k" style="margin-top:16px">Mục tiêu 6 tuần</p>
       <div class="row">
         <div class="fld"><label>Hiện tại (kg)</label><input id="hs-can2" inputmode="decimal" disabled></div>
@@ -255,7 +255,7 @@ small{color:var(--mute)}
   </div>
 
   <!-- LỘ TRÌNH -->
-  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="camket"></div><div class="card" id="luat"></div></div>
+  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="camket"></div><div class="card" id="anhtiendo"></div><div class="card" id="luat"></div></div>
 </div>
 
 <div class="tabs hide" id="tabs">
@@ -387,8 +387,8 @@ function doHoSoVaoForm(){
   $('#hs-hoten').value = h.hoTen || ''; $('#hs-namsinh').value = h.namSinh || ''; $('#hs-cao').value = h.cao || ''; $('#hs-can').value = h.canNang || '';
   $('#hs-mo').value = h.phanTramMo || ''; $('#hs-mokg').value = h.moNhap || ''; $('#hs-eo').value = h.vongEo || ''; $('#hs-tay').value = h.bapTay || ''; $('#hs-dui').value = h.bapDui || '';
   $('#hs-dich').value = h.canDich || ''; $('#hs-modich').value = h.moDich || '';
-  hsAnhB64 = ''; $('#hs-anh').value = ''; $('#hs-preview').style.display = 'none';
-  $('#hs-anh-note').textContent = h.anhBody ? '✅ Đã có ảnh xuất phát. Chọn ảnh mới chỉ khi muốn thay.' : 'Chỉ HLV xem được ảnh này. 6 tuần sau chụp lại đúng tư thế để so.';
+  xoaAnh3('#hs-anh3', hsAnh3);
+  $('#hs-anh-note').textContent = h.anhBody ? '✅ Đã có ảnh tuần 0. Chỉ chọn lại nếu muốn thay cả 3.' : 'Chỉ HLV xem được ảnh này. Mỗi tuần app sẽ nhắc bạn chụp lại đúng 3 góc để so.';
   hsGioi = /n[uữ]/i.test(String(h.gioiTinh || '')) ? 'Nữ' : 'Nam'; document.querySelectorAll('#hs-gioi button').forEach(x => x.classList.toggle('on', x.dataset.g === hsGioi));
   $('#btn-hs-huy').classList.toggle('hide', !h.hoSoDu); $('#hs-err').classList.add('hide');
   $('#hoso-loi-thieu').textContent = h.hoSoDu ? 'Sửa số rồi bấm LƯU — lộ trình và định mức tính lại ngay.' : 'Điền 1 lần (2 phút). Máy tự tính định mức ăn và 6 mốc cân theo công thức của HLV Dũng.';
@@ -412,13 +412,15 @@ function tinhHS(){
 ['#hs-can','#hs-mo','#hs-dich','#hs-mokg','#hs-modich'].forEach(id => $(id).addEventListener('input', tinhHS));
 $('#btn-hs-huy').onclick = () => hien('lotrinh');
 $('#btn-hs-luu').onclick = async () => {
-  const hs = { hoTen: $('#hs-hoten').value.trim(), namSinh: soF('#hs-namsinh'), gioiTinh: hsGioi, cao: soF('#hs-cao'), canNang: soF('#hs-can'), phanTramMo: soF('#hs-mo'), moKg: soF('#hs-mokg'), vongEo: soF('#hs-eo'), bapTay: soF('#hs-tay'), bapDui: soF('#hs-dui'), canDich: soF('#hs-dich'), moDich: soF('#hs-modich'), anhB64: hsAnhB64 };
+  const hs = { hoTen: $('#hs-hoten').value.trim(), namSinh: soF('#hs-namsinh'), gioiTinh: hsGioi, cao: soF('#hs-cao'), canNang: soF('#hs-can'), phanTramMo: soF('#hs-mo'), moKg: soF('#hs-mokg'), vongEo: soF('#hs-eo'), bapTay: soF('#hs-tay'), bapDui: soF('#hs-dui'), canDich: soF('#hs-dich'), moDich: soF('#hs-modich'), anh: du3(hsAnh3) ? hsAnh3 : null };
   const err = $('#hs-err'); err.classList.add('hide');
   const thieu = !hs.namSinh ? 'năm sinh' : !hs.cao ? 'chiều cao' : !hs.canNang ? 'cân nặng' : !hs.phanTramMo ? '% mỡ' : !hs.canDich ? 'cân muốn về' : !hs.moDich ? '% mỡ muốn về' : '';
   if (thieu) { err.textContent = 'Còn thiếu: ' + thieu + '.'; err.classList.remove('hide'); return; }
   if (hs.canDich >= hs.canNang) { err.textContent = 'Cân muốn về phải nhỏ hơn cân hiện tại.'; err.classList.remove('hide'); return; }
   if (hs.moDich >= hs.phanTramMo) { err.textContent = '% mỡ muốn về phải nhỏ hơn % mỡ hiện tại.'; err.classList.remove('hide'); return; }
-  if (!hs.anhB64 && !(S && S.hv.anhBody)) { err.textContent = 'Còn thiếu ảnh body hiện tại. Chụp theo ảnh mẫu rồi bấm LƯU.'; err.classList.remove('hide'); return; }
+  const soAnh = ['truoc','nghieng','sau'].filter(g => hsAnh3[g] && hsAnh3[g].b64).length;
+  if (soAnh > 0 && soAnh < 3) { err.textContent = 'Mới có ' + soAnh + '/3 ảnh. Chụp đủ trước, nghiêng, sau.'; err.classList.remove('hide'); return; }
+  if (!hs.anh && !(S && S.hv.anhBody)) { err.textContent = 'Còn thiếu 3 ảnh body (trước, nghiêng, sau). Chụp theo ảnh mẫu rồi bấm LƯU.'; err.classList.remove('hide'); return; }
   const b = $('#btn-hs-luu'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG TÍNH LỘ TRÌNH...';
   try {
     const r = await goi('capNhatHoSo', ten, pin, hs);
@@ -434,6 +436,44 @@ function veDinhMuc(r){
     d.bua.map(b => `<div class="dm"><div class="h">${esc(b.ten)} <span>${esc(b.gio)}${b.kcal ? ' · ~' + b.kcal + ' kcal' : ''} · ${b.protein} g protein</span></div><div class="m">${esc(b.mon)}</div><div class="g">${esc(b.ghiChu)}</div></div>`).join('') +
     `<div class="dm"><div class="h">🍚 Tinh bột</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.tinhBot)}</div></div><div class="dm"><div class="h">💧 Nước</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.nuoc)}</div></div><div class="dm"><div class="h" style="color:var(--red)">⛔ Cấm</div><div class="g" style="font-size:14px;color:#d5ddd6">${esc(d.khong)}</div></div>
     <small style="display:block;margin-top:8px">Tổng thịt/cá nạc cả ngày ~${d.thitTong} g (ước 23 g protein/100 g). Ăn no, không nhịn — đói làm giảm trao đổi chất.</small>`;
+}
+
+
+// ---------- ảnh tiến độ theo tuần ----------
+let tdAnh3 = {}; let tdDangXem = false;
+function veAnhTienDo(r){
+  const el = $('#anhtiendo'); const chiXem = !!r.xemBoi || r.hv.vaiTro === 'HLV'; const co = r.tuanCoAnh || {}; const tuan = r.tuan;
+  const chips = [0,1,2,3,4,5,6].map(t => `<span class="chip${co[t] !== undefined ? ' lime' : ''}" title="${co[t] || ''}">T${t}${co[t] !== undefined ? ' ✓' : ''}</span>`).join(' ');
+  const nhac = !chiXem && co[tuan] === undefined ? `<div class="warn" style="margin:8px 0 0">📸 Tuần ${tuan} chưa có ảnh. Chụp 3 góc như ảnh mẫu, cùng chỗ đứng, buổi sáng.</div>` : '';
+  el.innerHTML = `<p class="k">📸 Ảnh tiến độ · 3 góc mỗi tuần</p><div>${chips}</div>${nhac}` +
+    (!chiXem ? `<div class="anh3" id="td-anh3">
+        <label class="pick sm"><span>📸 TRƯỚC</span><input type="file" accept="image/*" data-goc="truoc"><img alt=""></label>
+        <label class="pick sm"><span>📸 NGHIÊNG</span><input type="file" accept="image/*" data-goc="nghieng"><img alt=""></label>
+        <label class="pick sm"><span>📸 SAU</span><input type="file" accept="image/*" data-goc="sau"><img alt=""></label>
+      </div><button class="btn sm" id="td-gui" style="margin-top:8px">GỬI ẢNH TUẦN ${tuan} ⚡</button><div id="td-err" class="err hide"></div>` : '') +
+    `<button class="btn ghost sm" id="td-xem" style="margin-top:8px">🖼 XEM ẢNH CÁC TUẦN CẠNH NHAU</button><div id="td-bang"></div>`;
+  if (r.anhVuaLuu !== undefined) { const w = document.createElement('div'); w.className = 'ok-ghim'; w.style.margin = '8px 0 0'; w.textContent = '✅ Đã lưu ảnh tuần ' + r.anhVuaLuu + '. HLV đã nhận.'; el.prepend(w); setTimeout(() => w.remove(), 6000); }
+  if (!chiXem) { tdAnh3 = {}; ganAnh3('#td-anh3', tdAnh3);
+    $('#td-gui').onclick = async () => {
+      const b = $('#td-gui'), err = $('#td-err'); err.classList.add('hide');
+      if (!du3(tdAnh3)) { err.textContent = 'Cần đủ 3 ảnh: trước, nghiêng, sau.'; err.classList.remove('hide'); return; }
+      b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG GỬI 3 ẢNH...';
+      try { const x = await goi('guiAnhTuan', ten, pin, tdAnh3);
+        if (x.loi) { err.textContent = /không tồn tại/i.test(x.loi) ? 'HLV đang cập nhật máy chủ, thử lại sau ít phút.' : x.loi; err.classList.remove('hide'); b.disabled = false; b.textContent = 'GỬI ẢNH TUẦN ' + tuan + ' ⚡'; }
+        else { nhan(x); hien('lotrinh'); }
+      } catch (e) { err.textContent = 'Lỗi mạng: ' + (e.message || e); err.classList.remove('hide'); b.disabled = false; b.textContent = 'GỬI ẢNH TUẦN ' + tuan + ' ⚡'; }
+    };
+  }
+  $('#td-xem').onclick = async () => {
+    const b = $('#td-xem'), bang = $('#td-bang'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG TẢI ẢNH...';
+    try { const x = await goi('layAnhTienDo', ten, pin, r.xemBoi ? r.hv.ten : '');
+      if (x.loi) bang.innerHTML = `<div class="err">${esc(x.loi)}</div>`;
+      else if (!x.ds.length) bang.innerHTML = `<small style="display:block;margin-top:8px">Chưa có ảnh nào.</small>`;
+      else bang.innerHTML = `<div class="td-grid"><div></div><div class="w">Trước</div><div class="w">Nghiêng</div><div class="w">Sau</div>` +
+        x.ds.map(t => `<div class="w">T${t.tuan}<br><small>${(t.ngay || '').slice(5).replace('-', '/')}</small></div>` + ['truoc','nghieng','sau'].map(g => t.thumb[g] ? (t.url[g] && chiXem ? `<a href="${esc(t.url[g])}" target="_blank"><img src="${t.thumb[g]}" alt=""></a>` : `<img src="${t.thumb[g]}" alt="">`) : '<div></div>').join('')).join('') + `</div>`;
+    } catch (e) { bang.innerHTML = `<div class="err">Lỗi mạng: ${esc(e.message || e)}</div>`; }
+    b.disabled = false; b.textContent = '🔄 TẢI LẠI ẢNH';
+  };
 }
 
 // ---------- cam kết tuần: học viên tự viết → máy lưu Sheet ----------
@@ -472,11 +512,18 @@ $('#in-anh').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   thuNhoAnh(f, 1024, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; });
 };
-let hsAnhB64 = '';
-$('#hs-anh').onchange = e => {
-  const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 1400, d => { hsAnhB64 = d.split(',')[1]; $('#hs-preview').src = d; $('#hs-preview').style.display = 'block'; });
-};
+// ---------- 3 ảnh body: chọn → thu nhỏ bản gốc 1400px + bản nhỏ 360px ----------
+function ganAnh3(rootSel, store){
+  document.querySelectorAll(rootSel + ' input[type=file]').forEach(inp => inp.onchange = e => {
+    const f = e.target.files[0]; if (!f) return; const g = inp.dataset.goc; const lab = inp.closest('label'); const img = lab.querySelector('img');
+    thuNhoAnh(f, 1400, d => { store[g] = store[g] || {}; store[g].b64 = d.split(',')[1]; img.src = d; lab.classList.add('co'); });
+    thuNhoAnh(f, 360, d => { store[g] = store[g] || {}; store[g].thumb = d.split(',')[1]; });
+  });
+}
+function xoaAnh3(rootSel, store){ ['truoc','nghieng','sau'].forEach(g => delete store[g]); document.querySelectorAll(rootSel + ' label').forEach(l => { l.classList.remove('co'); l.querySelector('img').src = ''; }); document.querySelectorAll(rootSel + ' input[type=file]').forEach(i => i.value = ''); }
+const du3 = st => ['truoc','nghieng','sau'].every(g => st[g] && st[g].b64 && st[g].thumb);
+let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
+
 
 // ---------- gửi bữa ----------
 $('#btn-gui').onclick = async () => {
@@ -566,7 +613,7 @@ function nhan(r){
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
     <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g · 🍚 tinh bột 0 g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button><button class="btn ghost sm" onclick="hien('huongdan')">❓ Hướng dẫn dùng app</button><button class="btn ghost sm" onclick="hien('doipin')">🔑 Đổi PIN</button>` : ''}`;
-  veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r);
+  veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r); veAnhTienDo(r);
   const nhom = {}; r.luat.forEach(l => { (nhom[l.muc] = nhom[l.muc] || []).push(l); });
   $('#luat').innerHTML = `<p class="k">Luật & nội quy · chặng ${r.tuan}/6</p>` + Object.keys(nhom).map(m => `<div class="muc">${esc(m)}</div>` + nhom[m].map(l => `<div class="nd">${esc(l.noiDung)}</div>`).join('')).join('');
 }
@@ -617,6 +664,7 @@ function dongLog(l){
   const ai = S && S.feedHomNay ? ' · <b>' + esc(l.ten) + '</b>' : '';
   if (l.bua === 'ngu') return `<div class="log"><div class="ic">😴</div><div><div class="t">${gio}${ai}</div><div class="n">${esc(l.moTa)}</div><div class="x">${esc(l.nhanXet)}</div></div></div>`;
   if (l.den === 'xa') return `<div class="log"><div class="ic">🎉</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai} · ngày xả</div><div class="n">${esc(l.moTa || 'Bữa ngày xả')}</div></div></div>`;
+  if (l.bua === 'anh') return `<div class="log"><div class="ic">📸</div><div><div class="t">${gio}${ai}</div><div class="n">${esc(l.moTa)}</div></div></div>`;
   if (l.bua === 'sodo') return `<div class="log"><div class="ic">📏</div><div><div class="t">${gio}${ai}</div><div class="n">${esc(l.moTa)}</div></div></div>`;
   if (l.bua === 'can') return `<div class="log"><div class="ic">⚖️</div><div><div class="t">${gio}${ai}</div><div class="n">${l.can} kg</div></div></div>`;
   if (l.bua === 'gym') return `<div class="log"><div class="ic">🏋️</div><div><div class="t">${gio}${ai}</div><div class="n">Buổi tập gym</div></div></div>`;
@@ -631,12 +679,12 @@ const MOCK = (() => {
   const hv = {ten:'Anh Tú', pin:'1002', vaiTro:'HV', gioiTinh:'Nam', canNang:74, mucTieu:-5, dam:163, dau:150, rau:400, tinhBot:0, nuoc:3, luuY:'', mo:18.5, moNhap:0, cao:170, namSinh:1992, phanTramMo:25, thamHut:1258, bmr:1637, tdee:2292, kcalMucTieu:1637, giamTuanDuKien:1.14, giamTuanMucTieu:0.83, bmi:25.6, canDich:69, moDich:18, anhBody:'', hoSoDu:false, vongEo:0, bapTay:0, bapDui:0, hoTen:'', dinhMuc:null, phaiDoiPin:false};
   let logs = [{thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'sang', moTa:'2 trứng, 200g đậu đũa, 200g đu đủ', den:'do', mon:'Trứng + đậu đũa + đu đủ', nhanXet:'Đu đủ là hoa quả ngọt b ơi, insulin lên cao là mỡ bị khoá lại. Trứng với đậu đũa ổn.', thayThe:'Bỏ đu đủ, thêm 2 trứng hoặc 100g ức gà. Muốn ngọt thì dưa chuột, cà chua.', dam:110, dau:0, rau:200, tinhBot:0, nuoc:0, viPham:'hoa quả ngọt', diem:3, protein:14}];
   const st = (kq) => { const t = {ngu:null,kcal:0,dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,soBua:0,diem:null,damSang:0,nuocChanh:0,diBo:0,gym:0,suaChua:false}; const ds=[]; logs.forEach(l=>{t.dam+=l.dam;t.protein+=(l.protein||0);t.dau+=l.dau;t.rau+=l.rau;t.tinhBot+=l.tinhBot;t.nuoc+=l.nuoc; if(l.bua==='gym'){t.gym++;return;} if(l.bua==='ngu'){t.ngu={gio:l.nguGio,sau:l.nguSau,rem:l.nguRem,den:l.den};return;} if(l.bua!=='nuoc'){t.soBua++; if(l.diem!=null) ds.push(l.diem); if(l.bua==='sang') t.damSang+=(l.protein||0); if(l.nuocChanh) t.nuocChanh++; if(l.diBo) t.diBo++;}}); if(ds.length) t.diem=Math.round(ds.reduce((a,b)=>a+b,0)/ds.length*10)/10;
-    return {hv, tuan:1, homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
+    return {hv, tuan:1, tuanCoAnh: Object.fromEntries(Object.keys(MOCK_ANH).map(k => [k, '2026-09-04'])), homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
       luat:[{muc:'5 quy tắc',tuan:0,noiDung:'1) BỎ tinh bột. 2) Lặp lại bữa ăn phù hợp. 3) Không uống calo. 4) Không hoa quả ngọt. 5) Một ngày ăn xả mỗi 7–10 ngày.'},{muc:'Thói quen 2 · Sau ăn',tuan:0,noiDung:'SAU mỗi bữa: 1 ly nước chanh loãng + đi bộ 100 bước.'},{muc:'Cam kết tuần',tuan:0,noiDung:'Mỗi tuần bạn tự viết cam kết trong tab Lộ trình.'}], camKet: CAMKET.slice(),
       bangDua:[{ten:'Thái Hưng',diemTuan:26,streak:3,buaHomNay:2,giam:4},{ten:'Anh Tú',diemTuan:14.5,streak:2,buaHomNay:t.soBua,giam:1.4},{ten:'Tiến Dũng',diemTuan:12,streak:1,buaHomNay:2},{ten:'Chị Ngát',diemTuan:0,streak:0,buaHomNay:0}], ketQua:kq}; };
   const cham = (bua, moTa) => { const x = /kfc|xúc xích|chiên xù|cơm|bún|phở|trà sữa|bánh ngọt/i.test(moTa); const kq = x ? {den:'do',diem:2,mon:'Đồ chiên/tinh bột trắng',nhanXet:'Cái này dính luật đạm rồi b: chiên xù + tinh bột, dầu chiên lại. Ăn xong insulin lên, mỡ không đốt được.',thayThe:'Gà luộc hoặc áp chảo dầu oliu 150g + 100g đỗ đen + rau cải.',conThieu:'đạm 110g, đậu 150g, rau 200g',dam:80,protein:18,dau:0,rau:0,tinhBot:60,may:'mock · 1s'} : {den:'xanh',diem:9,mon:'Đạm + đậu + rau',nhanXet:'Chuẩn đĩa rồi b. Đạm đủ, có đậu, có rau.',thayThe:'',conThieu:'đạm 60g',dam:150,protein:35,dau:100,rau:200,tinhBot:0,may:'mock · 1s'};
     logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua, moTa, den:kq.den, mon:kq.mon, nhanXet:kq.nhanXet, thayThe:kq.thayThe, dam:kq.dam, protein:kq.protein, dau:kq.dau, rau:kq.rau, tinhBot:kq.tinhBot, nuoc:0, viPham:'', diem:kq.diem}); return kq; };
-  const CAMKET = [];
+  const CAMKET = []; const MOCK_ANH = {};
   const wait = v => new Promise(ok => setTimeout(() => ok(v), 600));
   const hlvSt = () => { const x = st(); x.hv = Object.assign({}, hv, {ten:'Dũng', vaiTro:'HLV'}); x.feedHomNay = [...logs].reverse(); x.hlv = [{ten:'Chị Ngát',canDau:0,canMoi:0,giam:0,mucTieu:-4,streak:0,buaHomNay:0,diemHomNay:null,diemTuan:0,gymTuan:0,ngayCuoi:'',co:['chưa gửi gì','hồ sơ thiếu','chưa cân']},{ten:'Anh Tú',canDau:74,canMoi:72.6,giam:1.4,mucTieu:-5,streak:2,buaHomNay:2,diemHomNay:6,diemTuan:14.5,gymTuan:1,ngayCuoi:'2026-09-03',co:[]},{ten:'Thái Hưng',canDau:100,canMoi:96,giam:4,mucTieu:-4,streak:3,buaHomNay:2,diemHomNay:9,diemTuan:26,gymTuan:2,ngayCuoi:'2026-09-03',co:[]}]; return x; };
   return { dangNhap:(t,p) => wait(p === '2468' ? hlvSt() : p === '1234' ? Object.assign(st(), {hv: Object.assign({}, hv, {phaiDoiPin:true})}) : p === '1002' ? st() : {loi:'Sai tên hoặc mã PIN (bản thử: Anh Tú / 1002, HLV Dũng / 2468).'}), xemHocVien:(t,p,ai) => wait(Object.assign(st(), {xemBoi:'Dũng'})), layTrangThai:() => wait(st()),
@@ -646,7 +694,9 @@ const MOCK = (() => {
     doiPin:(t,c,m) => { hv.phaiDoiPin = false; const x = st(); x.daDoiPin = true; return wait(x); },
     datLaiPin:(t,p,ai) => { const x = hlvSt(); x.thongBao = 'Đã đặt lại PIN của ' + ai + ' về 1234.'; return wait(x); },
     themHocVien:(t,p,tm,g) => { const x = hlvSt(); x.thongBao = 'Đã thêm ' + tm + '.'; x.pinCap = '1234'; return wait(x); },
-    capNhatHoSo:(t,p,hs) => { Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anhB64 ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
+    guiAnhTuan:(t,p,anh) => { MOCK_ANH[1] = anh; const x = st(); x.anhVuaLuu = 1; return wait(x); },
+    layAnhTienDo:(t,p) => wait({ ten: hv.ten, tuanHienTai: 1, ds: Object.keys(MOCK_ANH).map(k => ({ tuan: Number(k), ngay: '2026-09-04', thumb: { truoc: 'data:image/jpeg;base64,' + MOCK_ANH[k].truoc.thumb, nghieng: 'data:image/jpeg;base64,' + MOCK_ANH[k].nghieng.thumb, sau: 'data:image/jpeg;base64,' + MOCK_ANH[k].sau.thumb }, url: {} })) }),
+    capNhatHoSo:(t,p,hs) => { if (hs.anh) MOCK_ANH[0] = hs.anh; Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anh ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
       hv.thamHut = Math.round(68*hv.mo); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 1 hộp sữa chua không đường + 100 g rau',protein:32,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
       const x = st(); x.hoSoVuaLuu = true; return wait(x); },
     ghiNgu:(t,p,g,sa,re) => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'ngu', moTa:'Ngủ '+g+' h · sâu '+sa+'% · REM '+re+'%', nhanXet:'', den: g>=7?'xanh':'vang', nguGio:Number(g), nguSau:Number(sa), nguRem:Number(re), dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,kcal:0, diem:null}); return wait(st()); },
