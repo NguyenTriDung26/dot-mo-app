@@ -48,7 +48,7 @@ textarea{min-height:70px;resize:vertical}
 .den{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-weight:900;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
 .den.xanh{background:rgba(163,255,91,.15);color:var(--lime)}.den.vang{background:rgba(255,176,32,.15);color:var(--amber)}.den.do{background:rgba(255,90,90,.15);color:var(--red)}
 .kq{position:relative;overflow:hidden}.kq:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--line)}
-.kq.xanh:before{background:var(--lime)}.kq.vang:before{background:var(--amber)}.kq.do:before{background:var(--red)}
+.kq.xanh:before{background:var(--lime)}.kq.vang:before{background:var(--amber)}.kq.do:before{background:var(--red)}.btn.dx{background:rgba(255,90,90,.12);color:var(--red);border:2px solid var(--red);font-size:18px;padding:18px;margin:8px 0 24px}
 .score{font-size:46px;font-weight:900;line-height:1;letter-spacing:-1px}.score small{font-size:16px;color:var(--mute);font-weight:700}
 .quote{font-size:16px;line-height:1.5;margin:12px 0 8px;font-weight:600}
 .thay{background:var(--sf2);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:8px}
@@ -280,7 +280,7 @@ small{color:var(--mute)}
   </div>
 
   <!-- LỘ TRÌNH -->
-  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="camket"></div><div class="card" id="anhtiendo"></div><div class="card" id="luat"></div></div>
+  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="camket"></div><div class="card" id="anhtiendo"></div><div class="card" id="luat"></div><button class="btn dx" onclick="dangXuat()">🚪 ĐĂNG XUẤT</button></div>
 </div>
 
 <div class="menu-bg hide" id="menu-bg"></div>
@@ -327,7 +327,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260905-100035';
+const APP_VER = '20260905-100214';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -791,7 +791,7 @@ function nhan(r){
   $('#hoso').innerHTML = `<p class="k">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${ho}
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
-    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button>` : ''}${!r.xemBoi ? `<button class="btn ghost sm" onclick="dangXuat()">🚪 Đăng xuất</button>` : ''}`;
+    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button>` : ''}${!r.xemBoi ? `` : ''}`;
   veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r); veAnhTienDo(r);
   $('#luat').innerHTML = `<p class="k">⚖️ Luật & nội quy</p>` + veLuatHtml(r.luat, r.hv.vaiTro === 'HLV');
   const canMoi = tk.canMoi || tk.canDau; const tuanNay = (r.lichSu || []).slice((r.tuan - 1) * 7, r.tuan * 7).filter(d => d.diem !== null);
