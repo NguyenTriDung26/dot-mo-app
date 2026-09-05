@@ -47,7 +47,7 @@ textarea{min-height:70px;resize:vertical}
 .tabs button{flex:1;font:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;border:0;background:none;color:var(--mute);padding:6px 2px;cursor:pointer;border-radius:12px}
 .tabs button.on{color:var(--lime)}.tabs .ic{display:block;font-size:22px;margin-bottom:2px}
 .den{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-weight:900;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
-.den.xanh{background:rgba(163,255,91,.15);color:var(--lime)}.den.vang{background:rgba(255,176,32,.15);color:var(--amber)}.den.do{background:rgba(255,90,90,.15);color:var(--red)}
+.den.xanh{background:rgba(163,255,91,.15);color:var(--lime)}.den.vang{background:rgba(255,176,32,.15);color:var(--amber)}.den.do{background:rgba(255,90,90,.15);color:var(--red)}.den.cho{background:rgba(255,255,255,.1);color:#ddd}.kq.cho:before{background:#888}
 .kq{position:relative;overflow:hidden}.kq:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--line)}
 .kq.xanh:before{background:var(--lime)}.kq.vang:before{background:var(--amber)}.kq.do:before{background:var(--red)}.btn.dx{background:rgba(255,90,90,.12);color:var(--red);border:2px solid var(--red);font-size:18px;padding:18px;margin:8px 0 24px}
 .score{font-size:46px;font-weight:900;line-height:1;letter-spacing:-1px}.score small{font-size:16px;color:var(--mute);font-weight:700}
@@ -321,10 +321,22 @@ small{color:var(--mute)}
 const coGAS = typeof google !== 'undefined' && google.script && google.script.run;
 const EXEC_URL = 'https://script.google.com/macros/s/AKfycbyTb0GyEZgEVe6GWSa-37n-HIFGBKtGnVRqTbON6dylzyFQlgP1Q_CQtVqcCVR-4aUaEQ/exec';
 const coFetch = EXEC_URL.indexOf('http') === 0;
-async function goiFetch(fn, args){
-  const res = await fetch(EXEC_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }) });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.json();
+async function goiFetch(fn, args, giay){
+  const ac = ('AbortController' in window) ? new AbortController() : null; const hen = ac ? setTimeout(() => ac.abort(), (giay || 60) * 1000) : 0;
+  try {
+    const res = await fetch(EXEC_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }), signal: ac ? ac.signal : undefined });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } finally { clearTimeout(hen); }
+}
+// Gọi có tự thử lại khi đứt mạng ("Load failed" / quá giờ). Lỗi do máy chủ trả về ({loi}) thì KHÔNG thử lại.
+async function goiBen(fn, args, lan, giay){
+  lan = lan || 3; let err = null;
+  for (let i = 0; i < lan; i++) {
+    try { if (coFetch) return await goiFetch(fn, args, giay); if (coGAS) return await goiGAS(fn, args); return await MOCK[fn](...args); }
+    catch (e) { err = e; if (i < lan - 1) { toast('📶 Mạng chập chờn, đang gửi lại… (' + (i + 2) + '/' + lan + ')', 2500); await new Promise(ok => setTimeout(ok, 1500 * (i + 1))); } }
+  }
+  throw new Error(err && err.name === 'AbortError' ? 'Máy chủ phản hồi quá lâu' : (err && (err.message || String(err))) || 'Lỗi mạng');
 }
 function goiGAS(fn, args){ return new Promise((ok, loi) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => loi(e))[fn](...args)); }
 async function goi(fn, ...args){
@@ -342,7 +354,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260905-131707';
+const APP_VER = '20260905-200148';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -404,7 +416,8 @@ function hien(v, tuBack){
   window.scrollTo(0,0);
 }
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => hien(b.dataset.v));
-document.querySelectorAll('#seg-bua button').forEach(b => { b.classList.toggle('on', b.dataset.b === bua); b.onclick = () => { bua = b.dataset.b; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x === b)); }; });
+document.querySelectorAll('#seg-bua button').forEach(b => { b.classList.toggle('on', b.dataset.b === bua); b.onclick = () => { bua = b.dataset.b; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x === b)); luuNhap(); }; });
+['#ck-nhai','#ck-chanh','#ck-dibo'].forEach(s => $(s).addEventListener('change', luuNhap));
 
 // ---------- đăng nhập ----------
 $('#in-ten').value = ten; $('#in-pin').value = pin;
@@ -736,21 +749,21 @@ function veCamKet(r){
 }
 
 // ---------- ảnh: thu nhỏ trước khi gửi ----------
-function thuNhoAnh(f, max, cb){
+function thuNhoAnh(f, max, cb, q){
   const img = new Image(); const url = URL.createObjectURL(f);
   img.onload = () => {
     let w = img.width, h = img.height;
     if (w > h && w > max) { h = Math.round(h * max / w); w = max; } else if (h > max) { w = Math.round(w * max / h); h = max; }
     const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
-    cb(c.toDataURL('image/jpeg', 0.82)); URL.revokeObjectURL(url);
+    cb(c.toDataURL('image/jpeg', q || 0.82)); URL.revokeObjectURL(url);
   };
   img.src = url;
 }
 function chonAnhBua(e){
   const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 900, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); });
+  thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
 }
-function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; $('#anh-act').classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; }
+function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; $('#anh-act').classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
 $('#btn-anh-xoa').onclick = boAnhBua;
 $('#btn-sua-huy').onclick = huySua;
@@ -775,29 +788,67 @@ let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 // ---------- gửi bữa ----------
 const coGram = s => /\d/.test(s || '');
-$('#in-mota').addEventListener('input', () => { const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); $('#gram-xacnhan').classList.add('hide');
+$('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); $('#gram-xacnhan').classList.add('hide');
   if (!v) { h.textContent = '⚖️ Ghi số gram (cân bếp) thì máy chấm chính xác hơn. Chỉ ghi tên món, máy phải đoán → dễ lệch.'; h.style.color = ''; }
   else if (coGram(v)) { h.textContent = '✅ Có định lượng rồi. Máy sẽ chấm theo đúng số bạn ghi.'; h.style.color = 'var(--lime)'; }
   else { h.textContent = '⚠️ Chưa thấy số gram. Thêm số vào từng món nhé, vd: ức gà 150g, rau 150g.'; h.style.color = '#ffe28a'; } });
 let boQuaGram = false;
 $('#gram-bosung').onclick = () => { $('#gram-xacnhan').classList.add('hide'); $('#in-mota').focus(); };
 $('#gram-guiluon').onclick = () => { boQuaGram = true; $('#gram-xacnhan').classList.add('hide'); $('#btn-gui').click(); };
+// ---------- nháp bữa (giữ trong máy, mất mạng không mất bài) + việc chấm còn treo ----------
+const NHAP_KEY = 'dm_nhap', CHAM_KEY = 'dm_cham';
+function luuNhap(){ try { const m = $('#in-mota').value; if (!m.trim() && !anhB64) { localStorage.removeItem(NHAP_KEY); return; }
+  localStorage.setItem(NHAP_KEY, JSON.stringify({ ten, bua, moTa: m, anhB64, anhMime, nhai: $('#ck-nhai').checked, chanh: $('#ck-chanh').checked, dibo: $('#ck-dibo').checked })); } catch(e){} }
+function xoaNhap(){ try { localStorage.removeItem(NHAP_KEY); } catch(e){} }
+function khoiPhucNhap(){ try { const n = JSON.parse(localStorage.getItem(NHAP_KEY) || 'null'); if (!n || n.ten !== ten || (!n.moTa && !n.anhB64)) return;
+  bua = n.bua || bua; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x.dataset.b === bua));
+  $('#in-mota').value = n.moTa || ''; $('#in-mota').dispatchEvent(new Event('input'));
+  if (n.anhB64) { anhB64 = n.anhB64; anhMime = n.anhMime || 'image/jpeg'; $('#preview').src = 'data:' + anhMime + ';base64,' + anhB64; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); }
+  $('#ck-nhai').checked = !!n.nhai; $('#ck-chanh').checked = !!n.chanh; $('#ck-dibo').checked = !!n.dibo;
+  toast('📝 Đã khôi phục bữa bạn đang soạn', 3000); } catch(e){} }
+function docCham(){ try { return JSON.parse(localStorage.getItem(CHAM_KEY) || 'null'); } catch(e){ return null; } }
+function tiepChamTreo(){ const c = docCham(); if (!c || c.ten !== ten) return; if (Date.now() - (c.luc || 0) > 12 * 3600e3) { try { localStorage.removeItem(CHAM_KEY); } catch(e){} return; }
+  toast('⏳ Đang chấm nốt bữa lần trước…', 2500); chamTiep(c.ma, c.anhB64 || null, c.anhMime || null); }
+let daKhoiPhuc = false;
+function loiGui(m){ $('#gui-err').textContent = m; $('#gui-err').classList.remove('hide'); }
+function hienDangCham(){ const el = $('#ket-qua'); el.className = 'card kq cho'; el.classList.remove('hide');
+  el.innerHTML = `<div class="row" style="align-items:center;justify-content:space-between"><span class="den cho">⏳ ĐÃ NHẬN · ĐANG CHẤM</span><span class="spin" style="border-color:#aaa;border-top-color:transparent;flex:0 0 16px"></span></div><div class="quote">Bữa đã lưu chắc vào sổ, không mất. HLV máy đang chấm, khoảng 10–20 giây…</div>`; }
+function hienChamLoi(ma, m){ const el = $('#ket-qua'); el.className = 'card kq cho'; el.classList.remove('hide');
+  el.innerHTML = `<span class="den cho">⏳ BỮA ĐÃ LƯU · CHƯA CHẤM</span><div class="quote">${esc(m)}</div><button class="btn sm" onclick="chamLai('${esc(ma)}')">🔁 CHẤM LẠI</button>`; lamMoi(true); }
+async function chamTiep(ma, a64, mime){
+  try {
+    const r = await goiBen('chamBua', [ten, pin, ma, a64, mime], 2, 90);
+    if (r.loi) { if (/Phiên hết hạn/.test(r.loi)) return; hienChamLoi(ma, r.loi); return; }
+    try { const c = docCham(); if (c && c.ma === ma) localStorage.removeItem(CHAM_KEY); } catch(e){}
+    nhan(r); hienKetQua(r.ketQua);
+  } catch (e) { hienChamLoi(ma, 'Mạng chập chờn khi nhận kết quả (' + (e.message || e) + '). Bữa đã lưu, không mất.'); }
+}
+window.chamLai = async function(ma){ const c = docCham(); const a = c && c.ma === ma ? c : {}; hienDangCham(); const nb = document.querySelector('button[data-v="gui"]'); if (nb && manHien !== 'gui') nb.click(); await chamTiep(ma, a.anhB64 || null, a.anhMime || null); };
+let maBuaHienTai = null;
 $('#btn-gui').onclick = async () => {
   const moTa = $('#in-mota').value.trim();
   $('#gui-err').classList.add('hide');
-  if (!moTa && !anhB64) { $('#gui-err').textContent = 'Chụp ảnh hoặc gõ vài chữ mô tả nhé.'; $('#gui-err').classList.remove('hide'); return; }
+  if (!moTa && !anhB64) { loiGui('Chụp ảnh hoặc gõ vài chữ mô tả nhé.'); return; }
   if (!coGram(moTa) && !boQuaGram) { $('#gram-xacnhan').classList.remove('hide'); $('#gram-xacnhan').scrollIntoView({behavior:'smooth', block:'center'}); return; }
   boQuaGram = false;
-  const b = $('#btn-gui'); b.disabled = true; b.innerHTML = '<span class="spin"></span>HLV MÁY ĐANG CHẤM (10–20 GIÂY)...';
+  const b = $('#btn-gui'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG GỬI BỮA LÊN SỔ…';
+  const g = { bua, moTa, anhB64, anhMime, nhai: $('#ck-nhai').checked, chanh: $('#ck-chanh').checked, dibo: $('#ck-dibo').checked };
+  if (!maBuaHienTai) maBuaHienTai = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); // giữ nguyên mã khi gửi lại → máy chủ không ghi trùng
+  const ma = maBuaHienTai;
+  const xong = () => { b.disabled = false; b.textContent = 'GỬI ĐỂ CHẤM ⚡'; };
   try {
-    const r = await goi('guiBua', ten, pin, bua, moTa, anhB64, anhMime, $('#ck-chanh').checked, $('#ck-dibo').checked, $('#ck-nhai').checked);
-    if (r.loi) { $('#gui-err').textContent = r.loi; $('#gui-err').classList.remove('hide'); }
-    else {
-      nhan(r); hienKetQua(r.ketQua);
-      $('#in-mota').value = ''; boAnhBua(); await xongSua(); $('#ck-chanh').checked = false; $('#ck-dibo').checked = false; $('#ck-nhai').checked = false;
-    }
-  } catch (e) { $('#gui-err').textContent = 'Lỗi: ' + (e.message || e); $('#gui-err').classList.remove('hide'); }
-  b.disabled = false; b.textContent = 'GỬI ĐỂ CHẤM ⚡';
+    const a = await goiBen('luuBua', [ten, pin, g.bua, g.moTa, g.anhB64, g.anhMime, g.chanh, g.dibo, g.nhai, ma], 3, 45);
+    if (a.loi) { loiGui(a.loi); xong(); return; }
+    // Chặng A xong: bữa đã nằm trong sổ → dọn form, nhớ việc chấm
+    maBuaHienTai = null; xoaNhap();
+    $('#in-mota').value = ''; boAnhBua(); $('#ck-chanh').checked = $('#ck-dibo').checked = $('#ck-nhai').checked = false; $('#in-mota').dispatchEvent(new Event('input'));
+    await xongSua();
+    if (a.ketQua) { nhan(a); hienKetQua(a.ketQua); xong(); return; } // ngày xả
+    if (a.ketQuaCu) { hienKetQua(a.ketQuaCu); lamMoi(true); xong(); return; } // gửi lại bữa đã chấm rồi
+    try { localStorage.setItem(CHAM_KEY, JSON.stringify({ ten, ma, anhB64: g.anhB64, anhMime: g.anhMime, luc: Date.now() })); } catch(e){}
+    toast('✅ Đã nhận bữa. Máy đang chấm…', 2500); hienDangCham(); xong();
+    await chamTiep(ma, g.anhB64, g.anhMime);
+  } catch (e) { loiGui('Lỗi mạng: ' + (e.message || e) + '. Bữa bạn soạn vẫn được giữ trong máy — bấm GỬI lại nhé.'); xong(); }
 };
 document.querySelectorAll('[data-ml]').forEach(b => b.onclick = () => { const goc = b.textContent; b.disabled = true; b.textContent = '✓ đã ghi'; setTimeout(() => { b.textContent = goc; b.disabled = false; }, 1200); goi('ghiNuoc', ten, pin, b.dataset.ml).then(r => { if (r.loi) toast('⚠️ ' + r.loi, 4000); else nhan(r); }).catch(() => toast('⚠️ Chưa ghi được nước, kiểm tra mạng rồi bấm lại', 4000)); });
 $('#btn-can').onclick = async () => { const v = $('#in-can').value.trim(); if (!v) return; const b = $('#btn-can'); b.disabled = true; b.textContent = '...';
@@ -837,6 +888,7 @@ function ganThu(id, tomTat, macDinhThu){
 }
 function nhan(r){
   S = r; lanCapNhat = Date.now();
+  if (!daKhoiPhuc && !r.xemBoi && ten) { daKhoiPhuc = true; setTimeout(() => { khoiPhucNhap(); tiepChamTreo(); }, 300); }
   if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } /* nhớ để lần sau mở là hiện ngay */
   const h = r.hv, tk = r.thongKe, t = tk.homNay;
   if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
@@ -879,10 +931,11 @@ function nhan(r){
   const so = (n, dv, nhan) => `<div class="pd"><div class="p" style="color:var(--ink)">${n}<small style="font-size:12px;color:var(--mute)">${dv}</small></div><div class="s">${nhan}</div></div>`;
   const mocHtml = r.loTrinh && r.loTrinh.length && tk.canDau ? `<table style="margin-top:10px"><tr><th>Tuần</th><th>Cân ngày</th><th class="r">Mốc</th><th class="r">Thực tế</th><th class="r"></th></tr>` +
     r.loTrinh.map(m => `<tr class="${m.tuan === r.tuan ? 'me' : ''}"><td>${m.tuan}</td><td>${m.ngay.slice(5).replace('-', '/')}</td><td class="r">≤ ${m.moc} kg</td><td class="r">${m.thucTe ? m.thucTe + ' kg' : '–'}</td><td class="r">${m.dat === null ? (m.daQua ? '⬜' : '') : (m.dat ? '✅' : '❌')}</td></tr>`).join('') + '</table>' : '';
-  $('#hoso').innerHTML = `<p class="k">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${ho}
+  const coSua = !r.xemBoi && h.vaiTro !== 'HLV';
+  $('#hoso').innerHTML = `<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><p class="k" style="margin:0">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${coSua ? `<button class="btn sm" style="margin:0;flex:0 0 auto;padding:10px 14px" onclick="hien('hoso')">✏️ SỬA HỒ SƠ</button>` : ''}</div>${ho}
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa/ngày')}${so(h.tranGiam6Tuan || '–', ' kg', 'trần giảm 6 tuần')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
-    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}${h.videoBody ? `<div>🎥 Video xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.videoBody)}" target="_blank" style="color:var(--lime)">mở video</a>` : ''}</div>` : `<div>🎥 Video xuất phát: <b style="color:var(--amber)">chưa có</b> <small>(tuỳ chọn · thêm trong Sửa hồ sơ)</small></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b></div>${h.tranGiam6Tuan ? `<div>🧱 Trần giảm 6 tuần: <b>${h.tranGiam6Tuan} kg</b> <small>(nhóm ${esc(h.nhomMo || '')} · ${h.tocDoTuan}% cân/tuần · ăn ≤ ${h.kcalMucTieu || '?'} kcal/ngày, không thấp hơn)</small></div>` : ''}<div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button>` : ''}${!r.xemBoi ? `` : ''}`;
+    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}${h.videoBody ? `<div>🎥 Video xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.videoBody)}" target="_blank" style="color:var(--lime)">mở video</a>` : ''}</div>` : `<div>🎥 Video xuất phát: <b style="color:var(--amber)">chưa có</b> <small>(tuỳ chọn · thêm trong Sửa hồ sơ)</small></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b></div>${h.tranGiam6Tuan ? `<div>🧱 Trần giảm 6 tuần: <b>${h.tranGiam6Tuan} kg</b> <small>(nhóm ${esc(h.nhomMo || '')} · ${h.tocDoTuan}% cân/tuần · ăn ≤ ${h.kcalMucTieu || '?'} kcal/ngày, không thấp hơn)</small></div>` : ''}<div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${coSua ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ (cân, % mỡ, số đo, ảnh, video)</button>` : ''}`;
   veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r); veAnhTienDo(r);
   $('#luat').innerHTML = `<p class="k">⚖️ Luật & nội quy</p>` + veLuatHtml(r.luat, r.hv.vaiTro === 'HLV');
   const canMoi = tk.canMoi || tk.canDau; const tuanNay = (r.lichSu || []).slice((r.tuan - 1) * 7, r.tuan * 7).filter(d => d.diem !== null);
@@ -1005,6 +1058,7 @@ function dongLog0(l, feed){
   if (l.bua === 'can') return `<div class="log"><div class="ic">⚖️</div><div><div class="t">${gio}${ai}</div><div class="n">${l.can} kg</div></div></div>`;
   if (l.bua === 'gym') return `<div class="log"><div class="ic">🏋️</div><div><div class="t">${gio}${ai}</div><div class="n">Buổi tập gym</div></div></div>`;
   if (l.bua === 'nuoc') return `<div class="log"><div class="ic">💧</div><div><div class="t">${gio}${ai}</div><div class="n">${l.nuoc} ml nước</div></div></div>`;
+  if (l.den === 'cho') return `<div class="log"><div class="ic">⏳</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai} · <span style="color:var(--amber)">đang chấm</span></div><div class="n">${esc(l.moTa || 'Bữa đã gửi, chờ chấm')}</div>${l.ten === ten && l.maBua ? `<div style="margin-top:6px"><button class="chipbtn" onclick="chamLai('${esc(l.maBua)}')">🔁 Chấm lại ngay</button></div>` : ''}</div></div>`;
   const ic = {xanh:'🟢', vang:'🟡', do:'🔴'}[l.den] || '⚪';
   const idAnh = /^https?:/.test(l.anh || '') ? ((l.anh.match(/\/d\/([^/?]+)/) || l.anh.match(/[?&]id=([^&]+)/) || [])[1] || '') : '';
   const anhHtml = idAnh ? `<a href="${esc(l.anh)}" target="_blank" rel="noopener"><img class="la" alt="ảnh bữa" loading="lazy" src="https://drive.google.com/thumbnail?id=${idAnh}&sz=w480" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'📷 Ảnh đã lưu — bấm xem'}))"></a>` : '';
@@ -1024,11 +1078,13 @@ const MOCK = (() => {
       bangDua:[{ten:'Thái Hưng',diemTuan:26,streak:3,buaHomNay:2,giam:4},{ten:'Anh Tú',diemTuan:14.5,streak:2,buaHomNay:t.soBua,giam:1.4},{ten:'Tiến Dũng',diemTuan:12,streak:1,buaHomNay:2},{ten:'Chị Ngát',diemTuan:0,streak:0,buaHomNay:0}], ketQua:kq}; };
   const cham = (bua, moTa) => { const x = /kfc|xúc xích|chiên xù|cơm|bún|phở|trà sữa|bánh ngọt/i.test(moTa); const kq = x ? {den:'do',diem:2,mon:'Đồ chiên/tinh bột trắng',nhanXet:'Cái này dính luật đạm rồi b: chiên xù + tinh bột, dầu chiên lại. Ăn xong insulin lên, mỡ không đốt được.',thayThe:'Gà luộc hoặc áp chảo dầu oliu 150g + 100g đỗ đen + rau cải.',conThieu:'đạm 110g, đậu 150g, rau 200g',dam:80,protein:18,dau:0,rau:0,tinhBot:60,may:'mock · 1s'} : {den:'xanh',diem:9,mon:'Đạm + đậu + rau',nhanXet:'Chuẩn đĩa rồi b. Đạm đủ, có đậu, có rau.',thayThe:'',conThieu:'đạm 60g',dam:150,protein:35,dau:100,rau:200,tinhBot:0,may:'mock · 1s'};
     logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua, moTa, den:kq.den, mon:kq.mon, nhanXet:kq.nhanXet, thayThe:kq.thayThe, dam:kq.dam, protein:kq.protein, dau:kq.dau, rau:kq.rau, tinhBot:kq.tinhBot, nuoc:0, viPham:'', diem:kq.diem}); return kq; };
-  const CAMKET = []; const MOCK_ANH = {};
+  const CAMKET = []; const MOCK_ANH = {}; const MOCK_CHO = {};
   const wait = v => new Promise(ok => setTimeout(() => ok(v), 600));
   const hlvSt = () => { const x = st(); x.hv = Object.assign({}, hv, {ten:'Dũng', vaiTro:'HLV'}); x.feedHomNay = [...logs].reverse(); x.hlv = [{ten:'Chị Ngát',canDau:0,canMoi:0,giam:0,mucTieu:-4,streak:0,buaHomNay:0,diemHomNay:null,diemTuan:0,gymTuan:0,ngayCuoi:'',co:['chưa gửi gì','hồ sơ thiếu','chưa cân']},{ten:'Anh Tú',canDau:74,canMoi:72.6,giam:1.4,mucTieu:-5,streak:2,buaHomNay:2,diemHomNay:6,diemTuan:14.5,gymTuan:1,ngayCuoi:'2026-09-03',co:[]},{ten:'Thái Hưng',canDau:100,canMoi:96,giam:4,mucTieu:-4,streak:3,buaHomNay:2,diemHomNay:9,diemTuan:26,gymTuan:2,ngayCuoi:'2026-09-03',co:[]}]; return x; };
   return { dangNhap:(t,p) => wait(p === '2468' ? hlvSt() : p === '1234' ? Object.assign(st(), {hv: Object.assign({}, hv, {phaiDoiPin:true})}) : p === '1002' ? st() : {loi:'Sai tên hoặc mã PIN (bản thử: Anh Tú / 1002, HLV Dũng / 2468).'}), xemHocVien:(t,p,ai) => wait(Object.assign(st(), {xemBoi:'Dũng'})), layTrangThai:() => wait(st()),
     guiBua:(t,p,b,m,a,mi,nc,db,nh) => { const kq = cham(b, m || 'ảnh'); kq.thieuGram = !/\d/.test(m || ''); logs[logs.length-1].nuocChanh = nc; logs[logs.length-1].diBo = db; logs[logs.length-1].nhai = nh; return wait(st(kq)); },
+    luuBua:(t,p,b,m,a,mi,nc,db,nh,ma) => { MOCK_CHO[ma] = {b, m: m || 'ảnh', nc, db, nh}; return wait({ok:1, maBua:ma, dangCho:1}); },
+    chamBua:(t,p,ma) => { const c = MOCK_CHO[ma]; if (!c) return wait({loi:'Không tìm thấy bữa này trong sổ.'}); const kq = cham(c.b, c.m); kq.thieuGram = !/\d/.test(c.m); const l = logs[logs.length-1]; l.nuocChanh = c.nc; l.diBo = c.db; l.nhai = c.nh; delete MOCK_CHO[ma]; return wait(st(kq)); },
     ghiCan:(t,p,kg) => wait(st()),
     xoaNhatKy:(t,p,k) => { logs = logs.filter(l => l.thoiGian !== k); return wait(st()); },
     ghiCamKet:(t,p,tu,nd) => { if (String(nd||'').trim().length < 5) return wait({loi:'Viết ít nhất 1 câu cam kết cụ thể.'}); const i = CAMKET.findIndex(c => c.tuan === tu); const c = {tuan:tu, noiDung:String(nd).trim(), luc:'04/09 10:00'}; if (i >= 0) CAMKET[i] = c; else CAMKET.push(c); const x = st(); x.camKetVuaLuu = true; return wait(x); },
