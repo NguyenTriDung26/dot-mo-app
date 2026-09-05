@@ -327,7 +327,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260905-100214';
+const APP_VER = '20260905-102845';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -502,6 +502,22 @@ function doHoSoVaoForm(){
   $('#hoso-loi-thieu').textContent = h.hoSoDu ? 'Sửa số rồi bấm LƯU — lộ trình và định mức tính lại ngay.' : 'Điền 1 lần (2 phút). Máy tự tính định mức ăn và 6 mốc cân theo công thức của HLV Dũng.';
   tinhHS();
 }
+function tranGiamJS(can, cao, namSinh, nu, pct, moKg) {
+  const o = { nhomMo: '', tocDoTuan: 0, tranNhom: 0, thamHut: 0, moGiam6Tuan: 0, nuocTuan1: 0, tranGiam6Tuan: 0, bmr: 0, tdee: 0 };
+  if (!can || !pct) return o;
+  const tuoi = namSinh ? new Date().getFullYear() - namSinh : 0;
+  o.bmr = (cao && tuoi) ? Math.round(10 * can + 6.25 * cao - 5 * tuoi + (nu ? -161 : 5)) : 0; o.tdee = o.bmr ? Math.round(o.bmr * 1.4) : 0;
+  const nhom = nu ? (pct < 28 ? 1 : pct <= 35 ? 2 : 3) : (pct < 20 ? 1 : pct <= 28 ? 2 : 3);
+  o.nhomMo = ['', 'Ít mỡ', 'Vừa', 'Nhiều mỡ'][nhom]; o.tocDoTuan = [0, 0.5, 0.75, 1][nhom]; o.tranNhom = [0, 500, 750, 1000][nhom];
+  const uv = [Math.round(o.tocDoTuan / 100 * can * 1100), o.tranNhom];
+  if (o.tdee) uv.push(o.tdee - o.bmr);
+  if (moKg) uv.push(Math.round(68 * moKg));
+  o.thamHut = Math.max(0, Math.min.apply(null, uv));
+  o.moGiam6Tuan = Math.round(o.thamHut * 42 / 7700 * 10) / 10;
+  o.nuocTuan1 = Math.min(2, Math.round(0.02 * can * 10) / 10);
+  o.tranGiam6Tuan = Math.round((o.moGiam6Tuan + o.nuocTuan1) * 10) / 10;
+  return o;
+}
 function tinhHS(){
   const can = soF('#hs-can'), mo = soF('#hs-mo'), dich = soF('#hs-dich'), moDich = soF('#hs-modich');
   $('#hs-can2').value = can || ''; $('#hs-mo2').value = mo || '';
@@ -510,14 +526,14 @@ function tinhHS(){
   if (!(can && dich)) { el.innerHTML = 'Nhập cân nặng và cân muốn về để máy tính mục tiêu.'; return; }
   if (dich >= can) { el.innerHTML = '<span style="color:var(--red)">Cân muốn về phải nhỏ hơn cân hiện tại.</span>'; return; }
   const giam = Math.round((can - dich) * 10) / 10, tuan = Math.round(giam / 6 * 100) / 100;
-  const moKg = soF('#hs-mokg'); const thamHut = moKg ? Math.round(68 * moKg) : 0; const duKien = thamHut ? Math.round(thamHut * 7 / 7700 * 100) / 100 : 0;
+  const moKg = soF('#hs-mokg'); const tr = tranGiamJS(can, soF('#hs-cao'), soF('#hs-namsinh'), /n[uữ]/i.test(hsGioi || ''), mo, moKg); const thamHut = tr.thamHut;
   let canhBao = '';
-  if (tuan > 1.2) canhBao = `<div style="color:var(--amber);margin-top:6px">⚠️ ${tuan} kg/tuần là nhanh. HLV thường chốt ≤ 1 kg/tuần để giữ cơ. Cứ lưu, HLV sẽ xem lại.</div>`;
-  else if (duKien && tuan > duKien) canhBao = `<div style="color:var(--amber);margin-top:6px">⚠️ Thâm hụt theo mỡ của bạn cho phép ~${duKien} kg/tuần. Mục tiêu hơi cao, HLV sẽ xem lại.</div>`;
+  if (tr.tranGiam6Tuan && giam > tr.tranGiam6Tuan + 0.05) canhBao = `<div style="color:var(--red);margin-top:6px">⛔ Với ${mo}% mỡ (nhóm ${tr.nhomMo}), cơ thể bạn tối đa giảm <b>${tr.tranGiam6Tuan} kg</b> trong 6 tuần (${tr.moGiam6Tuan} kg mỡ + ${tr.nuocTuan1} kg nước tuần 1, ăn ≤ ${tr.tdee ? Math.max(tr.bmr, tr.tdee - tr.thamHut) : '?'} kcal/ngày). Đặt ${giam} kg là mất cơ, chững cân rồi ăn bù. Sửa cân muốn về ≥ <b>${Math.round((can - tr.tranGiam6Tuan) * 10) / 10} kg</b>.</div>`;
+  else if (tr.tranGiam6Tuan) canhBao = `<div style="color:var(--lime);margin-top:6px">✅ Trong trần cho phép: nhóm ${tr.nhomMo} giảm tối đa ${tr.tranGiam6Tuan} kg/6 tuần.</div>`;
   const moTxt = (mo && moDich) ? (moDich >= mo ? ` · <span style="color:var(--red)">% mỡ muốn về phải nhỏ hơn ${mo}%</span>` : ` · mỡ <b>${mo}% → ${moDich}%</b> (−${Math.round((mo - moDich) * 10) / 10} điểm)`) : '';
-  el.innerHTML = `🎯 Giảm <b>${giam} kg</b> trong 6 tuần = <b>−${tuan} kg/tuần</b>${moTxt}${moKg ? ` · mỡ thừa ${moKg} kg → thâm hụt <b>${thamHut} kcal/ngày</b>` : ''}${canhBao}`;
+  el.innerHTML = `🎯 Giảm <b>${giam} kg</b> trong 6 tuần = <b>−${tuan} kg/tuần</b>${moTxt}${tr.tdee ? ` · nạp tối đa <b>${Math.max(tr.bmr, tr.tdee - tr.thamHut)} kcal/ngày</b>` : ''}${canhBao}`;
 }
-['#hs-can','#hs-mo','#hs-dich','#hs-mokg','#hs-modich'].forEach(id => $(id).addEventListener('input', tinhHS));
+['#hs-can','#hs-mo','#hs-dich','#hs-mokg','#hs-modich','#hs-cao','#hs-namsinh'].forEach(id => $(id).addEventListener('input', tinhHS));
 $('#btn-hs-huy').onclick = quayLai;
 $('#btn-hs-luu').onclick = async () => {
   const hs = { hoTen: $('#hs-hoten').value.trim(), namSinh: soF('#hs-namsinh'), gioiTinh: hsGioi, cao: soF('#hs-cao'), canNang: soF('#hs-can'), phanTramMo: soF('#hs-mo'), moKg: soF('#hs-mokg'), vongEo: soF('#hs-eo'), bapTay: soF('#hs-tay'), bapDui: soF('#hs-dui'), canDich: soF('#hs-dich'), moDich: soF('#hs-modich'), anh: du3(hsAnh3) ? hsAnh3 : null };
@@ -526,6 +542,8 @@ $('#btn-hs-luu').onclick = async () => {
   if (thieu) { err.textContent = 'Còn thiếu: ' + thieu + '.'; err.classList.remove('hide'); return; }
   if (hs.canDich >= hs.canNang) { err.textContent = 'Cân muốn về phải nhỏ hơn cân hiện tại.'; err.classList.remove('hide'); return; }
   if (hs.moDich >= hs.phanTramMo) { err.textContent = '% mỡ muốn về phải nhỏ hơn % mỡ hiện tại.'; err.classList.remove('hide'); return; }
+  const trS = tranGiamJS(hs.canNang, hs.cao, hs.namSinh, /n[uữ]/i.test(hsGioi || ''), hs.phanTramMo, hs.moKg);
+  if (trS.tranGiam6Tuan && hs.canNang - hs.canDich > trS.tranGiam6Tuan + 0.05) { err.textContent = 'Cơ thể bạn tối đa giảm ' + trS.tranGiam6Tuan + ' kg trong 6 tuần. Sửa cân muốn về ≥ ' + (Math.round((hs.canNang - trS.tranGiam6Tuan) * 10) / 10) + ' kg.'; err.classList.remove('hide'); return; }
   const soAnh = ['truoc','nghieng','sau'].filter(g => hsAnh3[g] && hsAnh3[g].b64).length;
   if (soAnh > 0 && soAnh < 3) { err.textContent = 'Mới có ' + soAnh + '/3 ảnh. Chụp đủ trước, nghiêng, sau.'; err.classList.remove('hide'); return; }
   if (!hs.anh && !(S && S.hv.anhBody)) { err.textContent = 'Còn thiếu 3 ảnh body (trước, nghiêng, sau). Chụp theo ảnh mẫu rồi bấm LƯU.'; err.classList.remove('hide'); return; }
@@ -771,7 +789,7 @@ function nhan(r){
   const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
     return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
   $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + `` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
-  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h${Math.round(t.ngu.gio % 1 * 60) ? ' ' + Math.round(t.ngu.gio % 1 * 60) + ' phút' : ''} · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.thamHut ? `<span>🎯 Thâm hụt mục tiêu ${h.thamHut} kcal/ngày</span>` : ''}</div>`;
+  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h${Math.round(t.ngu.gio % 1 * 60) ? ' ' + Math.round(t.ngu.gio % 1 * 60) + ' phút' : ''} · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.kcalMucTieu ? `<span>🎯 Nạp tối đa ${h.kcalMucTieu} kcal/ngày</span>` : ''}</div>`;
   $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
 
   const bd = r.bangDua; const medal = ['🥇','🥈','🥉'];
@@ -790,8 +808,8 @@ function nhan(r){
     r.loTrinh.map(m => `<tr class="${m.tuan === r.tuan ? 'me' : ''}"><td>${m.tuan}</td><td>${m.ngay.slice(5).replace('-', '/')}</td><td class="r">≤ ${m.moc} kg</td><td class="r">${m.thucTe ? m.thucTe + ' kg' : '–'}</td><td class="r">${m.dat === null ? (m.daQua ? '⬜' : '') : (m.dat ? '✅' : '❌')}</td></tr>`).join('') + '</table>' : '';
   $('#hoso').innerHTML = `<p class="k">Hồ sơ & lộ trình của ${esc(h.ten)}</p>${ho}
     <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:10px 0">${so(tk.canDau || h.canNang || '–', ' kg', 'xuất phát')}${so(h.phanTramMo || '–', '%', 'mỡ')}${so(h.mo || '–', ' kg', 'mỡ thừa')}</div>
-    <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.thamHut || '–', '', 'kcal thâm hụt/ngày')}${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
-    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b>${h.giamTuanDuKien ? ` <small>(thâm hụt cho phép ~${h.giamTuanDuKien} kg/tuần)</small>` : ''}</div><div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button>` : ''}${!r.xemBoi ? `` : ''}`;
+    <div class="podium" style="grid-template-columns:repeat(3,1fr);align-items:stretch;margin:0 0 10px">${so(h.kcalMucTieu || '–', '', 'kcal nạp tối đa/ngày')}${so(h.tranGiam6Tuan || '–', ' kg', 'trần giảm 6 tuần')}${so(h.dam || '–', ' g', 'protein/ngày')}</div>
+    <div style="font-size:14px;line-height:1.7;color:#d5ddd6">${h.hoTen || h.namSinh || h.cao ? `<div>👤 ${esc(h.hoTen || h.ten)}${h.tuoi ? ' · ' + h.tuoi + ' tuổi' : ''}${h.cao ? ' · ' + h.cao + ' cm' : ''}${h.gioiTinh ? ' · ' + esc(h.gioiTinh) : ''}</div>` : ''}${h.vongEo || h.bapTay || h.bapDui ? `<div>📏 Eo <b>${h.vongEo || '–'}</b> · tay <b>${h.bapTay || '–'}</b> · đùi <b>${h.bapDui || '–'}</b> cm <small>(số đo xuất phát)</small></div>` : ''}<div>🎯 Mục tiêu 6 tuần: <b>${h.mucTieu ? h.mucTieu + ' kg' : 'chưa đặt'}</b>${h.canDich ? ` → về <b>${h.canDich} kg</b>` : ''}${h.moDich ? ` · mỡ <b>${h.phanTramMo || '?'}% → ${h.moDich}%</b>` : ''}</div>${h.anhBody ? `<div>📸 Ảnh body xuất phát: <b>đã có</b>${h.vaiTro === 'HLV' || r.xemBoi ? ` · <a href="${esc(h.anhBody)}" target="_blank" style="color:var(--lime)">mở ảnh</a>` : ''}</div>` : `<div>📸 Ảnh body xuất phát: <b style="color:var(--amber)">chưa có</b></div>`}<div> → mỗi tuần <b style="color:var(--lime)">−${r.buocTuan || 0} kg</b></div>${h.tranGiam6Tuan ? `<div>🧱 Trần giảm 6 tuần: <b>${h.tranGiam6Tuan} kg</b> <small>(nhóm ${esc(h.nhomMo || '')} · ${h.tocDoTuan}% cân/tuần · ăn ≤ ${h.kcalMucTieu || '?'} kcal/ngày, không thấp hơn)</small></div>` : ''}<div>💧 Nước ${h.nuoc} L · 🫘 đậu ${h.dau} g · 🥬 rau ${h.rau} g${h.bmi ? ` · BMI ${h.bmi}` : ''}${h.tdee ? ` · TDEE ~${h.tdee} kcal` : ''}</div></div>${mocHtml}${!r.xemBoi && h.vaiTro !== 'HLV' ? `<button class="btn ghost sm" onclick="hien('hoso')">✏️ Sửa hồ sơ</button>` : ''}${!r.xemBoi ? `` : ''}`;
   veDinhMuc(r); veBieuDo(r); veLuoi(r); veCamKet(r); veAnhTienDo(r);
   $('#luat').innerHTML = `<p class="k">⚖️ Luật & nội quy</p>` + veLuatHtml(r.luat, r.hv.vaiTro === 'HLV');
   const canMoi = tk.canMoi || tk.canDau; const tuanNay = (r.lichSu || []).slice((r.tuan - 1) * 7, r.tuan * 7).filter(d => d.diem !== null);
@@ -945,7 +963,7 @@ const MOCK = (() => {
     guiAnhTuan:(t,p,anh) => { MOCK_ANH[1] = anh; const x = st(); x.anhVuaLuu = 1; return wait(x); },
     layAnhTienDo:(t,p) => wait({ ten: hv.ten, tuanHienTai: 1, ds: Object.keys(MOCK_ANH).map(k => ({ tuan: Number(k), ngay: '2026-09-04', thumb: { truoc: 'data:image/jpeg;base64,' + MOCK_ANH[k].truoc.thumb, nghieng: 'data:image/jpeg;base64,' + MOCK_ANH[k].nghieng.thumb, sau: 'data:image/jpeg;base64,' + MOCK_ANH[k].sau.thumb }, url: {} })) }),
     capNhatHoSo:(t,p,hs) => { if (hs.anh) MOCK_ANH[0] = hs.anh; Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anh ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
-      hv.thamHut = Math.round(68*hv.mo); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 1 hộp sữa chua không đường + 100 g rau',protein:32,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
+      Object.assign(hv, tranGiamJS(hv.canNang, hv.cao, hv.namSinh, /n[uữ]/i.test(hv.gioiTinh), hv.phanTramMo, hv.mo)); hv.kcalMucTieu = Math.max(hv.bmr, hv.tdee - hv.thamHut); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 1 hộp sữa chua không đường + 100 g rau',protein:32,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
       const x = st(); x.hoSoVuaLuu = true; return wait(x); },
     ghiNgu:(t,p,g,sa,re) => { g=Number(g); const ph=Math.round(g*60); const sp=Number(sa)||0, rp=Number(re)||0; const sa2=Math.round(sp/ph*100), re2=Math.round(rp/ph*100); const dat=(g>=7?1:0)+(sa2>=20?1:0)+(re2>=20?1:0); logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'ngu', moTa:'Ngủ '+g+' h · sâu '+sp+' phút ('+sa2+'%) · REM '+rp+' phút ('+re2+'%)', nhanXet:'Chất lượng giấc ngủ: '+(dat===3?'TỐT':dat===2?'KHÁ':'KÉM')+' ('+dat+'/3 tiêu chí).', den: dat===3?'xanh':dat>=1?'vang':'do', nguGio:g, nguSau:sa2, nguRem:re2, dam:0,dau:0,rau:0,tinhBot:0,nuoc:0}); return wait(st()); },
     ghiGym:() => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'gym', dam:0,dau:0,rau:0,tinhBot:0,nuoc:0, diem:null}); return wait(st()); },
