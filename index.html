@@ -39,7 +39,7 @@ textarea{min-height:70px;resize:vertical}
 .seg{display:flex;gap:6px}.seg button{flex:1;font:inherit;font-weight:700;font-size:14px;padding:11px 4px;border:1px solid var(--line);background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
 .seg button.on{background:var(--ink);color:#06130a;border-color:var(--ink)}
 .pick{display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed #3a463d;border-radius:14px;padding:22px;color:var(--lime);font-weight:800;cursor:pointer;background:#0f1411}
-.pick input{display:none}.anh2{margin-top:8px}.anh2 .pick{flex:1;flex-direction:column;gap:4px;padding:14px 6px;font-size:12px;text-align:center}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:12px;flex-direction:column;gap:6px;position:relative;overflow:hidden;min-height:96px}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{border-style:solid;border-color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
+.pick input{display:none}.anh-chon{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:10px;border:1px solid #3a463d;border-radius:14px;background:#0f1411}.anh-chon button{font:inherit;font-weight:800;font-size:15px;padding:14px;border-radius:12px;border:1px solid #3a463d;background:#1a2119;color:var(--lime);cursor:pointer}.anh-chon button.huy{background:transparent;color:var(--mute);font-weight:700;padding:10px}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:12px;flex-direction:column;gap:6px;position:relative;overflow:hidden;min-height:96px}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{border-style:solid;border-color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;accent-color:var(--lime)}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,11,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:9}
@@ -228,11 +228,13 @@ small{color:var(--mute)}
         <button data-b="sang">Sáng</button><button data-b="trua">Trưa</button><button data-b="chieu">Chiều</button><button data-b="toi">Tối</button>
       </div>
       <label>Ảnh bữa ăn</label>
-      <div class="row anh2">
-        <label class="pick">📷 CHỤP ẢNH MỚI<input id="in-anh" type="file" accept="image/*" capture="environment"></label>
-        <label class="pick">🖼 GỬI ẢNH ĐÃ CHỤP<input id="in-anh2" type="file" accept="image/*"></label>
+      <button type="button" class="pick" id="btn-anh" style="width:100%;font:inherit;font-weight:800">📷 THÊM ẢNH BỮA ĂN</button>
+      <input id="in-anh" type="file" accept="image/*" capture="environment" style="display:none"><input id="in-anh2" type="file" accept="image/*" style="display:none">
+      <div class="anh-chon hide" id="anh-chon">
+        <button type="button" id="anh-chup">📷 Chụp ảnh mới</button>
+        <button type="button" id="anh-thuvien">🖼 Chọn ảnh đã chụp trong máy</button>
+        <button type="button" id="anh-huy" class="huy">Huỷ</button>
       </div>
-      <small style="display:block;margin-top:6px">Ảnh đã chụp sẵn trong máy thì bấm nút bên phải để chọn từ thư viện.</small>
       <img id="preview" alt="">
       <div class="row hide" id="anh-act" style="margin-top:8px"><button class="btn ghost sm" id="btn-anh-doi" style="margin:0;flex:1">🔄 ĐỔI ẢNH KHÁC</button><button class="btn ghost sm" id="btn-anh-xoa" style="margin:0;flex:1">🗑 BỎ ẢNH</button></div>
       <label>Mô tả + định lượng (gram)</label>
@@ -325,7 +327,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260905-095913';
+const APP_VER = '20260905-100035';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -672,7 +674,12 @@ function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
 $('#btn-anh-xoa').onclick = boAnhBua;
 $('#btn-sua-huy').onclick = huySua;
-$('#btn-anh-doi').onclick = () => $('#in-anh2').click();
+function moChonAnh(mo){ $('#anh-chon').classList.toggle('hide', !mo); }
+$('#btn-anh').onclick = () => moChonAnh(true);
+$('#btn-anh-doi').onclick = () => moChonAnh(true);
+$('#anh-huy').onclick = () => moChonAnh(false);
+$('#anh-chup').onclick = () => { moChonAnh(false); $('#in-anh').click(); };
+$('#anh-thuvien').onclick = () => { moChonAnh(false); $('#in-anh2').click(); };
 // ---------- 3 ảnh body: chọn → thu nhỏ bản gốc 1400px + bản nhỏ 360px ----------
 function ganAnh3(rootSel, store){
   document.querySelectorAll(rootSel + ' input[type=file]').forEach(inp => inp.onchange = e => {
