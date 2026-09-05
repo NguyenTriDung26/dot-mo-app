@@ -39,7 +39,7 @@ textarea{min-height:70px;resize:vertical}
 .seg{display:flex;gap:6px}.seg button{flex:1;font:inherit;font-weight:700;font-size:14px;padding:11px 4px;border:1px solid var(--line);background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
 .seg button.on{background:var(--ink);color:#06130a;border-color:var(--ink)}
 .pick{display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed #3a463d;border-radius:14px;padding:22px;color:var(--lime);font-weight:800;cursor:pointer;background:#0f1411}
-.pick input{display:none}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:12px;flex-direction:column;gap:6px;position:relative;overflow:hidden;min-height:96px}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{border-style:solid;border-color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
+.pick input{display:none}.anh2{margin-top:8px}.anh2 .pick{flex:1;flex-direction:column;gap:4px;padding:14px 6px;font-size:12px;text-align:center}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:12px;flex-direction:column;gap:6px;position:relative;overflow:hidden;min-height:96px}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{border-style:solid;border-color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}#preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;accent-color:var(--lime)}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,11,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:9}
@@ -70,7 +70,7 @@ textarea{min-height:70px;resize:vertical}
 .pd .m{font-size:26px}.pd .t{font-weight:800;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pd .p{font-size:22px;font-weight:900;color:var(--gold);line-height:1.1}.pd .s{font-size:11px;color:var(--mute)}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mute);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 td.r,th.r{text-align:right}tr.me td{background:rgba(163,255,91,.08);font-weight:800}
-.log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:#c9d2cb}.tk-ok,.tk-no{margin:6px 0 0;padding-left:0;list-style:none;font-size:14px}.tk-ok li{padding:3px 0;color:var(--lime)}.tk-no li{padding:3px 0;color:var(--amber)}.tk-h{font-weight:900;margin-top:10px;font-size:13px;letter-spacing:.3px}.log .la{display:block;width:100%;max-width:220px;border-radius:10px;margin:6px 0;border:1px solid var(--line)}.log .act{display:flex;gap:6px;margin-top:6px}.log .act button{font:inherit;font-size:12px;font-weight:700;border:1px solid var(--line);background:transparent;color:var(--mute);border-radius:8px;padding:4px 9px;cursor:pointer}
+.log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:#c9d2cb}.tk-ok,.tk-no{margin:6px 0 0;padding-left:0;list-style:none;font-size:14px}.tk-ok li{padding:3px 0;color:var(--lime)}.tk-no li{padding:3px 0;color:var(--amber)}.tk-h{font-weight:900;margin-top:10px;font-size:13px;letter-spacing:.3px}.log .la{display:block;width:100%;max-width:220px;border-radius:10px;margin:6px 0;border:1px solid var(--line)}.log .act{display:flex;gap:6px;margin-top:6px}.log .act button{font:inherit;font-size:13px;font-weight:800;border:1px solid #3a463d;background:#0f1411;color:var(--lime);border-radius:9px;padding:7px 12px;cursor:pointer}.log .act button.xoa{color:#ff8a8a;border-color:#4a2a2a}
 .lg{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--sf2)}.lg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:900;font-size:14px;color:var(--lime);letter-spacing:.03em}.lg summary::-webkit-details-marker{display:none}.lg summary span{font-size:11px;color:var(--mute);font-weight:700}.lg summary::after{content:'▾';color:var(--mute);margin-left:8px}.lg[open] summary::after{content:'▴'}.lm{padding:0 14px 12px}.lt{font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;color:var(--ink)}.ld{margin:0;padding-left:20px;font-size:15px;color:#d5ddd6;line-height:1.55}.ld li{margin:2px 0}.muc{font-weight:900;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:#d5ddd6;line-height:1.55}
 .err{background:rgba(255,90,90,.12);color:#ffb3b3;border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600}
 .warn{background:rgba(255,200,61,.12);border:1px solid rgba(255,200,61,.35);color:#ffe28a;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:12px}
@@ -221,14 +221,20 @@ small{color:var(--mute)}
   <div id="xem-bar" class="hide" style="position:sticky;top:0;z-index:8;background:var(--gold);color:#1a1200;border-radius:12px;padding:10px 12px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px"><span id="xem-ten"></span><button id="btn-vehlv" style="font:inherit;font-weight:900;border:0;background:#1a1200;color:var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer">← VỀ HLV</button></div>
   <div id="v-gui" class="hide">
     <div id="canh-bao" class="warn hide"></div>
+    <div id="sua-bar" class="warn hide" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span id="sua-txt"></span><button id="btn-sua-huy" style="font:inherit;font-weight:800;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap">✕ Huỷ sửa</button></div>
     <div class="card">
       <p class="k">Bữa nào?</p>
       <div class="seg" id="seg-bua">
         <button data-b="sang">Sáng</button><button data-b="trua">Trưa</button><button data-b="chieu">Chiều</button><button data-b="toi">Tối</button>
       </div>
       <label>Ảnh bữa ăn</label>
-      <label class="pick">📷 CHỤP / CHỌN ẢNH <input id="in-anh" type="file" accept="image/*" capture="environment"></label>
+      <div class="row anh2">
+        <label class="pick">📷 CHỤP ẢNH MỚI<input id="in-anh" type="file" accept="image/*" capture="environment"></label>
+        <label class="pick">🖼 GỬI ẢNH ĐÃ CHỤP<input id="in-anh2" type="file" accept="image/*"></label>
+      </div>
+      <small style="display:block;margin-top:6px">Ảnh đã chụp sẵn trong máy thì bấm nút bên phải để chọn từ thư viện.</small>
       <img id="preview" alt="">
+      <div class="row hide" id="anh-act" style="margin-top:8px"><button class="btn ghost sm" id="btn-anh-doi" style="margin:0;flex:1">🔄 ĐỔI ẢNH KHÁC</button><button class="btn ghost sm" id="btn-anh-xoa" style="margin:0;flex:1">🗑 BỎ ẢNH</button></div>
       <label>Mô tả + định lượng (gram)</label>
       <textarea id="in-mota" placeholder="Ví dụ: 4 quả trứng ốp, 100g đỗ đen, 1 bát rau cải luộc"></textarea>
       <p class="k" style="margin-top:10px">Tích 3 thói quen bữa này</p><div class="row"><label class="chk"><input type="checkbox" id="ck-nhai"> 🦷 Nhai mỗi miếng 20 lần · bữa 20 phút</label><label class="chk"><input type="checkbox" id="ck-chanh"> 🍋 Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> 🚶 Đi bộ 100 bước sau ăn</label></div>
@@ -255,7 +261,7 @@ small{color:var(--mute)}
     <div class="card" id="tien-do"></div>
     <div class="card hide" id="tongket"></div>
     <div class="card" id="thoiquen"></div>
-    <div class="card"><p class="k">Các bữa hôm nay</p><div id="logs"></div></div>
+    <div class="card"><p class="k">Các bữa hôm nay</p><small style="display:block;margin-bottom:8px">Ghi sai? Bấm <b>✏️ Sửa</b> để chỉnh lại nội dung, hoặc <b>🗑 Xoá</b> để bỏ dòng đó.</small><div id="logs"></div></div>
   </div>
 
   <!-- BẢNG ĐUA -->
@@ -319,7 +325,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260904-204626';
+const APP_VER = '20260905-095142';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -658,10 +664,15 @@ function thuNhoAnh(f, max, cb){
   };
   img.src = url;
 }
-$('#in-anh').onchange = e => {
+function chonAnhBua(e){
   const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 900, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; });
-};
+  thuNhoAnh(f, 900, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); });
+}
+function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; $('#anh-act').classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; }
+$('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
+$('#btn-anh-xoa').onclick = boAnhBua;
+$('#btn-sua-huy').onclick = huySua;
+$('#btn-anh-doi').onclick = () => $('#in-anh2').click();
 // ---------- 3 ảnh body: chọn → thu nhỏ bản gốc 1400px + bản nhỏ 360px ----------
 function ganAnh3(rootSel, store){
   document.querySelectorAll(rootSel + ' input[type=file]').forEach(inp => inp.onchange = e => {
@@ -686,17 +697,17 @@ $('#btn-gui').onclick = async () => {
     if (r.loi) { $('#gui-err').textContent = r.loi; $('#gui-err').classList.remove('hide'); }
     else {
       nhan(r); hienKetQua(r.ketQua);
-      $('#in-mota').value = ''; anhB64 = null; $('#preview').style.display = 'none'; $('#in-anh').value = ''; $('#ck-chanh').checked = false; $('#ck-dibo').checked = false; $('#ck-nhai').checked = false;
+      $('#in-mota').value = ''; boAnhBua(); await xongSua(); $('#ck-chanh').checked = false; $('#ck-dibo').checked = false; $('#ck-nhai').checked = false;
     }
   } catch (e) { $('#gui-err').textContent = 'Lỗi: ' + (e.message || e); $('#gui-err').classList.remove('hide'); }
   b.disabled = false; b.textContent = 'GỬI ĐỂ CHẤM ⚡';
 };
 document.querySelectorAll('[data-ml]').forEach(b => b.onclick = () => { const goc = b.textContent; b.disabled = true; b.textContent = '✓ đã ghi'; setTimeout(() => { b.textContent = goc; b.disabled = false; }, 1200); goi('ghiNuoc', ten, pin, b.dataset.ml).then(r => { if (r.loi) toast('⚠️ ' + r.loi, 4000); else nhan(r); }).catch(() => toast('⚠️ Chưa ghi được nước, kiểm tra mạng rồi bấm lại', 4000)); });
 $('#btn-can').onclick = async () => { const v = $('#in-can').value.trim(); if (!v) return; const b = $('#btn-can'); b.disabled = true; b.textContent = '...';
-  try { const r = await goi('ghiCan', ten, pin, v); if (r.loi) { $('#can-hint').textContent = r.loi; } else { nhan(r); $('#in-can').value = ''; $('#can-hint').textContent = '✓ Đã ghi ' + v + ' kg'; } } catch(e){ $('#can-hint').textContent = 'Lỗi: ' + (e.message || e); }
+  try { const r = await goi('ghiCan', ten, pin, v); if (r.loi) { $('#can-hint').textContent = r.loi; } else { nhan(r); $('#in-can').value = ''; $('#can-hint').textContent = '✓ Đã ghi ' + v + ' kg'; await xongSua(); } } catch(e){ $('#can-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI CÂN'; };
 $('#btn-ngu').onclick = async () => { const gioN = Number($('#in-ngu-gio').value.trim()) || 0, phutN = Number($('#in-ngu-phut').value.trim()) || 0; if (!gioN && !phutN) return; const g = String(Math.round((gioN + phutN / 60) * 100) / 100); const b = $('#btn-ngu'); b.disabled = true; b.textContent = '...';
-  try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; $('#in-ngu-gio').value = $('#in-ngu-phut').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
+  try { const r = await goi('ghiNgu', ten, pin, g, $('#in-ngu-sau').value.trim(), $('#in-ngu-rem').value.trim()); if (r.loi) { $('#ngu-hint').textContent = r.loi; } else { nhan(r); $('#ngu-hint').textContent = '✓ Đã ghi giấc ngủ'; await xongSua(); $('#in-ngu-gio').value = $('#in-ngu-phut').value = $('#in-ngu-sau').value = $('#in-ngu-rem').value = ''; } } catch(e){ $('#ngu-hint').textContent = 'Lỗi: ' + (e.message || e); }
   b.disabled = false; b.textContent = 'GHI GIẤC NGỦ'; };
 $('#btn-gym').onclick = () => { const b = $('#btn-gym'); const goc = b.textContent; b.disabled = true; b.textContent = '✓ Đã ghi buổi gym hôm nay'; goi('ghiGym', ten, pin).then(r => { if (r.loi) { toast('⚠️ ' + r.loi, 4000); b.textContent = goc; b.disabled = false; } else nhan(r); }).catch(() => { toast('⚠️ Chưa ghi được, kiểm tra mạng rồi bấm lại', 4000); b.textContent = goc; b.disabled = false; }); };
 
@@ -861,7 +872,7 @@ function dongLog(l){
   const cuaMinh = l.ten === ten && !(S && S.xemBoi) && l.bua !== 'anh' && l.bua !== 'sodo';
   if (!cuaMinh) return html;
   const laBua = ['sang','trua','chieu','toi','ngu','can'].indexOf(l.bua) >= 0;
-  const act = `<div class="act">${laBua ? `<button onclick="suaLog('${l.thoiGian}')">✏️ Sửa</button>` : ''}<button onclick="xoaLog('${l.thoiGian}')">🗑 Xoá</button></div>`;
+  const act = `<div class="act">${laBua ? `<button onclick="suaLog('${l.thoiGian}')">✏️ Sửa</button>` : ''}<button class="xoa" onclick="xoaLog('${l.thoiGian}')">🗑 Xoá</button></div>`;
   return html.replace(/<\/div><\/div>$/, act + '</div></div>');
 }
 async function xoaLog(k, imLang){
@@ -870,10 +881,13 @@ async function xoaLog(k, imLang){
   try { const r = await goi('xoaNhatKy', ten, pin, k); if (r.loi) { toast(r.loi, 3000); return false; } nhan(r); if (!imLang) toast('🗑 Đã xoá'); return true; }
   catch (e) { toast('Lỗi: ' + (e.message || e), 3000); return false; }
 }
+let SUA_KEY = null; // dòng đang sửa: xoá dòng cũ chỉ sau khi dòng mới ghi thành công
+function hienSuaBar(){ const b = $('#sua-bar'); if (!b) return; if (SUA_KEY && LOGMAP[SUA_KEY]) { const l = LOGMAP[SUA_KEY]; $('#sua-txt').innerHTML = '✏️ Đang sửa: <b>' + esc(l.mon || l.moTa || l.bua) + '</b>. Ghi lại xong, dòng cũ tự được thay.'; b.classList.remove('hide'); } else b.classList.add('hide'); }
+function huySua(){ SUA_KEY = null; hienSuaBar(); }
+async function xongSua(){ if (!SUA_KEY) return; const k = SUA_KEY; SUA_KEY = null; hienSuaBar(); await xoaLog(k, true); toast('✓ Đã thay dòng cũ bằng nội dung mới', 3000); }
 async function suaLog(k){
   const l = LOGMAP[k]; if (!l) return;
-  if (!confirm('Sửa dòng này? Dòng cũ sẽ bị xoá, nội dung được đưa lại vào ô nhập để bạn chỉnh rồi ghi lại.')) return;
-  const ok = await xoaLog(k, true); if (!ok) return;
+  SUA_KEY = k; hienSuaBar();
   const nb0 = document.querySelector('button[data-v="gui"]'); if (nb0) nb0.click();
   if (l.bua === 'ngu') { const ph = Math.round((l.nguGio || 0) * 60); $('#in-ngu-gio').value = Math.floor(ph / 60); $('#in-ngu-phut').value = ph % 60; $('#in-ngu-sau').value = Math.round(ph * (l.nguSau || 0) / 100); $('#in-ngu-rem').value = Math.round(ph * (l.nguRem || 0) / 100); toast('✏️ Chỉnh lại rồi bấm GHI GIẤC NGỦ', 3000); $('#in-ngu-gio').focus(); return; }
   if (l.bua === 'can') { const c = $('#in-can'); if (c) { c.value = l.can || ''; c.focus(); } toast('✏️ Chỉnh lại số cân rồi bấm GHI CÂN', 3000); return; }
