@@ -29,21 +29,22 @@ body{background:radial-gradient(900px 500px at 50% -200px,#1b2a1e 0%,var(--bg) 6
 .chip.lime{background:var(--lime-dim);color:var(--lime)}
 .card{background:var(--sf);border:0;border-radius:var(--r);padding:16px;margin:0 0 16px}
 .k{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
-label{display:block;font-size:14px;font-weight:600;color:var(--ink2);margin:16px 0 8px}
+label{display:block;font-size:14px;font-weight:600;color:var(--ink2);margin:12px 0 8px}
 input,textarea,select{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid transparent;border-radius:12px;background:var(--sf2);color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--lime)}
-textarea{min-height:80px;resize:vertical}
+textarea{min-height:72px;resize:vertical}
 .btn{display:block;width:100%;font:inherit;font-weight:800;font-size:16px;line-height:1.3;padding:14px 16px;border:0;border-radius:14px;background:var(--lime);color:#06130a;cursor:pointer;margin-top:16px;transition:transform .08s}
 .btn.cta{position:fixed;left:16px;right:16px;bottom:calc(72px + env(safe-area-inset-bottom));max-width:488px;margin:0 auto;z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.45);font-size:17px;padding:16px}
 .linkbtn{display:block;width:100%;background:none;border:0;color:var(--mute);font:inherit;font-size:14px;font-weight:600;padding:14px 0 0;cursor:pointer;text-align:center}
 .nhac{font-size:14px;color:var(--mute);line-height:1.45;margin:8px 0 0}
+.cau{font-size:15px;line-height:1.4;color:var(--ink2);font-weight:500;margin:-8px 0 16px;text-wrap:pretty}
 .ic-s{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;display:inline-block;vertical-align:middle}
 .btn:active{transform:scale(.98)}.btn:disabled{opacity:.55}
 .btn.ghost{background:var(--sf2);color:var(--ink);border:0;font-weight:600}
 .row{display:flex;gap:8px}.row>*{flex:1}
 .seg{display:flex;gap:8px}.seg button{flex:1;font:inherit;font-weight:600;font-size:15px;padding:0 4px;height:44px;border:0;background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
 .seg button.on{background:var(--lime-dim);color:var(--lime);box-shadow:inset 0 0 0 1.5px var(--lime)}
-.pick{display:flex;align-items:center;justify-content:flex-start;gap:12px;border:0;border-radius:12px;padding:0 16px;min-height:56px;width:100%;font-family:inherit;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;background:var(--sf2)}.pick .ic-s{color:var(--lime)}.pick .pk-sub{margin-left:auto;color:var(--mute);font-weight:500;font-size:13px}
+.pick{display:flex;align-items:center;justify-content:flex-start;gap:12px;border:0;border-radius:12px;padding:0 16px;min-height:56px;width:100%;font-family:inherit;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;background:var(--sf2)}.pick .ic-s{color:var(--lime)}.pick .pk-sub{margin-left:auto;color:var(--mute);font-weight:500;font-size:12px;white-space:nowrap}#btn-anh{white-space:nowrap}
 .pick input{display:none}.anh-chon{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:8px;border:0;border-radius:12px;background:var(--sf2)}.anh-chon button{font:inherit;font-weight:600;font-size:15px;padding:12px;border-radius:10px;border:0;background:var(--sf);color:var(--ink);cursor:pointer}.anh-chon button.huy{background:transparent;color:var(--mute);font-weight:600;padding:10px}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:13px;flex-direction:column;justify-content:center;gap:6px;position:relative;overflow:hidden;min-height:110px;color:var(--mute)}.pick.sm span{display:flex;flex-direction:column;align-items:center;gap:6px}.chips{display:flex;gap:8px;flex-wrap:wrap}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{box-shadow:inset 0 0 0 1.5px var(--lime);color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}.vid-pick{margin-top:10px;padding:14px}.vid-pick.co{box-shadow:inset 0 0 0 1.5px var(--lime)}#hs-video-xem{width:100%;max-height:260px;border-radius:12px;margin-top:8px;display:none;background:#000;border:1px solid var(--line)}#hs-video-xem.co{display:block}.vid-info{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#d5ddd6}.vid-info button{font:inherit;font-weight:800;font-size:13px;background:transparent;border:1px solid #3a463d;color:var(--mute);border-radius:10px;padding:6px 10px;cursor:pointer}
 #preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
 .chk{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;color:var(--ink);margin:0;padding:0 14px;min-height:44px;border:0;border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}.row.hbs{flex-direction:column;gap:8px}
@@ -137,6 +138,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="brand-row"><button class="chipbtn hide" id="btn-back" title="Quay lại">←</button><div><div class="brand" id="ten-game">Đốt Mỡ <b>6 Tuần</b></div><div class="sub" id="sub">Chụp. Gửi. Biết ngay đúng hay sai.</div></div></div>
     <div class="tools"><span class="chip lime hide" id="chip-ngay"></span><button class="chipbtn hide" id="btn-menu" title="Menu" aria-label="Menu"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   </div>
+  <p class="cau hide" id="cau-ngay"></p>
 
   <!-- ĐĂNG NHẬP -->
   <div id="v-login">
@@ -272,9 +274,9 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div class="row hide" id="anh-act" style="margin-top:8px"><button class="btn ghost sm" id="btn-anh-doi" style="margin:0;flex:1">Đổi ảnh khác</button><button class="btn ghost sm" id="btn-anh-xoa" style="margin:0;flex:1">Bỏ ảnh</button></div>
       <label>Mô tả và số gram từng món</label>
       <textarea id="in-mota" placeholder="Ức gà 150g, đỗ đen 100g, rau cải 150g, 4 quả trứng"></textarea>
-      <small id="gram-hint" style="display:block;margin-top:8px">Có số gram thì máy chấm đúng hơn. Chỉ ghi tên món, máy phải đoán.</small>
+      <small id="gram-hint" style="display:block;margin-top:8px">Ghi số gram thì máy chấm đúng hơn.</small>
       <div class="warn hide" id="gram-xacnhan" style="margin:10px 0 0"><b>Chưa thấy số gram.</b> Cân từng món rồi ghi (vd: ức gà 150g, đỗ đen 100g) để chấm đúng. Không có cân thì ghi số lượng (4 quả trứng, 1 bát rau).<div class="row" style="margin-top:10px"><button class="btn sm" id="gram-bosung" style="margin:0;flex:1.2">Bổ sung gram</button><button class="btn ghost sm" id="gram-guiluon" style="margin:0;flex:1">Gửi luôn, máy ước lượng</button></div></div>
-      <p class="k" style="margin-top:16px">Thói quen bữa này</p><div class="row hbs"><label class="chk"><input type="checkbox" id="ck-nhai"> Nhai mỗi miếng 20 lần</label><label class="chk"><input type="checkbox" id="ck-chanh"> Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> Đi bộ 100 bước sau ăn</label></div>
+      <p class="k" style="margin-top:12px">Thói quen bữa này</p><div class="row hbs"><label class="chk"><input type="checkbox" id="ck-nhai"> Nhai mỗi miếng 20 lần</label><label class="chk"><input type="checkbox" id="ck-chanh"> Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> Đi bộ 100 bước sau ăn</label></div>
       <button class="btn cta" id="btn-gui">Gửi bữa để chấm</button>
       <div id="gui-err" class="err hide"></div>
     </div>
@@ -369,6 +371,11 @@ async function goi(fn, ...args){
 }
 const $ = s => document.querySelector(s);
 const LBL = {sang:'Sáng',trua:'Trưa',chieu:'Chiều',toi:'Tối',nuoc:'Nước',gym:'Gym'};
+const THU = ['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+// Câu mở ngày: bộ 1 (chặng 1–3, thúc đúng việc hôm đó), bộ 2 (chặng 4–6, kiên trì · bền bỉ). Chỉ số = getDay(), 0 = Chủ nhật.
+const CAU_NGAY_1 = ['Ngày xả. Thèm gì ăn nấy, đúng 3 nguyên tắc ngày xả. Mai quay lại đường đua.', 'Cân lúc đói trước khi ăn. Số sáng nay là vạch xuất phát của tuần, không phải bản án.', 'Một bữa đúng chưa đổi được gì. Ba bữa đúng, sáu ngày liền thì đổi. Hôm nay đủ 3.', 'Không ai thấy bạn nhai 20 lần hay đi bộ 100 bước. Sáu tuần nữa thì ai cũng thấy.', 'Phiên bản tốt hơn của bạn ăn sáng thế nào? Ăn đúng như thế, ngay bữa này.', 'Cuối tuần chưa tới. Hôm nay vẫn là ngày đua: đủ đạm, đủ rau, không tinh bột.', 'Còn một ngày nữa là được xả. Giữ đúng luật hôm nay để mai ăn không áy náy.'];
+const CAU_NGAY_2 = ['Thiết kế cuộc sống nghe to tát. Thật ra nó bắt đầu từ việc bạn chọn ăn gì lúc 7 giờ sáng mai.', 'Không cần thêm động lực. Cần một buổi sáng thiết kế sẵn: cân, ăn đúng, gửi ảnh. Rồi lặp lại.', 'Cơ thể không nhớ ngày bạn hăng nhất. Nó nhớ ngày bạn làm đều nhất.', 'Người bền bỉ không phải người chưa từng hụt. Là người hụt hôm qua mà sáng nay vẫn mở app.', 'Thành tựu lớn là cùng một quyết định nhỏ được lặp lại đủ lâu. Bữa này là một lần lặp.', 'Bữa đúng hôm nay là tiền gửi tiết kiệm. Chưa thấy lãi ngay, 6 tuần sau rút cả gốc lẫn lãi.', 'HLV của bạn từng về đích Ironman. Không phải vì nhanh, mà vì không dừng. Bạn chỉ cần 42 ngày.'];
+function cauMoNgay(r){ const d = new Date().getDay(); return ((r && r.tuan) > 3 ? CAU_NGAY_2 : CAU_NGAY_1)[d]; }
 function nhanGui(){ return 'Gửi bữa ' + (LBL[bua] || '').toLowerCase() + ' để chấm'; }
 function capNhatNutGui(){ const b = $('#btn-gui'); if (b && !b.disabled) b.textContent = nhanGui(); }
 let S = null, ten = '', pin = '', bua = 'sang', anhB64 = null, anhMime = 'image/jpeg';
@@ -376,7 +383,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260907-091212';
+const APP_VER = '20260907-102745';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -389,6 +396,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function dangXuat(){
   if (!confirm('Đăng xuất để vào tài khoản khác?')) return;
   try { localStorage.removeItem('dm_ten'); localStorage.removeItem('dm_pin'); localStorage.removeItem('dm_state'); } catch(e){}
+  $('#sub').textContent = 'Chụp. Gửi. Biết ngay đúng hay sai.';
   S = null; ten = ''; pin = ''; $('#in-ten').value = ''; $('#in-pin').value = ''; hien('login'); toast('Đã đăng xuất');
 }
 // ---------- điều hướng: màn chính (tab) / màn phụ (có nút ← và nút back của máy) ----------
@@ -422,6 +430,7 @@ async function lamMoi(im){
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
 function hien(v, tuBack){
   ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv'].forEach(x => $('#v-'+x).classList.toggle('hide', x !== v));
+  const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || khoa);
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
@@ -811,7 +820,7 @@ let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 // ---------- gửi bữa ----------
 const coGram = s => /\d/.test(s || '');
 $('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); $('#gram-xacnhan').classList.add('hide');
-  if (!v) { h.textContent = 'Có số gram thì máy chấm đúng hơn. Chỉ ghi tên món, máy phải đoán.'; h.style.color = ''; }
+  if (!v) { h.textContent = 'Ghi số gram thì máy chấm đúng hơn.'; h.style.color = ''; }
   else if (coGram(v)) { h.textContent = 'Có định lượng rồi, máy chấm theo đúng số bạn ghi.'; h.style.color = 'var(--lime)'; }
   else { h.textContent = '⚠️ Chưa thấy số gram. Thêm số vào từng món nhé, vd: ức gà 150g, rau 150g.'; h.style.color = '#ffe28a'; } });
 let boQuaGram = false;
@@ -921,7 +930,8 @@ function nhan(r){
     $('#hlv-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th><th>✍️</th><th></th></tr>' +
       r.hlv.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.khoa ? x.khoa + ' · ' : ''}${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td style="font-size:12px;max-width:140px" title="${esc(x.camKet || '')}">${x.camKet ? esc(x.camKet).slice(0, 60) + (x.camKet.length > 60 ? '…' : '') : '<span style="color:var(--mute)">–</span>'}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`).join('');
   }
-  $('#sub').textContent = `${h.ten} · Chặng ${r.tuan}/6`;
+  $('#sub').textContent = `${THU[new Date().getDay()]} · Chặng ${r.tuan}/6`;
+  const cn = $('#cau-ngay'); if (cn) { cn.textContent = cauMoNgay(r); cn.classList.remove('hide'); }
   $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; $('#chip-ngay').classList.remove('hide');
   const cb = $('#canh-bao'); const gio = new Date().getHours();
   tongKetNgay(h, t, tk, gio);
