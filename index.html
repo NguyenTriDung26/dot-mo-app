@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180718';
+const APP_VER = '20260922-180950';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -912,8 +912,14 @@ async function taiHoc(){
 function veHoc(){
   const r = hocDL; if (!r) return;
   const cuaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh && b.moKhoa);
+  const laHLV0 = !!(S && S.hlv);
+  const tatCaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh);
+  const soDaMo = tatCaNhanh.filter(b => !b.an).length;
   const xongNhanh = cuaNhanh.filter(b => b.daHoc).length;
-  $('#hoc-tomtat').innerHTML = r.tongMo
+  if (laHLV0) {
+    $('#hoc-tomtat').innerHTML = `<b style="color:var(--lime)">${soDaMo}</b> bài học viên đang thấy · <b>${tatCaNhanh.length - soDaMo}</b> bài còn ẩn`
+      + (soDaMo ? '' : ' — <b style="color:var(--gold)">chưa mở bài nào, học viên thấy trống</b>');
+  } else $('#hoc-tomtat').innerHTML = r.tongMo
     ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · ${hocNhanh === 'thuchanh' ? 'Thực hành' : 'Kiến thức'}: đã mở <b>${cuaNhanh.length}</b> bài · xong <b>${xongNhanh}</b>` +
       (cuaNhanh.length - xongNhanh > 0 ? ` · <b style="color:var(--gold)">còn ${cuaNhanh.length - xongNhanh} bài</b>` : (cuaNhanh.length ? ' · <b style="color:var(--lime)">xong hết 👏</b>' : ''))
     : 'HLV đang soạn bài, sắp có.';
@@ -927,11 +933,13 @@ function veHoc(){
         <button class="chipbtn" style="white-space:nowrap;font-size:13px;padding:8px 6px;text-align:center" onclick="moCaTuan(${t},false)">🚫 Ẩn tuần ${t}</button></div>` : ''}
       ${theoTuan[t].map(b => `
         <div onclick="${b.moKhoa ? 'moBai(' + b.id + ')' : 'toast(\'🔒 Bài tuần ' + b.tuan + ' mở khi bạn tới tuần đó.\', 2500)'}"
-             style="display:flex;gap:10px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;${b.moKhoa ? '' : 'opacity:.45'}">
+             style="display:flex;gap:10px;padding:11px;margin-bottom:8px;border-radius:12px;cursor:pointer;${laHLV && b.an ? 'background:var(--sf2);opacity:.6;' : (laHLV ? 'background:var(--lime-dim);' : 'border-top:1px solid var(--line);')}${b.moKhoa ? '' : 'opacity:.45'}">
           <div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>
           ${laHLV ? `<button class="chipbtn" style="flex:none;align-self:flex-start;white-space:nowrap;font-size:12px;padding:5px 9px" title="${b.an ? 'Đang ẩn — bấm để mở' : 'Đang mở — bấm để ẩn'}" onclick="event.stopPropagation();batTat(${b.id})">${b.an ? '🚫 Mở' : '👁 Ẩn'}</button>` : ''}
           <div style="min-width:0;flex:1">
-            <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}${b.an ? ' <span style="color:var(--mute);font-size:11px">· đang ẩn</span>' : ''}</div>
+            <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}${laHLV ? (b.an
+  ? ' <span style="background:var(--mute);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">HỌC VIÊN CHƯA THẤY</span>'
+  : ' <span style="background:var(--lime);color:var(--tren-nhan);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">ĐANG MỞ</span>') : ''}</div>
             <div style="font-size:12px;color:var(--mute);margin-top:2px">${esc(b.tomtat || '')}</div>
             <div style="font-size:11px;color:var(--mute);margin-top:3px">${b.soAnh ? b.soAnh + ' ảnh · ' : ''}${b.coVideo ? 'có video · ' : ''}${b.coPdf ? 'có PDF · ' : ''}${b.phut ? b.phut + ' phút' : ''}</div>
           </div>
