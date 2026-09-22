@@ -423,7 +423,13 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div class="row"><input id="cn-ten-moi" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="cn-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div>
       <button class="btn" id="cn-them">＋ THÊM VÀO CA</button>
       <div id="cn-kq" class="thay hide"></div></div>
-    <div class="card"><p class="k">Học viên trong ca</p><div style="overflow-x:auto"><table id="cn-bang"></table></div></div>
+    <div class="card"><p class="k">Học viên trong ca</p>
+      <small style="display:block;margin-bottom:8px;color:var(--mute)">Bấm tên để mở hồ sơ. Tích ô vuông để chọn người rồi chuyển sang ca khác.</small>
+      <div style="overflow-x:auto"><table id="cn-bang"></table></div>
+      <div id="cn-chuyen" class="hide" style="margin-top:10px;padding:10px;background:var(--lime-dim);border-radius:12px">
+        <div style="font-size:13px;margin-bottom:8px"><b id="cn-dem">0</b> người đang chọn — chuyển sang:</div>
+        <div class="row"><select id="cn-ca-dich" style="flex:1;margin-top:0"></select><button class="btn sm" id="cn-chuyen-nut" style="flex:1;margin-top:0">CHUYỂN</button></div>
+      </div></div>
   </div>
 
   <!-- THÊM · BẢNG ĐIỀU KHIỂN -->
@@ -542,7 +548,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-211805';
+const APP_VER = '20260922-212140';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -904,19 +910,75 @@ async function lamMoiChat(im){
 // Bảng học viên của HLV: gõ tên lọc ngay, chọn ca thu hẹp thêm.
 // Dũng chốt 22/09 khi chuẩn bị đông người: nhớ tên mà không nhớ ca thì ô tìm là lối thoát.
 let hlvDS = [];
+const HLV_DAU = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th><th>✍️</th><th></th></tr>';
+const hangHLV = x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.khoa ? x.khoa + ' · ' : ''}${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td style="font-size:12px;max-width:140px" title="${esc(x.camKet || '')}">${x.camKet ? esc(x.camKet).slice(0, 60) + (x.camKet.length > 60 ? '…' : '') : '<span style="color:var(--mute)">–</span>'}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`;
+
+// Bản đồ mã ca → {tên, ngày xuất phát, năm, tháng} để gom bảng HLV theo Năm ▸ Tháng.
+let caTheoMa = {}, caDaNap = 0;
+async function napCaTheoMa(){
+  if (caDaNap) return;
+  caDaNap = 1;
+  try {
+    const r = await goi('cayCa', ten, pin);
+    if (r.loi) return;
+    Object.values(r.cay || {}).forEach(thangs => Object.values(thangs).forEach(tuans =>
+      Object.values(tuans).forEach(cac => cac.forEach(c => { caTheoMa[c.ma] = c; }))));
+    veBangHLV();
+  } catch(e){}
+}
+
 function veBangHLV(){
   const el = $('#hlv-bang'); if (!el) return;
-  const q = (($('#hlv-tim')||{}).value || '').trim().toLowerCase();
+  const q = (($('#hlv-tim')||{}).value || '').trim();
   const ca = (($('#hlv-loc')||{}).value || '');
   const bo = (s) => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
+  const t = $('#hlv-tong');
+  if (t) t.innerHTML = t.innerHTML.split(' · đang xem')[0];
+
+  // KHÔNG gõ gì, KHÔNG chọn ca → gom theo Năm ▸ Tháng ▸ K, mỗi ca một dòng.
+  // Dũng chốt 22/09: "không để danh sách học viên rối như tơ vò" — muốn thấy người thì bấm vào ca.
+  if (!q && !ca) { el.innerHTML = gomTheoCa(hlvDS); return; }
+
   let ds = hlvDS;
   if (ca) ds = ds.filter(x => (x.khoa || 'K1') === ca);
   if (q) ds = ds.filter(x => bo(x.ten).includes(bo(q)));
-  el.innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ</th><th>✍️</th><th></th></tr>' +
-      ds.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g, '&#39;')}')"><td><b style="color:var(--lime)">${esc(x.ten)}</b><div style="font-size:11px;color:var(--mute)">${x.khoa ? x.khoa + ' · ' : ''}${x.canMoi ? x.canMoi + ' kg' : 'chưa cân'}${x.ngayCuoi ? ' · ' + x.ngayCuoi.slice(5).replace('-', '/') : ''}</div></td><td class="r">${x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) : '–'}</td><td class="r">${x.streak}</td><td class="r">${x.buaHomNay}/3${x.diemHomNay !== null && x.diemHomNay !== undefined ? '<br><small>' + x.diemHomNay + 'đ</small>' : ''}</td><td class="r">${x.diemTuan}</td><td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td><td style="font-size:12px;max-width:140px" title="${esc(x.camKet || '')}">${x.camKet ? esc(x.camKet).slice(0, 60) + (x.camKet.length > 60 ? '…' : '') : '<span style="color:var(--mute)">–</span>'}</td><td><button class="chipbtn" onclick="event.stopPropagation();datLaiPinHV('${esc(x.ten).replace(/'/g, '&#39;')}')" title="Đặt lại PIN">🔑</button></td></tr>`).join('');
+  el.innerHTML = HLV_DAU + ds.map(hangHLV).join('');
   if (!ds.length) el.innerHTML += '<tr><td colspan="8"><small>Không thấy ai khớp' + (q ? ' "' + esc(q) + '"' : '') + '.</small></td></tr>';
-  const t = $('#hlv-tong');
-  if (t && (q || ca)) t.innerHTML = t.innerHTML.split(' · đang xem')[0] + ` · đang xem <b>${ds.length}</b>/${hlvDS.length}`;
+  if (t) t.innerHTML = t.innerHTML + ` · đang xem <b>${ds.length}</b>/${hlvDS.length}`;
+}
+
+// Gom danh sách phẳng thành Năm ▸ Tháng ▸ Ca. Ngày xuất phát của ca lấy từ cây ca đã tải.
+function gomTheoCa(ds){
+  const cay = {};
+  ds.forEach(x => {
+    const k = x.khoa || 'K1';
+    const c = caTheoMa[k] || {};
+    const nam = c.nam || 0, thang = c.thang || 0;
+    cay[nam] = cay[nam] || {};
+    cay[nam][thang] = cay[nam][thang] || {};
+    (cay[nam][thang][k] = cay[nam][thang][k] || []).push(x);
+  });
+  const nams = Object.keys(cay).sort((a,b) => b - a);
+  if (!nams.length) return '<tr><td><small>Chưa có ca nào.</small></td></tr>';
+  let h = '';
+  nams.forEach(nam => {
+    h += `<tr><td colspan="4" style="background:var(--sf4);font-weight:700;padding:8px 6px">${nam == 0 ? 'Chưa xếp lịch' : 'Năm ' + nam}</td></tr>`;
+    Object.keys(cay[nam]).sort((a,b) => b - a).forEach(thang => {
+      if (thang != 0) h += `<tr><td colspan="4" style="padding:6px 6px 4px 14px;color:var(--mute);font-size:12px">Tháng ${thang}</td></tr>`;
+      Object.keys(cay[nam][thang]).sort().forEach(k => {
+        const nguoi = cay[nam][thang][k];
+        const co = nguoi.filter(x => x.co && x.co.length).length;
+        const gui = nguoi.filter(x => x.buaHomNay > 0).length;
+        const c = caTheoMa[k] || {};
+        h += `<tr style="cursor:pointer" onclick="moCa('${k}')">
+          <td style="padding-left:22px"><b style="color:var(--lime)">${k}</b><div style="font-size:11px;color:var(--mute)">${esc(c.ten || '')}${c.ngayBatDau ? ' · ' + c.ngayBatDau.split('-').reverse().join('/') : ''}</div></td>
+          <td class="r">${nguoi.length} người</td>
+          <td class="r">${gui}/${nguoi.length} gửi</td>
+          <td class="r">${co ? '<b style="color:var(--red)">' + co + ' cờ</b>' : '<span style="color:var(--lime)">✓</span>'}</td></tr>`;
+      });
+    });
+  });
+  return h;
 }
 
 function veChonPhong(r){
@@ -1730,9 +1792,43 @@ async function taiCay(){
     }).join('');
   } catch(e){ $('#ca-cay').innerHTML = '<div class="card"><small>' + esc(e.message) + '</small></div>'; }
 }
+// Tick người trong ca rồi chuyển sang ca khác — Dũng chốt 22/09: phân người phải làm ngay tại ca,
+// không phải đi vòng qua sổ dữ liệu.
+function noiTickCa(soNguoi){
+  const khung = $('#cn-chuyen'), dem = $('#cn-dem'), sel = $('#cn-ca-dich');
+  if (!khung) return;
+  const ticks = [...document.querySelectorAll('.cn-tick')];
+  const dapUng = () => {
+    const n = ticks.filter(t => t.checked).length;
+    if (dem) dem.textContent = n;
+    khung.classList.toggle('hide', !n);
+  };
+  ticks.forEach(t => t.onchange = dapUng);
+  dapUng();
+  if (sel) {
+    const cac = Object.keys(caTheoMa).filter(k => k !== caHien).sort();
+    sel.innerHTML = cac.length ? cac.map(k => `<option value="${k}">${k} — ${esc((caTheoMa[k]||{}).ten || '')}</option>`).join('')
+      : '<option value="">(chưa có ca khác)</option>';
+  }
+  const nut = $('#cn-chuyen-nut');
+  if (nut) nut.onclick = async () => {
+    const chon = [...document.querySelectorAll('.cn-tick')].filter(t => t.checked).map(t => t.value);
+    const dich = (($('#cn-ca-dich')||{}).value || '');
+    if (!chon.length || !dich) return;
+    nut.disabled = true; nut.textContent = 'ĐANG CHUYỂN…';
+    try {
+      const r = await goi('chuyenCa', ten, pin, chon, dich);
+      toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 5000);
+      if (!r.loi) { caDaNap = 0; await napCaTheoMa(); moCa(caHien); }
+    } catch(e){ toast('⚠️ ' + e.message, 3000); }
+    finally { nut.disabled = false; nut.textContent = 'CHUYỂN'; }
+  };
+}
+
 async function moCa(ma){
   caHien = ma;
   hien('canguoi');
+  napCaTheoMa();   // cần bản đồ ca để đổ danh sách ca đích
   $('#cn-ten').textContent = 'Ca ' + ma;
   $('#cn-bang').innerHTML = '';
   try {
@@ -1741,13 +1837,15 @@ async function moCa(ma){
     $('#cn-ten').textContent = esc(r.ca.ten || ('Ca ' + ma));
     $('#cn-tom').innerHTML = `Tuần <b>${r.tuan}/6</b> · <b>${r.ds.length}</b> học viên`
       + (r.soCoDo ? ` · <b style="color:var(--red)">${r.soCoDo} người có cờ đỏ</b>` : ' · không ai có cờ đỏ');
-    $('#cn-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th class="r">Cờ</th></tr>'
-      + (r.ds.length ? r.ds.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g,'&#39;')}')" title="${esc(x.co.join(' · '))}">
-          <td><b style="color:var(--lime)">${esc(x.ten)}</b></td>
+    $('#cn-bang').innerHTML = '<tr><th style="width:26px"></th><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th class="r">Cờ</th></tr>'
+      + (r.ds.length ? r.ds.map(x => `<tr title="${esc(x.co.join(' · '))}">
+          <td><input type="checkbox" class="cn-tick" value="${esc(x.ten)}" onclick="event.stopPropagation()" style="width:18px;height:18px"></td>
+          <td style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g,'&#39;')}')"><b style="color:var(--lime)">${esc(x.ten)}</b></td>
           <td class="r">${x.canMoi || '–'}</td><td class="r">${x.streak}</td>
           <td class="r">${x.buaHomNay}/3</td><td class="r">${x.diemTuan}</td>
           <td class="r">${x.co.length ? '<b style="color:var(--red)">' + x.co.length + '</b>' : '<span style="color:var(--lime)">✓</span>'}</td></tr>`).join('')
-        : '<tr><td colspan="6"><small>Chưa có ai trong ca này.</small></td></tr>');
+        : '<tr><td colspan="7"><small>Chưa có ai trong ca này.</small></td></tr>');
+    noiTickCa(r.ds.length);
   } catch(e){ $('#cn-tom').textContent = e.message; }
 }
 function moTaoCa(){ $('#ca-form').classList.remove('hide'); $('#ca-form').scrollIntoView({block:'center'}); }
@@ -2027,6 +2125,7 @@ function nhan(r){
     const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;
     $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
     hlvDS = r.hlv;
+    napCaTheoMa();
     const sel = $('#hlv-loc');
     if (sel) {
       const cac = [...new Set(r.hlv.map(x => x.khoa || 'K1'))].sort();
