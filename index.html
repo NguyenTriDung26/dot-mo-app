@@ -85,6 +85,13 @@ td.r,th.r{text-align:right}tr.me td{background:var(--lime-dim);font-weight:800}.
 .spin{display:inline-block;width:16px;height:16px;border:3px solid #06130a;border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px;margin-right:8px}
 @keyframes s{to{transform:rotate(360deg)}}
 .login-hero{text-align:center;padding:26px 0 10px}.login-hero .h{font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-1px;text-transform:uppercase}.login-hero .h b{color:var(--lime)}.login-hero p{color:var(--mute);margin:10px 0 0;font-weight:600}
+.luoi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.o{background:var(--sf);border-radius:14px;padding:14px;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:6px;min-height:104px}
+.o .ot{font-size:24px;line-height:1}
+.o .on{font-weight:700;font-size:14px;line-height:1.3}
+.o .om{font-size:11px;color:var(--mute);line-height:1.4}
+.o .ob{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:2px 7px}
+.o.rong{grid-column:1 / -1;min-height:auto;flex-direction:row;align-items:center}
 .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.rules div{background:var(--sf2);border:0;border-radius:12px;padding:10px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}.rules div i{display:block;font-style:normal;font-size:20px;margin-bottom:4px}
 small{color:var(--mute)}
 .g42{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
@@ -371,6 +378,22 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     </div>
   </div>
 
+  <!-- BÀI TẬP CUỐI TUẦN -->
+  <div id="v-baitap" class="hide">
+    <div class="card"><p class="k">📝 Bài tập tuần <span id="bt-tuan"></span></p>
+      <div id="bt-mo" style="font-size:14px;color:var(--ink2)"></div></div>
+    <div id="bt-cau"></div>
+    <div class="card hide" id="bt-ketqua"></div>
+    <button class="btn" id="bt-nop">NỘP BÀI</button>
+  </div>
+
+  <!-- THÊM · BẢNG ĐIỀU KHIỂN -->
+  <div id="v-them" class="hide">
+    <div class="card"><p class="k">Bảng điều khiển</p><div id="them-chao" style="font-size:14px;color:var(--ink2)"></div></div>
+    <div id="them-luoi" class="luoi"></div>
+    <button class="btn dx" onclick="dangXuat()">Đăng xuất</button>
+  </div>
+
   <!-- CHAT -->
   <div id="v-chat" class="hide">
     <div class="seg" id="chat-tab" style="margin-bottom:12px"><button data-p="nhom" class="on">👥 Nhóm <span id="tab-nhom-ten"></span></button><button data-p="rieng">💬 Riêng với HLV<span id="tab-rieng-cham" class="hide" style="color:var(--red)"> ●</span></button></div>
@@ -421,13 +444,11 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 </div>
 <div class="toast" id="toast"></div>
 <div class="tabs hide" id="tabs">
-  <button data-v="gui" class="on"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Gửi bữa</button>
-  <button data-v="homnay"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-11"/></svg></span>Hôm nay</button>
-  <button data-v="dua"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M6 21V4h11l-2 4 2 4H6"/></svg></span>Bảng đua</button>
+  <button data-v="gui" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Gửi bữa</button>
+  <button data-v="homnay" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-11"/></svg></span>Hôm nay</button>
   <button data-v="chat" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H8l-4 3v-4.5A8 8 0 1 1 21 12z"/></svg></span>Chat<span id="chat-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 20px);width:9px;height:9px;border-radius:99px;background:var(--red)"></span></button>
-  <button data-v="hoc"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M3 6.5 12 4l9 2.5v11L12 20l-9-2.5z"/><path d="M12 4v16"/></svg></span>Học<span id="hoc-cham" class="hide" style="position:absolute;transform:translate(14px,-14px);width:8px;height:8px;border-radius:99px;background:var(--lime)"></span></button>
-  <button data-v="lotrinh"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg></span>Lộ trình</button>
-  <button data-v="hlv" id="tab-hlv" class="hide"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M16 4.5a3.5 3.5 0 0 1 0 7M21 20a6 6 0 0 0-4.5-5.8"/></svg></span>HLV</button>
+  <button data-v="hoc" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M3 6.5 12 4l9 2.5v11L12 20l-9-2.5z"/><path d="M12 4v16"/></svg></span>Học<span id="hoc-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 18px);width:8px;height:8px;border-radius:99px;background:var(--lime)"></span></button>
+  <button data-v="them" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>Thêm<span id="them-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 20px);width:9px;height:9px;border-radius:99px;background:var(--red)"></span></button>
 </div>
 
 <script>
@@ -475,7 +496,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-163239';
+const APP_VER = '20260922-163809';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -521,7 +542,7 @@ async function lamMoi(im){
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
 function hien(v, tuBack){
-  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
+  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
   const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || khoa);
@@ -535,6 +556,7 @@ function hien(v, tuBack){
   if (coBack && !tuBack && MAN_CHINH.has(manHien)) { try { history.pushState({ dm: v }, ''); } catch(e){} }
   manHien = v;
   if (v === 'chat') { try { lamMoiChat(); } catch(e){} }
+  if (v === 'them' && S) { try { veThem(S); } catch(e){} }
   if (v === 'doipin') { $('#btn-dp-huy').classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; $('#dp-err').classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
   window.scrollTo(0,0);
@@ -676,6 +698,86 @@ async function khoiPhucSo(id){
 $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
+
+// ----- Bài tập cuối tuần: cổng sang tuần sau -----
+let btDL = null, btChon = [];
+async function moBaiTap(tuan){
+  try {
+    const t = tuan || (S ? S.tuan : 1);
+    const r = await goi('layBaiTap', ten, pin, t);
+    if (r.loi) { toast('⚠️ ' + r.loi, 3500); return; }
+    btDL = r; btChon = new Array(r.tong).fill(-1);
+    $('#bt-tuan').textContent = r.tuan;
+    $('#bt-mo').innerHTML = r.daLam && r.ketQua
+      ? (r.ketQua.dat
+          ? `✅ Bạn đã qua cổng tuần ${r.tuan} (${r.ketQua.diem}/${r.ketQua.tong} câu). Làm lại cũng được.`
+          : `Lần trước đúng <b style="color:var(--gold)">${r.ketQua.diem}/${r.ketQua.tong}</b>, cần <b>${r.dat}</b> câu. Đọc lại bài rồi làm lại — không giới hạn số lần.`)
+      : `Đúng <b>${r.dat}/${r.tong}</b> câu là qua cổng, tuần sau mở. Sai thì làm lại thoải mái.`;
+    $('#bt-ketqua').classList.add('hide');
+    $('#bt-nop').classList.remove('hide');
+    veCauHoi();
+    hien('baitap');
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+function veCauHoi(){
+  $('#bt-cau').innerHTML = btDL.cau.map((c, i) => `
+    <div class="card"><p style="font-weight:700;font-size:15px;line-height:1.45;margin:0 0 10px">${i+1}. ${esc(c.hoi)}</p>
+      ${c.chon.map((x, k) => `<div onclick="chonDapAn(${i},${k})" id="da-${i}-${k}"
+        style="padding:11px 12px;border-radius:12px;background:var(--sf2);margin-bottom:6px;cursor:pointer;font-size:14px;line-height:1.45;border:1.5px solid transparent">${esc(x)}</div>`).join('')}
+    </div>`).join('');
+}
+function chonDapAn(i, k){
+  btChon[i] = k;
+  btDL.cau[i].chon.forEach((_, kk) => {
+    const e = $('#da-' + i + '-' + kk);
+    if (e) { e.style.borderColor = kk === k ? 'var(--lime)' : 'transparent'; e.style.background = kk === k ? 'var(--lime-dim)' : 'var(--sf2)'; }
+  });
+}
+async function nopBT(){
+  if (!btDL) return;
+  if (btChon.some(x => x < 0)) { toast('Còn câu chưa chọn đáp án.', 2500); return; }
+  const nut = $('#bt-nop'); nut.disabled = true; nut.textContent = 'Đang chấm…';
+  try {
+    const r = await goi('nopBaiTap', ten, pin, btDL.tuan, btChon);
+    if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
+    $('#bt-ketqua').classList.remove('hide');
+    $('#bt-ketqua').innerHTML = `<p class="k" style="color:${r.dat ? 'var(--lime)' : 'var(--gold)'}">${r.dat ? '✅ QUA CỔNG' : '⚠️ CHƯA QUA'}</p>
+      <div style="font-size:15px;font-weight:700;margin-bottom:10px">${esc(r.thongBao)}</div>
+      ${r.soi.map(x => `<div style="padding:9px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.5">
+        <div>${x.dung ? '✅' : '❌'} <b>${esc(x.hoi)}</b></div>
+        ${x.giaiThich ? `<div style="color:var(--ink2);margin-top:3px">${esc(x.giaiThich)}</div>` : ''}</div>`).join('')}`;
+    $('#bt-ketqua').scrollIntoView({block:'start'});
+    if (r.dat) { taiHoc(); lamMoi(true); }
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+  finally { nut.disabled = false; nut.textContent = 'NỘP BÀI'; }
+}
+document.addEventListener('DOMContentLoaded', () => { const n = $('#bt-nop'); if (n) n.onclick = nopBT; });
+
+// ----- Bảng điều khiển: mỗi mục một ô, bấm vào mở màn riêng -----
+function veThem(r){
+  const hlv = !!r.hlv, hv = r.hv || {}, tk = r.thongKe || {};
+  $('#them-chao').innerHTML = hlv
+    ? `Xin chào HLV <b style="color:var(--lime)">${esc(hv.ten)}</b> · ${r.hlv.length} học viên đang chạy`
+    : `<b style="color:var(--lime)">${esc(hv.ten)}</b> · khoá ${esc(hv.khoa || 'K1')} · tuần ${r.tuan}/6 · đã giảm <b>${tk.giam || 0} kg</b>`;
+  const o = (icon, ten, mo, di, badge) =>
+    `<div class="o" onclick="${di}">${badge ? `<span class="ob">${badge}</span>` : ''}<div class="ot">${icon}</div><div class="on">${ten}</div><div class="om">${mo}</div></div>`;
+  let ds = [
+    o('🏁','Bảng đua','Thứ hạng cả khoá 7 ngày','hien(\'dua\')'),
+    o('📈','Lộ trình','6 mốc cân · định mức · ảnh tiến độ','hien(\'lotrinh\')'),
+    o('📝','Bài tập tuần','Làm xong mới mở tuần sau','moBaiTap()', r.baiTapDat === false && r.coBaiTap ? '!' : ''),
+    o('👤','Hồ sơ của tôi','Chỉ số, số đo, thông tin liên lạc','hien(\'hoso\')'),
+  ];
+  if (hlv) ds = ds.concat([
+    o('🎛','Điều khiển HLV','Bảng học viên · cờ đỏ · thêm người','hien(\'hlv\')', (r.hlv.filter(x=>x.co.length).length || '')),
+    o('🎯','Khách tiềm năng','Người làm bài kiểm tra, chờ gọi','hien(\'hlv\');setTimeout(()=>{const e=$(\'#the-khach\');if(e)e.scrollIntoView();},200)'),
+    o('🗂','Sổ dữ liệu','Xem và sửa mọi bảng','hien(\'hlv\');setTimeout(()=>{const e=$(\'#the-so\');if(e)e.scrollIntoView();},200)'),
+    o('🌙','Bản tin 21h','Tổng kết ngày cho nhóm Zalo','hien(\'hlv\');setTimeout(()=>{const e=$(\'#btn-bt-xem\');if(e)e.scrollIntoView();},200)'),
+  ]);
+  ds.push(o('❓','Hướng dẫn dùng app','Xem lại cách chụp bữa và ghi cân','hien(\'huongdan\')'));
+  $('#them-luoi').innerHTML = ds.join('');
+  const cham = $('#them-cham');
+  if (cham) cham.classList.toggle('hide', !(hlv && r.hlv.some(x => x.co.length)) && !(r.coBaiTap && r.baiTapDat === false));
+}
 
 // ----- Tab Chat: hai phòng, tự cập nhật như Messenger -----
 let phongHien = 'nhom', hen1 = null, hen2 = null;
@@ -1485,6 +1587,7 @@ function nhan(r){
         : `Gửi đủ 3 bữa hôm nay là <b style="color:var(--cam)">bắt đầu chuỗi ngày</b> của bạn. Còn ${3 - sb} bữa.`;
   } catch(e){}
   try { taiHoc(); if (r.hlv) $('#hoc-soan').classList.remove('hide'); } catch(e){}
+  try { veThem(r); } catch(e){}
   try {
     const tn = $('#the-nhom');
     if (tn && r.coChat) {
