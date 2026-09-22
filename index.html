@@ -344,7 +344,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 
   <!-- BẢNG ĐUA -->
   <div id="v-dua" class="hide">
-    <div class="card"><p class="k" id="bang-title">Bảng đua · điểm 7 ngày gần nhất</p><div class="podium" id="podium"></div><table id="bang"></table></div>
+    <div class="card"><p class="k" id="bang-title">Bảng đua · điểm 7 ngày gần nhất</p><div class="seg hide" id="dua-chon" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"></div><div id="dua-phu" style="font-size:12px;color:var(--mute);margin-bottom:8px"></div><div class="podium" id="podium"></div><table id="bang"></table></div>
     <div class="card hide" id="the-nhom"><p class="k">💬 Phòng chat <span id="nhom-ten"></span></p><small style="display:block;margin-bottom:8px">Cả khoá nói chuyện ở đây. Khoá khác không đọc được.</small>
       <div class="seg hide" id="nhom-chon" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
       <div id="nhom-khung" style="max-height:340px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
@@ -496,7 +496,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-163809';
+const APP_VER = '20260922-163924';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -557,6 +557,7 @@ function hien(v, tuBack){
   manHien = v;
   if (v === 'chat') { try { lamMoiChat(); } catch(e){} }
   if (v === 'them' && S) { try { veThem(S); } catch(e){} }
+  if (v === 'dua' && S && S.hlv) { try { xemDuaKhoa(duaKhoa || (S.hv && S.hv.khoa) || ''); } catch(e){} }
   if (v === 'doipin') { $('#btn-dp-huy').classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; $('#dp-err').classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
   window.scrollTo(0,0);
@@ -698,6 +699,32 @@ async function khoiPhucSo(id){
 $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
+
+function veBangDua(DS, TOI){
+  TOI = TOI || (S && S.hv ? S.hv.ten : '');
+  const bd = DS; const medal = ['🥇','🥈','🥉'];
+  const kg = x => x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) + ' kg' : '';
+  const pd = i => bd[i] ? `<div class="pd ${i===0?'first':''}"><div class="m">${medal[i]}</div><div class="p">${bd[i].diemTuan}</div><div class="t">${esc(bd[i].ten)}</div><div class="s">🔥${bd[i].streak}${kg(bd[i]) ? ' · ' + kg(bd[i]) : ''}</div></div>` : '<div></div>';
+  $('#podium').innerHTML = pd(1) + pd(0) + pd(2);
+  $('#bang').innerHTML = '<tr><th>#</th><th>Tên</th><th class="r">Điểm</th><th class="r">Chuỗi</th><th class="r">Kg</th><th class="r">Nay</th></tr>' +
+    bd.map((x, i) => `<tr class="${x.ten === TOI ? 'me' : ''}"><td>${i+1}</td><td>${esc(x.ten)}</td><td class="r">${x.diemTuan}</td><td class="r">🔥${x.streak}</td><td class="r">${kg(x) || '–'}</td><td class="r">${x.buaHomNay}/3</td></tr>`).join('');
+}
+
+// ----- HLV chuyển giữa các cuộc đua K1…K9 -----
+let duaKhoa = '';
+async function xemDuaKhoa(k){
+  try {
+    const r = await goi('bangDuaKhoa', ten, pin, k || duaKhoa || '');
+    if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
+    duaKhoa = r.khoa;
+    $('#dua-chon').classList.remove('hide');
+    $('#dua-chon').innerHTML = (r.cacKhoa || []).map(x =>
+      `<button class="${x === duaKhoa ? 'on' : ''}" onclick="xemDuaKhoa('${x}')">${x}</button>`).join('');
+    $('#dua-phu').innerHTML = `Cuộc đua <b style="color:var(--lime)">${esc(r.khoa)}</b> · tuần ${r.tuan}/6 · xuất phát ${esc(String(r.ngayBatDau).slice(8,10) + '/' + String(r.ngayBatDau).slice(5,7))} · ${r.bangDua.length} người`;
+    $('#bang-title').textContent = 'Bảng đua ' + r.khoa + ' · điểm 7 ngày gần nhất';
+    veBangDua(r.bangDua);
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
 
 // ----- Bài tập cuối tuần: cổng sang tuần sau -----
 let btDL = null, btChon = [];
@@ -1644,13 +1671,8 @@ function nhan(r){
   $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.suaChua ? '✅' : '⬜'} Sữa chua không đường</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span><span>${tk.gymTuan >= 2 ? '✅' : '⬜'} Gym tuần này ${tk.gymTuan}/2</span><span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h${Math.round(t.ngu.gio % 1 * 60) ? ' ' + Math.round(t.ngu.gio % 1 * 60) + ' phút' : ''} · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa ghi giấc ngủ (chuẩn 7 h, sâu 20%, REM 20%)'}</span>${h.kcalMucTieu ? `<span>🎯 Nạp tối đa ${h.kcalMucTieu} kcal/ngày</span>` : ''}</div>`;
   $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
 
-  const bd = r.bangDua; const medal = ['🥇','🥈','🥉'];
+  veBangDua(r.bangDua, h.ten);
   { const bt = $('#bang-title'); if (bt) bt.textContent = 'Bảng đua' + (h.vaiTro === 'HLV' ? ' · tất cả khoá' : (h.khoa ? ' · ' + h.khoa : '')) + ' · điểm 7 ngày gần nhất'; }
-  const kg = x => x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) + ' kg' : '';
-  const pd = i => bd[i] ? `<div class="pd ${i===0?'first':''}"><div class="m">${medal[i]}</div><div class="p">${bd[i].diemTuan}</div><div class="t">${esc(bd[i].ten)}</div><div class="s">🔥${bd[i].streak}${kg(bd[i]) ? ' · ' + kg(bd[i]) : ''}</div></div>` : '<div></div>';
-  $('#podium').innerHTML = pd(1) + pd(0) + pd(2);
-  $('#bang').innerHTML = '<tr><th>#</th><th>Tên</th><th class="r">Điểm</th><th class="r">Chuỗi</th><th class="r">Kg</th><th class="r">Nay</th></tr>' +
-    bd.map((x, i) => `<tr class="${x.ten === h.ten ? 'me' : ''}"><td>${i+1}</td><td>${esc(x.ten)}</td><td class="r">${x.diemTuan}</td><td class="r">🔥${x.streak}</td><td class="r">${kg(x) || '–'}</td><td class="r">${x.buaHomNay}/3</td></tr>`).join('');
   if (r.feedHomNay) { $('#feed-card').classList.remove('hide'); $('#feed').innerHTML = r.feedHomNay.length ? r.feedHomNay.map(l => dongLog(l, true)).join('') : '<p><small>Chưa ai gửi bữa nào. Gửi trước để dẫn đầu!</small></p>'; }
 
   const thieu = h.hoSoDu === false || !(h.canNang && h.cao && h.namSinh && (h.phanTramMo || h.moNhap));
