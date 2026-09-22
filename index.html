@@ -497,7 +497,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-164044';
+const APP_VER = '20260922-165131';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -526,11 +526,11 @@ function batBuoc(v){ // màn phụ đang bị ép (chưa xong bước) → khôn
 function quayLai(){ hien(MAN_CHINH.has(manTruoc) ? manTruoc : 'gui', true); }
 window.addEventListener('popstate', () => { if (S && !MAN_CHINH.has(manHien) && manHien !== 'login' && !batBuoc(manHien)) quayLai(); });
 function toast(msg, ms){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms || 2200); }
-function dongMenu(){ $('#menu').classList.add('hide'); $('#menu-bg').classList.add('hide'); }
-$('#btn-menu').onclick = () => { const mo = $('#menu').classList.contains('hide'); if (!mo) return dongMenu();
+function dongMenu(){ ($('#menu')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); ($('#menu-bg')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
+$('#btn-menu').onclick = () => { const mo = ($('#menu')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.contains('hide'); if (!mo) return dongMenu();
   const hlv = S && S.hv.vaiTro === 'HLV', xem = S && S.xemBoi;
-  $('#mn-hoso').classList.toggle('hide', !!(hlv || xem)); $('#mn-doipin').classList.toggle('hide', !!xem); $('#mn-dx').classList.toggle('hide', !!xem);
-  $('#menu').classList.remove('hide'); $('#menu-bg').classList.remove('hide'); };
+  ($('#mn-hoso')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!(hlv || xem)); ($('#mn-doipin')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!xem); ($('#mn-dx')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!xem);
+  ($('#menu')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); ($('#menu-bg')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); };
 $('#menu-bg').onclick = dongMenu;
 document.querySelectorAll('#menu button').forEach(b => b.onclick = () => { dongMenu(); const m = b.dataset.m;
   if (m === 'dangxuat') dangXuat(); else if (m === 'lammoi') lamMoi(); else hien(m); });
@@ -538,7 +538,7 @@ $('#btn-back').onclick = quayLai;
 async function lamMoi(im){
   if (!S || !ten) return;
   try { const r = S.xemBoi ? await goi('xemHocVien', ten, pin, S.hv.ten) : await goi('layTrangThai', ten, pin);
-    if (r.loi) { if (/Phiên hết hạn|đăng nhập lại/i.test(r.loi)) { try { localStorage.removeItem('dm_state'); } catch(e){} S = null; hien('login'); $('#login-err').textContent = r.loi; $('#login-err').classList.remove('hide'); } else if (!im) toast('⚠️ ' + r.loi); return; } nhan(r); if (!im) toast('✅ Đã cập nhật dữ liệu mới nhất');
+    if (r.loi) { if (/Phiên hết hạn|đăng nhập lại/i.test(r.loi)) { try { localStorage.removeItem('dm_state'); } catch(e){} S = null; hien('login'); $('#login-err').textContent = r.loi; ($('#login-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } else if (!im) toast('⚠️ ' + r.loi); return; } nhan(r); if (!im) toast('✅ Đã cập nhật dữ liệu mới nhất');
   } catch (e) { if (!im) toast('⚠️ Không có mạng, thử lại sau'); }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
@@ -546,20 +546,20 @@ function hien(v, tuBack){
   ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
   const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
-  $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || khoa);
+  ($('#xem-bar')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !(S && S.xemBoi) || khoa);
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-  $('#tabs').classList.toggle('hide', khoa);
+  ($('#tabs')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', khoa);
   dongMenu();
-  $('#btn-menu').classList.toggle('hide', v === 'login' || batBuoc(v));
+  ($('#btn-menu')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', v === 'login' || batBuoc(v));
   const coBack = !MAN_CHINH.has(v) && v !== 'login' && !batBuoc(v);
-  $('#btn-back').classList.toggle('hide', !coBack);
+  ($('#btn-back')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !coBack);
   if (MAN_CHINH.has(manHien)) manTruoc = manHien;
   if (coBack && !tuBack && MAN_CHINH.has(manHien)) { try { history.pushState({ dm: v }, ''); } catch(e){} }
   manHien = v;
   if (v === 'chat') { try { lamMoiChat(); } catch(e){} }
   if (v === 'them' && S) { try { veThem(S); } catch(e){} }
   if (v === 'dua' && S && S.hlv) { try { xemDuaKhoa(duaKhoa || (S.hv && S.hv.khoa) || ''); } catch(e){} }
-  if (v === 'doipin') { $('#btn-dp-huy').classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; $('#dp-err').classList.add('hide'); }
+  if (v === 'doipin') { ($('#btn-dp-huy')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; ($('#dp-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
   window.scrollTo(0,0);
 }
@@ -573,12 +573,12 @@ $('#btn-login').onclick = async () => {
   const t = $('#in-ten').value.trim(), p = $('#in-pin').value.trim();
   if (!t || !p) return;
   const b = $('#btn-login'); b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG VÀO...';
-  $('#login-err').classList.add('hide');
+  ($('#login-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   try {
     const r = await goi('dangNhap', t, p);
-    if (r.loi) { $('#login-err').textContent = r.loi; $('#login-err').classList.remove('hide'); }
+    if (r.loi) { $('#login-err').textContent = r.loi; ($('#login-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); }
     else { ten = t; pin = p; try { localStorage.setItem('dm_ten', t); localStorage.setItem('dm_pin', p); } catch(e){} nhan(r); dieuHuong(r); }
-  } catch (e) { $('#login-err').textContent = 'Lỗi mạng: ' + (e.message || e); $('#login-err').classList.remove('hide'); }
+  } catch (e) { $('#login-err').textContent = 'Lỗi mạng: ' + (e.message || e); ($('#login-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); }
   b.disabled = false; b.textContent = 'VÀO GAME →';
 };
 $('#in-pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-login').click(); });
@@ -718,7 +718,7 @@ async function xemDuaKhoa(k){
     const r = await goi('bangDuaKhoa', ten, pin, k || duaKhoa || '');
     if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
     duaKhoa = r.khoa;
-    $('#dua-chon').classList.remove('hide');
+    ($('#dua-chon')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
     $('#dua-chon').innerHTML = (r.cacKhoa || []).map(x =>
       `<button class="${x === duaKhoa ? 'on' : ''}" onclick="xemDuaKhoa('${x}')">${x}</button>`).join('');
     $('#dua-phu').innerHTML = `Cuộc đua <b style="color:var(--lime)">${esc(r.khoa)}</b> · tuần ${r.tuan}/6 · xuất phát ${esc(String(r.ngayBatDau).slice(8,10) + '/' + String(r.ngayBatDau).slice(5,7))} · ${r.bangDua.length} người`;
@@ -741,8 +741,8 @@ async function moBaiTap(tuan){
           ? `✅ Bạn đã qua cổng tuần ${r.tuan} (${r.ketQua.diem}/${r.ketQua.tong} câu). Làm lại cũng được.`
           : `Lần trước đúng <b style="color:var(--gold)">${r.ketQua.diem}/${r.ketQua.tong}</b>, cần <b>${r.dat}</b> câu. Đọc lại bài rồi làm lại — không giới hạn số lần.`)
       : `Đúng <b>${r.dat}/${r.tong}</b> câu là qua cổng, tuần sau mở. Sai thì làm lại thoải mái.`;
-    $('#bt-ketqua').classList.add('hide');
-    $('#bt-nop').classList.remove('hide');
+    ($('#bt-ketqua')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
+    ($('#bt-nop')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
     veCauHoi();
     hien('baitap');
   } catch(e){ toast('⚠️ ' + e.message, 3000); }
@@ -768,7 +768,7 @@ async function nopBT(){
   try {
     const r = await goi('nopBaiTap', ten, pin, btDL.tuan, btChon);
     if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
-    $('#bt-ketqua').classList.remove('hide');
+    ($('#bt-ketqua')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
     $('#bt-ketqua').innerHTML = `<p class="k" style="color:${r.dat ? 'var(--lime)' : 'var(--gold)'}">${r.dat ? '✅ QUA CỔNG' : '⚠️ CHƯA QUA'}</p>
       <div style="font-size:15px;font-weight:700;margin-bottom:10px">${esc(r.thongBao)}</div>
       ${r.soi.map(x => `<div style="padding:9px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.5">
@@ -813,8 +813,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#chat-tab button').forEach(b => b.onclick = () => {
     phongHien = b.dataset.p;
     document.querySelectorAll('#chat-tab button').forEach(x => x.classList.toggle('on', x === b));
-    $('#p-nhom').classList.toggle('hide', phongHien !== 'nhom');
-    $('#p-rieng').classList.toggle('hide', phongHien !== 'rieng');
+    ($('#p-nhom')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', phongHien !== 'nhom');
+    ($('#p-rieng')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', phongHien !== 'rieng');
     lamMoiChat();
   });
   const g2 = $('#nhom-gui2'); if (g2) g2.onclick = () => guiPhong('nhom');
@@ -842,7 +842,7 @@ async function lamMoiChat(im){
       if (!r.loi) { nhomKhoa = r.khoa; $('#tab-nhom-ten').textContent = r.khoa; veTin('#nhom-khung2', r.ds, t => t.cuaToi); }
     } else {
       const r = await goi('layTinNhan', ten, pin, S.hlv ? (htAi || '') : '');
-      if (!r.loi) { veTin('#rieng-khung', r.ds, t => t.ben === (S.hlv ? 'HLV' : 'HV')); $('#tab-rieng-cham').classList.add('hide'); $('#chat-cham').classList.add('hide'); }
+      if (!r.loi) { veTin('#rieng-khung', r.ds, t => t.ben === (S.hlv ? 'HLV' : 'HV')); ($('#tab-rieng-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); ($('#chat-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
     }
   } catch(e){ if (!im) {} }
 }
@@ -935,11 +935,11 @@ async function moBai(id){
       || '<div style="color:var(--mute);font-size:13px">Bài này HLV chưa gắn nội dung.</div>';
     $('#hoc-xong').textContent = r.daHoc ? '✓ ĐÃ HỌC — bấm để bỏ đánh dấu' : '✓ ĐÃ HỌC XONG BÀI NÀY';
     $('#hoc-xong').dataset.xong = r.daHoc ? '1' : '';
-    $('#hoc-bai').classList.remove('hide');
+    ($('#hoc-bai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
     $('#hoc-bai').scrollIntoView({block:'start'});
   } catch(e){ toast('⚠️ ' + e.message, 3000); }
 }
-function dongBai(){ $('#hoc-bai').classList.add('hide'); baiDangMo = 0; }
+function dongBai(){ ($('#hoc-bai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); baiDangMo = 0; }
 async function xongBai(){
   if (!baiDangMo) return;
   const bo = $('#hoc-xong').dataset.xong === '1';
@@ -954,13 +954,13 @@ async function xongBai(){
 async function luuBai(){
   const b = { id: suaBaiId || 0, tuan: $('#sb-tuan').value, thutu: $('#sb-thutu').value, tieude: $('#sb-tieude').value,
     tomtat: $('#sb-tomtat').value, video: $('#sb-video').value, pdf: $('#sb-pdf').value, an: 0 };
-  try { const r = await goi('luuBaiHoc', ten, pin, b); toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 3000); if (!r.loi) { suaBaiId = 0; $('#hoc-soan').classList.add('hide'); taiHoc(); } }
+  try { const r = await goi('luuBaiHoc', ten, pin, b); toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 3000); if (!r.loi) { suaBaiId = 0; ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); taiHoc(); } }
   catch(e){ toast('⚠️ ' + e.message, 3000); }
 }
 document.addEventListener('DOMContentLoaded', () => {
   const x = $('#hoc-xong'); if (x) x.onclick = xongBai;
   const l = $('#sb-luu'); if (l) l.onclick = luuBai;
-  const h = $('#sb-huy'); if (h) h.onclick = () => { suaBaiId = 0; $('#hoc-soan').classList.add('hide'); };
+  const h = $('#sb-huy'); if (h) h.onclick = () => { suaBaiId = 0; ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); };
 });
 
 // ----- Khách tiềm năng từ bài kiểm tra -----
@@ -1037,11 +1037,11 @@ async function taiHopThu(){
   } catch(e){}
 }
 async function moHopThu(ai){
-  htAi = ai; $('#ht-ten').textContent = '💬 ' + ai; $('#ht-chat').classList.remove('hide');
+  htAi = ai; $('#ht-ten').textContent = '💬 ' + ai; ($('#ht-chat')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
   try { const r = await goi('layTinNhan', ten, pin, ai); if (!r.loi) veChat('#ht-khung', r.ds || [], 'HLV'); } catch(e){}
   taiHopThu();
 }
-function dongHopThu(){ $('#ht-chat').classList.add('hide'); htAi = ''; }
+function dongHopThu(){ ($('#ht-chat')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); htAi = ''; }
 async function guiHopThu(){
   const o = $('#ht-o'); const v = (o.value || '').trim(); if (!v || !htAi) return;
   o.value = ''; o.disabled = true;
@@ -1132,11 +1132,11 @@ function doHoSoVaoForm(){
   $('#hs-hoten').value = h.hoTen || ''; $('#hs-namsinh').value = h.namSinh || ''; $('#hs-cao').value = h.cao || ''; $('#hs-can').value = h.canNang || '';
   $('#hs-mo').value = h.phanTramMo || ''; $('#hs-mokg').value = h.moNhap || ''; $('#hs-eo').value = h.vongEo || ''; $('#hs-tay').value = h.bapTay || ''; $('#hs-dui').value = h.bapDui || '';
   $('#hs-dich').value = h.canDich || ''; $('#hs-modich').value = h.moDich || '';
-  xoaAnh3('#hs-anh3', hsAnh3); boVideoHS(); $('#btn-hs-video-lai').classList.add('hide');
+  xoaAnh3('#hs-anh3', hsAnh3); boVideoHS(); ($('#btn-hs-video-lai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   $('#hs-video-note').textContent = h.videoBody ? '✅ Đã có video xuất phát. Chỉ chọn lại nếu muốn thay.' : 'Không bắt buộc, nhưng có video thì HLV nhìn dáng đứng, tư thế và đối chiếu sau 6 tuần chính xác hơn nhiều.';
   $('#hs-anh-note').textContent = h.anhBody ? '✅ Đã có ảnh tuần 0. Chỉ chọn lại nếu muốn thay cả 3.' : 'Chỉ HLV xem được ảnh này. Mỗi tuần app sẽ nhắc bạn chụp lại đúng 3 góc để so.';
   hsGioi = /n[uữ]/i.test(String(h.gioiTinh || '')) ? 'Nữ' : 'Nam'; document.querySelectorAll('#hs-gioi button').forEach(x => x.classList.toggle('on', x.dataset.g === hsGioi));
-  $('#btn-hs-huy').classList.toggle('hide', !h.hoSoDu); $('#hs-err').classList.add('hide');
+  ($('#btn-hs-huy')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !h.hoSoDu); ($('#hs-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   $('#hoso-loi-thieu').textContent = h.hoSoDu ? 'Sửa số rồi bấm LƯU — lộ trình và định mức tính lại ngay.' : 'Điền 1 lần (2 phút). Máy tự tính định mức ăn và 6 mốc cân theo công thức của HLV Dũng.';
   tinhHS();
 }
@@ -1206,12 +1206,12 @@ const VIDEO_MB_TOI_DA = 300;
 $('#hs-video').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   if (f.size > VIDEO_MB_TOI_DA * 1048576) { toast('⚠️ Video ' + Math.round(f.size / 1048576) + ' MB, quá ' + VIDEO_MB_TOI_DA + ' MB. Quay ngắn 10–20 giây thôi.', 5000); e.target.value = ''; return; }
-  hsVideo = f; $('#hs-video-pick').classList.add('co'); $('#hs-video-lbl').textContent = '🎥 ĐỔI VIDEO KHÁC';
-  $('#hs-video-ten').textContent = (f.name || 'video') + ' · ' + (f.size / 1048576).toFixed(1) + ' MB'; $('#hs-video-info').classList.remove('hide');
+  hsVideo = f; ($('#hs-video-pick')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('co'); $('#hs-video-lbl').textContent = '🎥 ĐỔI VIDEO KHÁC';
+  $('#hs-video-ten').textContent = (f.name || 'video') + ' · ' + (f.size / 1048576).toFixed(1) + ' MB'; ($('#hs-video-info')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
   const v = $('#hs-video-xem'); try { v.src = URL.createObjectURL(f); v.classList.add('co'); } catch (x) {}
-  $('#btn-hs-video-lai').classList.add('hide');
+  ($('#btn-hs-video-lai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
 };
-function boVideoHS(){ hsVideo = null; $('#hs-video').value = ''; $('#hs-video-pick').classList.remove('co'); $('#hs-video-lbl').textContent = '🎥 CHỌN / QUAY VIDEO'; $('#hs-video-info').classList.add('hide'); const v = $('#hs-video-xem'); v.removeAttribute('src'); v.classList.remove('co'); }
+function boVideoHS(){ hsVideo = null; $('#hs-video').value = ''; ($('#hs-video-pick')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('co'); $('#hs-video-lbl').textContent = '🎥 CHỌN / QUAY VIDEO'; ($('#hs-video-info')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); const v = $('#hs-video-xem'); v.removeAttribute('src'); v.classList.remove('co'); }
 function docB64(blob){ return new Promise((ok, loi) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1]); fr.onerror = () => loi(new Error('Không đọc được video')); fr.readAsDataURL(blob); }); }
 async function taiVideoLen(file, tienDo, tuan){
   const bd = await goi('batDauVideo', ten, pin, file.name || 'video.mp4', file.type || 'video/mp4', file.size, Number(tuan) || 0);
@@ -1232,10 +1232,10 @@ async function guiVideoHS(b, err){
     b.disabled = true; b.innerHTML = '<span class="spin"></span>ĐANG TẢI VIDEO 0%...';
     const r = await taiVideoLen(hsVideo, p => { b.innerHTML = '<span class="spin"></span>ĐANG TẢI VIDEO ' + p + '%...'; }, 0);
     if (r && r.hv) nhan(r);
-    boVideoHS(); $('#btn-hs-video-lai').classList.add('hide'); toast('✅ Đã lưu video xuất phát', 3000); return true;
+    boVideoHS(); ($('#btn-hs-video-lai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); toast('✅ Đã lưu video xuất phát', 3000); return true;
   } catch (e) {
     err.textContent = 'Hồ sơ đã lưu ✅ nhưng video chưa tải được: ' + (e.message || e) + '. Bấm "TẢI LẠI VIDEO" để thử lại.'; err.classList.remove('hide');
-    $('#btn-hs-video-lai').classList.remove('hide'); return false;
+    ($('#btn-hs-video-lai')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); return false;
   }
 }
 $('#btn-hs-video-lai').onclick = async () => { if (!hsVideo) { toast('Chọn video trước đã', 3000); return; } const b = $('#btn-hs-video-lai'); const err = $('#hs-err'); err.classList.add('hide'); const ok = await guiVideoHS(b, err); b.disabled = false; b.textContent = '🔁 TẢI LẠI VIDEO'; if (ok) hien('lotrinh'); };
@@ -1388,13 +1388,13 @@ function veVideoTienDo(r){
     return;
   }
 
-  const boChon = () => { tdVideo = null; $('#tdv-file').value = ''; $('#tdv-pick').classList.remove('co'); $('#tdv-lbl').textContent = '🎥 CHỌN / QUAY VIDEO'; $('#tdv-info').classList.add('hide'); const v = $('#tdv-xem'); v.removeAttribute('src'); v.classList.remove('co'); };
+  const boChon = () => { tdVideo = null; $('#tdv-file').value = ''; ($('#tdv-pick')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('co'); $('#tdv-lbl').textContent = '🎥 CHỌN / QUAY VIDEO'; ($('#tdv-info')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); const v = $('#tdv-xem'); v.removeAttribute('src'); v.classList.remove('co'); };
   $('#tdv-bo').onclick = boChon;
   $('#tdv-file').onchange = e => {
     const f = e.target.files && e.target.files[0]; if (!f) return;
     if (f.size > VIDEO_MB_TOI_DA * 1048576) { toast('⚠️ Video ' + Math.round(f.size / 1048576) + ' MB, quá ' + VIDEO_MB_TOI_DA + ' MB. Quay ngắn 10–20 giây thôi.', 5000); e.target.value = ''; return; }
-    tdVideo = f; $('#tdv-pick').classList.add('co'); $('#tdv-lbl').textContent = '🎥 ĐỔI VIDEO KHÁC';
-    $('#tdv-ten').textContent = (f.name || 'video') + ' · ' + (f.size / 1048576).toFixed(1) + ' MB'; $('#tdv-info').classList.remove('hide');
+    tdVideo = f; ($('#tdv-pick')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('co'); $('#tdv-lbl').textContent = '🎥 ĐỔI VIDEO KHÁC';
+    $('#tdv-ten').textContent = (f.name || 'video') + ' · ' + (f.size / 1048576).toFixed(1) + ' MB'; ($('#tdv-info')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
     const v = $('#tdv-xem'); try { v.src = URL.createObjectURL(f); v.classList.add('co'); } catch (x) {}
   };
   $('#tdv-gui').onclick = async () => {
@@ -1468,13 +1468,13 @@ function thuNhoAnh(f, max, cb, q){
 }
 function chonAnhBua(e){
   const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
+  thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
 }
-function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; $('#anh-act').classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
+function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
 $('#btn-anh-xoa').onclick = boAnhBua;
 $('#btn-sua-huy').onclick = huySua;
-function moChonAnh(mo){ $('#anh-chon').classList.toggle('hide', !mo); }
+function moChonAnh(mo){ ($('#anh-chon')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !mo); }
 $('#btn-anh').onclick = () => moChonAnh(true);
 $('#btn-anh-doi').onclick = () => moChonAnh(true);
 $('#anh-huy').onclick = () => moChonAnh(false);
@@ -1495,13 +1495,13 @@ let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 // ---------- gửi bữa ----------
 const coGram = s => /\d/.test(s || '');
-$('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); $('#gram-xacnhan').classList.add('hide');
+$('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   if (!v) { h.textContent = 'Ghi số gram thì máy chấm đúng hơn.'; h.style.color = ''; }
   else if (coGram(v)) { h.textContent = 'Có định lượng rồi, máy chấm theo đúng số bạn ghi.'; h.style.color = 'var(--lime)'; }
   else { h.textContent = '⚠️ Chưa thấy số gram. Thêm số vào từng món nhé, vd: ức gà 150g, rau 150g.'; h.style.color = '#ffe28a'; } });
 let boQuaGram = false;
-$('#gram-bosung').onclick = () => { $('#gram-xacnhan').classList.add('hide'); $('#in-mota').focus(); };
-$('#gram-guiluon').onclick = () => { boQuaGram = true; $('#gram-xacnhan').classList.add('hide'); $('#btn-gui').click(); };
+$('#gram-bosung').onclick = () => { ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-mota').focus(); };
+$('#gram-guiluon').onclick = () => { boQuaGram = true; ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#btn-gui').click(); };
 // ---------- nháp bữa (giữ trong máy, mất mạng không mất bài) + việc chấm còn treo ----------
 const NHAP_KEY = 'dm_nhap', CHAM_KEY = 'dm_cham';
 function luuNhap(){ try { const m = $('#in-mota').value; if (!m.trim() && !anhB64) { localStorage.removeItem(NHAP_KEY); return; }
@@ -1510,14 +1510,14 @@ function xoaNhap(){ try { localStorage.removeItem(NHAP_KEY); } catch(e){} }
 function khoiPhucNhap(){ try { const n = JSON.parse(localStorage.getItem(NHAP_KEY) || 'null'); if (!n || n.ten !== ten || (!n.moTa && !n.anhB64)) return;
   bua = n.bua || bua; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x.dataset.b === bua)); capNhatNutGui();
   $('#in-mota').value = n.moTa || ''; $('#in-mota').dispatchEvent(new Event('input'));
-  if (n.anhB64) { anhB64 = n.anhB64; anhMime = n.anhMime || 'image/jpeg'; $('#preview').src = 'data:' + anhMime + ';base64,' + anhB64; $('#preview').style.display = 'block'; $('#anh-act').classList.remove('hide'); }
+  if (n.anhB64) { anhB64 = n.anhB64; anhMime = n.anhMime || 'image/jpeg'; $('#preview').src = 'data:' + anhMime + ';base64,' + anhB64; $('#preview').style.display = 'block'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); }
   $('#ck-nhai').checked = !!n.nhai; $('#ck-chanh').checked = !!n.chanh; $('#ck-dibo').checked = !!n.dibo;
   toast('📝 Đã khôi phục bữa bạn đang soạn', 3000); } catch(e){} }
 function docCham(){ try { return JSON.parse(localStorage.getItem(CHAM_KEY) || 'null'); } catch(e){ return null; } }
 function tiepChamTreo(){ const c = docCham(); if (!c || c.ten !== ten) return; if (Date.now() - (c.luc || 0) > 12 * 3600e3) { try { localStorage.removeItem(CHAM_KEY); } catch(e){} return; }
   toast('⏳ Đang chấm nốt bữa lần trước…', 2500); chamTiep(c.ma, c.anhB64 || null, c.anhMime || null); }
 let daKhoiPhuc = false;
-function loiGui(m){ $('#gui-err').textContent = m; $('#gui-err').classList.remove('hide'); }
+function loiGui(m){ $('#gui-err').textContent = m; ($('#gui-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); }
 function hienDangCham(){ const el = $('#ket-qua'); el.className = 'card kq cho'; el.classList.remove('hide');
   el.innerHTML = `<div class="row" style="align-items:center;justify-content:space-between"><span class="den cho">⏳ ĐÃ NHẬN · ĐANG CHẤM</span><span class="spin" style="border-color:#aaa;border-top-color:transparent;flex:0 0 16px"></span></div><div class="quote">Bữa đã lưu chắc vào sổ, không mất. HLV máy đang chấm, khoảng 10–20 giây…</div>`; }
 function hienChamLoi(ma, m){ const el = $('#ket-qua'); el.className = 'card kq cho'; el.classList.remove('hide');
@@ -1534,9 +1534,9 @@ window.chamLai = async function(ma){ const c = docCham(); const a = c && c.ma ==
 let maBuaHienTai = null;
 $('#btn-gui').onclick = async () => {
   const moTa = $('#in-mota').value.trim();
-  $('#gui-err').classList.add('hide');
+  ($('#gui-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   if (!moTa && !anhB64) { loiGui('Chụp ảnh hoặc gõ vài chữ mô tả nhé.'); return; }
-  if (!coGram(moTa) && !boQuaGram) { $('#gram-xacnhan').classList.remove('hide'); $('#gram-xacnhan').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  if (!coGram(moTa) && !boQuaGram) { ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); $('#gram-xacnhan').scrollIntoView({behavior:'smooth', block:'center'}); return; }
   boQuaGram = false;
   const b = $('#btn-gui'); b.disabled = true; b.innerHTML = '<span class="spin"></span>Đang gửi bữa lên sổ…';
   const g = { bua, moTa, anhB64, anhMime, nhai: $('#ck-nhai').checked, chanh: $('#ck-chanh').checked, dibo: $('#ck-dibo').checked };
@@ -1599,7 +1599,7 @@ function nhan(r){
   if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } /* nhớ để lần sau mở là hiện ngay */
   const h = r.hv, tk = r.thongKe, t = tk.homNay;
   if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
-  $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
+  { const th = $('#tab-hlv'); if (th) th.classList.toggle('hide', !(r.hlv || r.xemBoi)); }
   { const ts = $('#the-so'); if (ts) ts.classList.toggle('hide', !(r.hlv && r.coSoDuLieu)); }
   try { chaoNguoiMoi(r); } catch(e){}
   try {
@@ -1614,7 +1614,7 @@ function nhan(r){
         ? `Còn <b style="color:var(--lime)">${3 - sb} bữa</b> nữa là giữ được chuỗi <b style="color:var(--cam)">${ch} ngày</b>. ${gio2 >= 20 ? 'Sắp hết ngày rồi đấy.' : 'Đừng để đứt.'}`
         : `Gửi đủ 3 bữa hôm nay là <b style="color:var(--cam)">bắt đầu chuỗi ngày</b> của bạn. Còn ${3 - sb} bữa.`;
   } catch(e){}
-  try { taiHoc(); if (r.hlv) $('#hoc-soan').classList.remove('hide'); } catch(e){}
+  try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
   try { veThem(r); } catch(e){}
   try {
     const tn = $('#the-nhom');
@@ -1623,17 +1623,17 @@ function nhan(r){
       if (r.hlv) {
         const ks = [...new Set(r.hlv.map(x => x.khoa || 'K1'))].sort();
         nhomKhoa = nhomKhoa || ks[0] || 'K1';
-        $('#nhom-chon').classList.remove('hide');
+        ($('#nhom-chon')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
         $('#nhom-chon').innerHTML = ks.map(k => `<button class="${k===nhomKhoa?'on':''}" onclick="nhomKhoa='${k}';taiNhom('${k}');veLaiChonKhoa()">${k}</button>`).join('');
       } else nhomKhoa = (r.hv && r.hv.khoa) || 'K1';
       taiNhom(nhomKhoa);
       $('#tab-nhom-ten').textContent = nhomKhoa;
       if (r.hlv) {
         const ks2 = [...new Set(r.hlv.map(x => x.khoa || 'K1'))].sort();
-        $('#nhom-chon2').classList.remove('hide');
+        ($('#nhom-chon2')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
         $('#nhom-chon2').innerHTML = ks2.map(k => `<button class="${k===nhomKhoa?'on':''}" onclick="nhomKhoa='${k}';$('#tab-nhom-ten').textContent='${k}';lamMoiChat();veLaiChonKhoa()">${k}</button>`).join('');
       }
-      if (r.chatChuaDoc > 0) { $('#chat-cham').classList.remove('hide'); $('#tab-rieng-cham').classList.remove('hide'); }
+      if (r.chatChuaDoc > 0) { ($('#chat-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); ($('#tab-rieng-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); }
     }
   } catch(e){}
   if (r.coChat) {
@@ -1656,7 +1656,7 @@ function nhan(r){
   }
   $('#sub').textContent = `${THU[new Date().getDay()]} · Chặng ${r.tuan}/6`;
   const cn = $('#cau-ngay'); if (cn) { cn.textContent = cauMoNgay(r); cn.classList.remove('hide'); }
-  $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; $('#chip-ngay').classList.remove('hide');
+  $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; ($('#chip-ngay')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
   const cb = $('#canh-bao'); const gio = new Date().getHours();
   tongKetNgay(h, t, tk, gio);
   if (!r.coKhoa) { cb.textContent = 'HLV chưa bật máy chấm (chưa dán khoá Gemini).'; cb.classList.remove('hide'); } else cb.classList.add('hide');
@@ -1674,7 +1674,7 @@ function nhan(r){
 
   veBangDua(r.bangDua, h.ten);
   { const bt = $('#bang-title'); if (bt) bt.textContent = 'Bảng đua' + (h.vaiTro === 'HLV' ? ' · tất cả khoá' : (h.khoa ? ' · ' + h.khoa : '')) + ' · điểm 7 ngày gần nhất'; }
-  if (r.feedHomNay) { $('#feed-card').classList.remove('hide'); $('#feed').innerHTML = r.feedHomNay.length ? r.feedHomNay.map(l => dongLog(l, true)).join('') : '<p><small>Chưa ai gửi bữa nào. Gửi trước để dẫn đầu!</small></p>'; }
+  if (r.feedHomNay) { ($('#feed-card')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); $('#feed').innerHTML = r.feedHomNay.length ? r.feedHomNay.map(l => dongLog(l, true)).join('') : '<p><small>Chưa ai gửi bữa nào. Gửi trước để dẫn đầu!</small></p>'; }
 
   const thieu = h.hoSoDu === false || !(h.canNang && h.cao && h.namSinh && (h.phanTramMo || h.moNhap));
   const ho = thieu ? `<div class="warn" style="margin:8px 0 0">Hồ sơ chưa đủ (cần cân nặng, chiều cao, năm sinh, % mỡ, cân đích, % mỡ đích). <button class="btn sm" onclick="hien('hoso')" style="margin:8px 0 0">Điền hồ sơ</button></div>` : '';
