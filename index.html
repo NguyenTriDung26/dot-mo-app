@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-204025';
+const APP_VER = '20260922-204139';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -928,18 +928,17 @@ function veHoc(){
   const laHLV = !!(S && S.hlv);
   $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
     <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
-      ${laHLV ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px">
-        <button class="chipbtn" style="white-space:nowrap;font-size:13px;padding:8px 6px;text-align:center" onclick="moCaTuan(${t},true)">👁 Mở tuần ${t}</button>
-        <button class="chipbtn" style="white-space:nowrap;font-size:13px;padding:8px 6px;text-align:center" onclick="moCaTuan(${t},false)">🚫 Ẩn tuần ${t}</button></div>` : ''}
+      ${laHLV ? `<div style="display:flex;gap:6px;margin:0 0 8px">
+        <button class="chipbtn" style="font-size:12px;padding:4px 10px" onclick="moCaTuan(${t},true)">Mở hết</button>
+        <button class="chipbtn" style="font-size:12px;padding:4px 10px" onclick="moCaTuan(${t},false)">Ẩn hết</button></div>` : ''}
       ${theoTuan[t].map(b => `
         <div onclick="${b.moKhoa ? 'moBai(' + b.id + ')' : 'toast(\'🔒 Bài tuần ' + b.tuan + ' mở khi bạn tới tuần đó.\', 2500)'}"
-             style="display:flex;gap:10px;padding:11px;margin-bottom:8px;border-radius:12px;cursor:pointer;${laHLV && b.an ? 'background:var(--sf2);opacity:.6;' : (laHLV ? 'background:var(--lime-dim);' : 'border-top:1px solid var(--line);')}${b.moKhoa ? '' : 'opacity:.45'}">
-          <div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>
-          ${laHLV ? `<button class="chipbtn" style="flex:none;align-self:flex-start;white-space:nowrap;font-size:12px;padding:5px 9px" title="${b.an ? 'Đang ẩn — bấm để mở' : 'Đang mở — bấm để ẩn'}" onclick="event.stopPropagation();batTat(${b.id})">${b.an ? '🚫 Mở' : '👁 Ẩn'}</button>` : ''}
+             style="display:flex;gap:10px;padding:11px 0;cursor:pointer;${laHLV ? (b.an ? 'opacity:.45;border-top:1px solid var(--line);' : 'border-top:1px solid var(--line);') : 'border-top:1px solid var(--line);'}${b.moKhoa ? '' : 'opacity:.45'}">
+          ${laHLV
+            ? `<button class="chipbtn" style="flex:none;align-self:center;white-space:nowrap;font-size:11px;font-weight:700;padding:5px 10px;${b.an ? '' : 'background:var(--lime);color:var(--tren-nhan)'}" title="${b.an ? 'Bấm để mở cho học viên' : 'Bấm để ẩn đi'}" onclick="event.stopPropagation();batTat(${b.id})">${b.an ? 'ẨN' : 'MỞ'}</button>`
+            : `<div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>`}
           <div style="min-width:0;flex:1">
-            <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}${laHLV ? (b.an
-  ? ' <span style="background:var(--mute);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">HỌC VIÊN CHƯA THẤY</span>'
-  : ' <span style="background:var(--lime);color:var(--tren-nhan);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">ĐANG MỞ</span>') : ''}</div>
+            <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}</div>
             <div style="font-size:12px;color:var(--mute);margin-top:2px">${esc(b.tomtat || '')}</div>
             <div style="font-size:11px;color:var(--mute);margin-top:3px">${b.soAnh ? b.soAnh + ' ảnh · ' : ''}${b.coVideo ? 'có video · ' : ''}${b.coPdf ? 'có PDF · ' : ''}${b.phut ? b.phut + ' phút' : ''}</div>
           </div>
@@ -1613,6 +1612,74 @@ function chepHomQua(){
   chepVaoMoTa(g.moTa);
 }
 
+// ---------- Chúc mừng các mốc: vào đường đua · qua từng tuần · về đích ----------
+const MOC_KEY = 'dm_moc';
+function docMoc(){ try { return JSON.parse(localStorage.getItem(MOC_KEY) || '{}'); } catch(e){ return {}; } }
+function ghiMoc(m){ try { localStorage.setItem(MOC_KEY, JSON.stringify(m)); } catch(e){} }
+function phaoHoa(){
+  const mau = ['#18a957','#e06f00','#f0b429','#4f46e5','#c9342c'];
+  for (let i = 0; i < 28; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = `position:fixed;left:${10 + Math.random()*80}%;top:-20px;width:9px;height:14px;z-index:9999;
+      background:${mau[i % mau.length]};border-radius:2px;pointer-events:none;opacity:.95`;
+    document.body.appendChild(d);
+    const roi = 900 + Math.random() * 900, lech = (Math.random() - .5) * 220;
+    d.animate([{ transform: 'translate(0,0) rotate(0)' }, { transform: `translate(${lech}px, ${window.innerHeight + 60}px) rotate(${540 + Math.random()*360}deg)` }],
+      { duration: roi + 800, easing: 'cubic-bezier(.2,.6,.5,1)' });
+    setTimeout(() => d.remove(), roi + 800);
+  }
+}
+function chucMung(o){
+  const n = document.createElement('div');
+  n.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+  n.innerHTML = `<div style="background:var(--sf);border-radius:20px;padding:26px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="font-size:54px;line-height:1">${o.icon}</div>
+      <div style="font-size:21px;font-weight:800;margin-top:10px;line-height:1.3;color:var(--lime)">${esc(o.tieuDe)}</div>
+      <div style="font-size:15px;line-height:1.6;color:var(--ink2);margin-top:10px">${o.noi}</div>
+      ${o.so ? `<div style="display:flex;gap:10px;margin-top:16px">${o.so}</div>` : ''}
+      <button class="btn" style="margin-top:18px">${esc(o.nut || 'TIẾP TỤC')}</button>
+    </div>`;
+  n.querySelector('button').onclick = () => n.remove();
+  n.onclick = e => { if (e.target === n) n.remove(); };
+  document.body.appendChild(n);
+  phaoHoa();
+}
+const oSo = (n, t) => `<div style="flex:1;background:var(--sf2);border-radius:12px;padding:10px"><div style="font-size:22px;font-weight:800;line-height:1">${n}</div><div style="font-size:11px;color:var(--mute);margin-top:4px">${t}</div></div>`;
+function soatMoc(r){
+  if (!r || !r.hv || r.xemBoi || r.hlv) return;
+  const m = docMoc(), tuan = r.tuan || 1, tk = r.thongKe || {};
+  const ngay = ngayThu ? ngayThu(r) : 0;
+  // 1) Vào đường đua — lần đầu mở app
+  if (!m.batDau) {
+    m.batDau = 1; ghiMoc(m);
+    chucMung({ icon: '🏁', tieuDe: 'Chào mừng vào đường đua!',
+      noi: `42 ngày, một chỉ số, một vạch đích. Việc của b từ hôm nay rất đơn giản: <b>cân buổi sáng</b> và <b>chụp đủ 3 bữa</b>.`,
+      nut: 'BẮT ĐẦU' });
+    return;
+  }
+  // 2) Qua tuần mới
+  if (tuan > (m.tuan || 1)) {
+    const tuanCu = m.tuan || 1;
+    m.tuan = tuan; ghiMoc(m);
+    if (tuan <= 6) {
+      chucMung({ icon: tuan >= 5 ? '🔥' : '🎉', tieuDe: `Qua tuần ${tuanCu} rồi!`,
+        noi: `B đã đi được <b>${tuanCu}/6 chặng</b>. Bắt đầu tuần ${tuan} hôm nay — bài học tuần mới đã mở trong tab Học.`,
+        so: oSo(tk.giam > 0 ? '−' + tk.giam + ' kg' : (tk.giam < 0 ? '+' + Math.abs(tk.giam) + ' kg' : '0 kg'), 'đã giảm')
+          + oSo(tk.streak || 0, 'chuỗi ngày') + oSo(tk.diemTuan || 0, 'điểm tuần'),
+        nut: 'VÀO TUẦN ' + tuan });
+      return;
+    }
+  }
+  // 3) Về đích
+  if (ngay >= 42 && !m.veDich) {
+    m.veDich = 1; ghiMoc(m);
+    chucMung({ icon: '🏆', tieuDe: 'B đã về đích 42 ngày!',
+      noi: `Sáu tuần, không bỏ cuộc. Chụp 3 ảnh body hôm nay để so với ngày đầu — đó là phần thưởng thật.`,
+      so: oSo(tk.giam > 0 ? '−' + tk.giam + ' kg' : '0 kg', 'tổng giảm') + oSo(tk.canMoi || '—', 'cân hiện tại'),
+      nut: 'XEM LẠI HÀNH TRÌNH' });
+  }
+}
+
 // ---------- thực đơn mẫu hôm nay (số gram riêng từng người) ----------
 let thucDonMo = false;
 function veThucDon(h){
@@ -1770,6 +1837,7 @@ function nhan(r){
   } catch(e){}
   try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
   try { veThucDon(h); } catch(e){}
+  try { setTimeout(() => soatMoc(r), 600); } catch(e){}
   try {
     const oMota = $('#in-mota');
     if (!daChonBuaTay && (!oMota || !oMota.value.trim())) chonBua(buaTheoGio());
