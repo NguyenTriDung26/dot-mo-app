@@ -332,6 +332,10 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div style="overflow-x:auto;margin-top:6px"><table id="so-bangdl" style="width:100%;border-collapse:collapse;font-size:12px"></table></div>
       <div class="row" style="margin-top:8px"><button class="btn ghost sm" id="so-truoc" style="flex:1;margin-top:0">← Trước</button><button class="btn ghost sm" id="so-sau" style="flex:1;margin-top:0">Sau →</button></div>
     </div>
+    <div class="card" id="the-khach"><p class="k">🎯 Khách đã làm bài kiểm tra</p><small style="display:block;margin-bottom:8px">Người lạ làm bài ở <b>dotmo6tuan.com/kiemtra.html</b> rồi để lại số. Đây là danh sách để gọi — ai mỡ thừa nhiều và điểm thói quen thấp thì dễ chốt nhất.</small>
+      <div id="kh-ds"></div>
+      <button class="btn ghost sm" id="kh-tai">🔄 TẢI DANH SÁCH</button>
+    </div>
     <div class="card" id="the-hopthu"><p class="k">💬 Hộp thư học viên</p><small style="display:block;margin-bottom:8px">Ai nhắn mà chưa đọc thì nằm trên cùng, có chấm đỏ.</small>
       <div id="ht-ds"></div>
       <div id="ht-chat" class="hide" style="margin-top:10px">
@@ -409,7 +413,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-160807';
+const APP_VER = '20260922-161315';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -610,6 +614,37 @@ $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
 
+// ----- Khách tiềm năng từ bài kiểm tra -----
+const NHAN_TT = {moi:'🆕 mới', da_goi:'📞 đã gọi', hen_lai:'⏳ hẹn lại', da_mua:'✅ đã mua', tu_choi:'✖️ từ chối'};
+async function taiKhach(){
+  const e = $('#kh-ds'); e.innerHTML = '<div style="color:var(--mute);font-size:13px">Đang tải…</div>';
+  try {
+    const r = await goi('dsTracNghiem', ten, pin, 0, 30);
+    if (r.loi) { e.innerHTML = '<div style="color:var(--red);font-size:13px">' + esc(r.loi) + '</div>'; return; }
+    const ds = r.ds || [];
+    if (!ds.length) { e.innerHTML = '<div style="color:var(--mute);font-size:13px">Chưa ai làm bài. Gửi link <b>dotmo6tuan.com/kiemtra.html</b> vào TikTok, Facebook, Zalo.</div>'; return; }
+    e.innerHTML = '<div style="font-size:12px;color:var(--mute);margin-bottom:6px">' + r.tong + ' người đã làm bài</div>' + ds.map(x => `
+      <div style="padding:10px 0;border-top:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+          <b style="color:var(--lime)">${esc(x.ten || '(không để tên)')}</b>
+          <span style="font-size:12px;color:var(--mute)">${esc(String(x.luc||'').slice(5,16))}</span></div>
+        <div style="font-size:13px;color:var(--ink2);margin-top:2px">
+          ${x.sdt ? '<a href="tel:' + esc(x.sdt) + '" style="color:var(--lime)">' + esc(x.sdt) + '</a>' : '<span style="color:var(--mute)">chưa để số</span>'}
+          · ${esc(x.gioiTinh||'')} · ${x.canNang||'?'} kg · mỡ ${x.phanTramMo||'?'}%</div>
+        <div style="font-size:13px;margin-top:2px">mỡ thừa <b style="color:var(--gold)">${x.moThua ?? '?'} kg</b> · thói quen <b>${x.diemThoiQuen ?? '?'}/12</b> · muốn giảm ${x.mucTieu || '?'} kg (tối đa ${x.tranGiam ?? '?'} kg)</div>
+        <div class="row" style="margin-top:6px;gap:6px">
+          ${Object.keys(NHAN_TT).map(k => `<button class="chipbtn" style="${x.trangThai===k?'background:var(--lime-dim);color:var(--lime)':''}" onclick="danhDauKhach(${x.id},'${k}')">${NHAN_TT[k]}</button>`).join('')}
+        </div>
+        ${x.ghiChu ? '<div style="font-size:12px;color:var(--mute);margin-top:4px">' + esc(x.ghiChu) + '</div>' : ''}
+      </div>`).join('');
+  } catch(err){ e.innerHTML = '<div style="color:var(--red);font-size:13px">' + esc(err.message) + '</div>'; }
+}
+async function danhDauKhach(id, tt){
+  const gc = tt === 'hen_lai' || tt === 'tu_choi' ? (prompt('Ghi chú (hẹn khi nào / vì sao từ chối):', '') || '') : '';
+  try { const r = await goi('danhDauTracNghiem', ten, pin, id, tt, gc); toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 2500); if (!r.loi) taiKhach(); }
+  catch(e){ toast('⚠️ ' + e.message, 2500); }
+}
+
 // ----- Chat riêng HLV ↔ học viên + thông tin liên lạc -----
 const gioNgan = l => String(l || '').slice(11, 16) + ' ' + String(l || '').slice(8, 10) + '/' + String(l || '').slice(5, 7);
 function veChat(khung, ds, benToi){
@@ -670,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const o = $('#chat-o'); if (o) o.addEventListener('keydown', e => { if (e.key === 'Enter') guiChatHV(); });
   const l = $('#tt-luu'); if (l) l.onclick = luuTTin;
   const hg = $('#ht-gui'); if (hg) hg.onclick = guiHopThu;
+  const kt = $('#kh-tai'); if (kt) kt.onclick = taiKhach;
   const ho = $('#ht-o'); if (ho) ho.addEventListener('keydown', e => { if (e.key === 'Enter') guiHopThu(); });
 });
 
@@ -1227,7 +1263,7 @@ function nhan(r){
       const dat = (id, v) => { const e = $(id); if (e && !e.value) e.value = v || ''; };
       dat('#tt-sdt', h2.sdt); dat('#tt-ns', h2.ngaySinh); dat('#tt-email', h2.email); dat('#tt-nghe', h2.ngheNghiep); dat('#tt-dc', h2.diaChi);
       if (r.thieuThongTin) { const n = $('#ttin-nhac'); if (n) n.innerHTML = '<b style="color:var(--red)">Chưa có số điện thoại</b> — HLV không gọi được khi bạn im lặng. Điền giúp nhé.'; }
-    } else if (r.hlv) taiHopThu();
+    } else if (r.hlv) { taiHopThu(); taiKhach(); }
   }
   if (r.hlv) {
     const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;

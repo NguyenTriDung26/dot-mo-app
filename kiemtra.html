@@ -1,0 +1,174 @@
+<!doctype html><html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Bạn đang thừa bao nhiêu mỡ? · Đốt Mỡ 6 Tuần</title>
+<meta name="description" content="Bài kiểm tra 2 phút: biết chính xác lượng mỡ thừa, mức ăn tối đa mỗi ngày và lộ trình 6 tuần của riêng bạn.">
+<style>
+:root{--bg:#0b0d0c;--sf:#151917;--sf2:#1f2521;--line:#2a312c;--ink:#f3f6f2;--ink2:#c3cbc5;--mute:#8e9a91;--lime:#a3ff5b;--lime-dim:rgba(163,255,91,.14);--cam:#ff9600;--red:#ff5a5a;--r:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:520px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:26px;line-height:1.25;margin:0 0 6px;font-weight:800}
+.sub{color:var(--mute);font-size:14px;margin:0 0 20px}
+.card{background:var(--sf);border-radius:var(--r);padding:16px;margin:0 0 12px}
+.k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:700}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+input,select{width:100%;font:inherit;font-size:16px;background:var(--sf2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:13px 14px;outline:0}
+input:focus,select:focus{border-color:var(--lime)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.mt{margin-top:12px}
+.btn{display:block;width:100%;font:inherit;font-weight:800;font-size:17px;padding:16px;border:0;border-radius:14px;background:var(--lime);color:#06130a;cursor:pointer;margin-top:16px}
+.btn:active{transform:scale(.99)}
+.btn.phu{background:transparent;color:var(--ink2);border:1px solid var(--line);font-weight:600;font-size:15px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1;min-width:88px;font:inherit;font-weight:600;font-size:14px;padding:12px 8px;border:0;background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
+.seg button.on{background:var(--lime-dim);color:var(--lime);box-shadow:inset 0 0 0 1.5px var(--lime)}
+.hide{display:none}
+.big{font-size:54px;line-height:1;font-weight:800;letter-spacing:-.02em}
+.donvi{font-size:16px;color:var(--mute);font-weight:600}
+.oto{background:var(--sf2);border-radius:14px;padding:18px;text-align:center;margin-bottom:10px}
+.hang{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:15px}
+.hang:first-of-type{border-top:0}
+.hang b{font-weight:700}
+.canhbao{background:rgba(255,90,90,.12);border-radius:12px;padding:14px;font-size:14px;line-height:1.55;margin-top:12px}
+.moc{display:flex;gap:6px;margin-top:10px}
+.moc div{flex:1;background:var(--sf2);border-radius:10px;padding:10px 4px;text-align:center}
+.moc small{display:block;color:var(--mute);font-size:11px}
+.moc b{font-size:15px}
+.sua{display:flex;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.55}
+.sua span{color:var(--cam);font-weight:800;flex:none}
+.thanh{height:4px;background:var(--sf2);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.thanh div{height:100%;background:var(--lime);transition:width .3s}
+</style></head><body>
+<div class="wrap">
+  <div class="thanh"><div id="tien" style="width:12%"></div></div>
+
+  <div id="b1">
+    <h1>Bạn đang thừa bao nhiêu mỡ?</h1>
+    <p class="sub">2 phút, 9 câu. Xong là biết lượng mỡ thừa, mức ăn tối đa mỗi ngày và lộ trình 6 tuần của riêng bạn — tính bằng đúng công thức đang dùng cho học viên trả phí.</p>
+    <div class="card">
+      <p class="k">Bước 1 · Cơ thể bạn</p>
+      <label>Bạn là</label>
+      <div class="seg" id="gt"><button data-v="Nam" class="on">Nam</button><button data-v="Nữ">Nữ</button></div>
+      <div class="row mt"><div><label>Năm sinh</label><input id="ns" inputmode="numeric" placeholder="1990"></div><div><label>Chiều cao (cm)</label><input id="cao" inputmode="decimal" placeholder="165"></div></div>
+      <div class="row mt"><div><label>Cân nặng (kg)</label><input id="can" inputmode="decimal" placeholder="68"></div><div><label>Vòng eo (cm)</label><input id="eo" inputmode="decimal" placeholder="88"></div></div>
+      <p style="font-size:12px;color:var(--mute);margin:8px 0 0">Không có thước? Bỏ trống vòng eo cũng được, máy vẫn tính ra %mỡ ước lượng.</p>
+      <button class="btn" onclick="sang(2)">TIẾP →</button>
+    </div>
+  </div>
+
+  <div id="b2" class="hide">
+    <h1>Thói quen hiện tại</h1>
+    <p class="sub">Trả lời thật. Càng nhiều thứ chưa tốt thì 2 tuần đầu càng giảm nhanh.</p>
+    <div class="card">
+      <p class="k">Bước 2 · Ăn và ngủ</p>
+      <label>Mỗi ngày bạn ăn tinh bột (cơm, bún, phở, bánh mì) mấy bữa?</label>
+      <div class="seg" id="tb"><button data-v="moi_bua" class="on">Cả 3 bữa</button><button data-v="hai_bua">2 bữa</button><button data-v="mot_bua">1 bữa</button><button data-v="khong">Không</button></div>
+      <label class="mt">Nước ngọt, bia rượu, trà sữa?</label>
+      <div class="seg" id="uc"><button data-v="hang_ngay" class="on">Hằng ngày</button><button data-v="vai_lan">Vài lần/tuần</button><button data-v="hiem">Hiếm khi</button><button data-v="khong">Không bao giờ</button></div>
+      <label class="mt">Vận động</label>
+      <div class="seg" id="vd"><button data-v="it" class="on">Gần như không</button><button data-v="vua">1–2 buổi/tuần</button><button data-v="nhieu">3 buổi trở lên</button></div>
+      <div class="mt"><label>Mỗi đêm ngủ mấy tiếng?</label><input id="ngu" inputmode="decimal" placeholder="6.5"></div>
+      <button class="btn" onclick="sang(3)">TIẾP →</button>
+      <button class="btn phu" onclick="sang(1)">← Quay lại</button>
+    </div>
+  </div>
+
+  <div id="b3" class="hide">
+    <h1>Mục tiêu của bạn</h1>
+    <p class="sub">Câu cuối. Xong là ra kết quả.</p>
+    <div class="card">
+      <p class="k">Bước 3 · Bạn muốn gì</p>
+      <div><label>Muốn giảm bao nhiêu kg trong 6 tuần?</label><input id="mt" inputmode="decimal" placeholder="5"></div>
+      <div class="mt"><label>Đã từng giảm cân chưa? Kết quả thế nào?</label><input id="tg" placeholder="Từng nhịn ăn, giảm 3kg rồi tăng lại"></div>
+      <div class="mt"><label>Vì sao bạn muốn giảm mỡ lần này?</label><input id="ld" placeholder="Muốn mặc lại đồ cũ, khám sức khoẻ có mỡ máu…"></div>
+      <button class="btn" onclick="xong()" id="nut-xong">XEM KẾT QUẢ CỦA TÔI →</button>
+      <button class="btn phu" onclick="sang(2)">← Quay lại</button>
+    </div>
+  </div>
+
+  <div id="kq" class="hide"></div>
+</div>
+<script>
+const MAY = 'https://dot-mo-6-tuan.dot-mo-6-tuan.workers.dev';
+const $ = s => document.querySelector(s);
+const chon = {gt:'Nam', tb:'moi_bua', uc:'hang_ngay', vd:'it'};
+Object.keys(chon).forEach(id => document.querySelectorAll('#'+id+' button').forEach(b => b.onclick = () => {
+  chon[id] = b.dataset.v;
+  document.querySelectorAll('#'+id+' button').forEach(x => x.classList.toggle('on', x===b));
+}));
+function sang(n){
+  [1,2,3].forEach(i => $('#b'+i).classList.toggle('hide', i!==n));
+  $('#kq').classList.add('hide');
+  $('#tien').style.width = (n*29) + '%';
+  window.scrollTo(0,0);
+}
+const esc = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function xong(){
+  const nut = $('#nut-xong'); nut.disabled = true; nut.textContent = 'Đang tính…';
+  const d = {gioiTinh:chon.gt, namSinh:$('#ns').value, cao:$('#cao').value, canNang:$('#can').value, vongEo:$('#eo').value,
+    tinhBot:chon.tb, uongCalo:chon.uc, vanDong:chon.vd, ngu:$('#ngu').value,
+    mucTieu:$('#mt').value, tungGiam:$('#tg').value, lyDo:$('#ld').value};
+  try {
+    const res = await fetch(MAY, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({fn:'guiTracNghiem', args:[d]})});
+    const r = await res.json();
+    if (r.loi) { alert(r.loi); nut.disabled=false; nut.textContent='XEM KẾT QUẢ CỦA TÔI →'; return; }
+    veKetQua(r.kq, d);
+  } catch(e){ alert('Mạng chập chờn, thử lại nhé.'); nut.disabled=false; nut.textContent='XEM KẾT QUẢ CỦA TÔI →'; }
+}
+function veKetQua(k, d){
+  [1,2,3].forEach(i => $('#b'+i).classList.add('hide'));
+  $('#tien').style.width = '100%';
+  const e = $('#kq'); e.classList.remove('hide');
+  e.innerHTML = `
+    <h1>Kết quả của bạn</h1>
+    <p class="sub">${esc(k.gioiTinh)} · ${k.tuoi} tuổi · ${k.cao} cm · ${k.canNang} kg · BMI ${k.bmi}</p>
+    <div class="card">
+      <div class="oto"><div class="big" style="color:var(--cam)">${k.moThua}<span class="donvi"> kg</span></div>
+        <div style="color:var(--mute);font-size:14px;margin-top:6px">mỡ thừa so với mức khoẻ mạnh</div></div>
+      <div class="hang"><span>Tỷ lệ mỡ${k.moUoc?' (ước lượng)':''}</span><b>${k.phanTramMo}%</b></div>
+      <div class="hang"><span>Khối mỡ trong người</span><b>${k.moKg} kg</b></div>
+      <div class="hang"><span>Khối nạc (cơ, xương, nước)</span><b>${k.canNac} kg</b></div>
+      <div class="hang"><span>Nhóm mỡ</span><b>${esc(k.nhomMo)}</b></div>
+    </div>
+    <div class="card">
+      <p class="k">Cơ thể bạn đốt bao nhiêu</p>
+      <div class="hang"><span>Nằm yên cả ngày (BMR)</span><b>${k.bmr} kcal</b></div>
+      <div class="hang"><span>Sinh hoạt bình thường (TDEE)</span><b>${k.tdee} kcal</b></div>
+      <div class="hang"><span style="color:var(--lime)">Được ăn tối đa mỗi ngày</span><b style="color:var(--lime)">${k.kcalToiDa} kcal</b></div>
+      <div class="hang"><span>Đạm cần mỗi ngày</span><b>${k.dam} g</b></div>
+      <div class="hang"><span>Nước mỗi ngày</span><b>${k.nuoc} L</b></div>
+    </div>
+    <div class="card">
+      <p class="k">Lộ trình 6 tuần của bạn</p>
+      <div class="oto" style="padding:14px"><div class="big" style="font-size:40px">${k.tranGiam6Tuan}<span class="donvi"> kg</span></div>
+        <div style="color:var(--mute);font-size:13px;margin-top:4px">mức giảm cơ thể bạn chịu được trong 6 tuần</div></div>
+      <div class="moc">${k.moc.map(m => `<div><small>T${m.tuan}</small><b>${m.can}</b></div>`).join('')}</div>
+      ${k.canBaoMucTieu ? `<div class="canhbao" style="${k.vuotTran?'':'background:var(--lime-dim)'}">${k.vuotTran?'⚠️ ':'✅ '}${esc(k.canBaoMucTieu)}</div>` : ''}
+    </div>
+    <div class="card">
+      <p class="k">Điểm thói quen: ${k.diemThoiQuen}/12</p>
+      <p style="font-size:14px;color:var(--ink2);margin:0 0 4px">${k.diemThoiQuen <= 4 ? 'Điểm thấp nghĩa là bạn còn rất nhiều chỗ để giảm nhanh — không phải tin xấu.' : k.diemThoiQuen <= 8 ? 'Nền tảng tạm được, sửa mấy chỗ dưới đây là chạy.' : 'Thói quen nền đã tốt. Việc còn lại là ăn đúng định mức.'}</p>
+      ${k.canSua.map((x,i) => `<div class="sua"><span>${i+1}</span><div>${esc(x)}</div></div>`).join('')}
+    </div>
+    <div class="card" style="background:var(--lime-dim)">
+      <p class="k" style="color:var(--lime)">Nhận lộ trình chi tiết</p>
+      <p style="font-size:14px;margin:0 0 12px;color:var(--ink2)">Để lại tên và số điện thoại, HLV Dũng gọi lại tư vấn thực đơn từng bữa theo đúng con số ở trên. Không spam, không bán data.</p>
+      <div class="row"><input id="k-ten" placeholder="Tên của bạn"><input id="k-sdt" inputmode="tel" placeholder="Số điện thoại"></div>
+      <button class="btn" onclick="luuLienHe()" id="nut-lh">GỬI CHO HLV →</button>
+      <div id="lh-kq" style="font-size:14px;margin-top:10px"></div>
+    </div>`;
+  window.KQ = k; window.DL = d;
+  window.scrollTo(0,0);
+}
+async function luuLienHe(){
+  const ten = ($('#k-ten').value||'').trim(), sdt = ($('#k-sdt').value||'').replace(/[^\d+]/g,'');
+  if (!ten || sdt.length < 9) { $('#lh-kq').innerHTML = '<span style="color:var(--red)">Điền tên và số điện thoại hợp lệ nhé.</span>'; return; }
+  const nut = $('#nut-lh'); nut.disabled = true; nut.textContent = 'Đang gửi…';
+  try {
+    const d = Object.assign({}, window.DL, {ten, sdt});
+    await fetch(MAY, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({fn:'guiTracNghiem', args:[d]})});
+    $('#lh-kq').innerHTML = '<span style="color:var(--lime)">✅ Đã gửi. HLV sẽ gọi lại trong hôm nay.</span>';
+    nut.textContent = 'ĐÃ GỬI ✓';
+  } catch(e){ $('#lh-kq').innerHTML = '<span style="color:var(--red)">Mạng lỗi, thử lại nhé.</span>'; nut.disabled=false; nut.textContent='GỬI CHO HLV →'; }
+}
+</script></body></html>
