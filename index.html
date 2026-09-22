@@ -542,7 +542,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-205948';
+const APP_VER = '20260922-211310';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -893,12 +893,21 @@ async function lamMoiChat(im){
   try {
     if (phongHien === 'nhom') {
       const r = await goi('layTinNhom', ten, pin, nhomKhoa || '');
-      if (!r.loi) { nhomKhoa = r.khoa; $('#tab-nhom-ten').textContent = r.khoa; veTin('#nhom-khung2', r.ds, t => t.cuaToi); }
+      if (!r.loi) { nhomKhoa = r.khoa; $('#tab-nhom-ten').textContent = r.khoa; veTin('#nhom-khung2', r.ds, t => t.cuaToi); veChonPhong(r); }
     } else {
       const r = await goi('layTinNhan', ten, pin, S.hlv ? (htAi || '') : '');
       if (!r.loi) { veTin('#rieng-khung', r.ds, t => t.ben === (S.hlv ? 'HLV' : 'HV')); ($('#tab-rieng-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); ($('#chat-cham')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
     }
   } catch(e){ if (!im) {} }
+}
+// HLV cầm nhiều ca nên có dãy nút nhảy phòng; học viên chỉ một phòng nên dãy này ẩn luôn.
+function veChonPhong(r){
+  const el = $('#nhom-chon2'); if (!el) return;
+  const cac = r.cacPhong || [];
+  if (cac.length < 2) { el.classList.add('hide'); return; }
+  el.classList.remove('hide');
+  el.innerHTML = cac.map(c => `<button data-k="${esc(c.ma)}" class="${c.ma === r.khoa ? 'on' : ''}" title="${esc(c.ten)}">${esc(c.ma)}${c.dong ? ' ·đóng' : ''} <small style="opacity:.7">${c.soNguoi}</small></button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { nhomKhoa = b.dataset.k; lamMoiChat(); });
 }
 async function guiPhong(p){
   const o = $(p === 'nhom' ? '#nhom-o2' : '#rieng-o');
@@ -907,7 +916,7 @@ async function guiPhong(p){
   try {
     const r = p === 'nhom' ? await goi('guiTinNhom', ten, pin, v, nhomKhoa) : await goi('guiTinNhan', ten, pin, v, S.hlv ? (htAi || '') : '');
     if (r.loi) { toast('⚠️ ' + r.loi, 3000); o.value = v; }
-    else if (p === 'nhom') { nhomKhoa = r.khoa; veTin('#nhom-khung2', r.ds, t => t.cuaToi); }
+    else if (p === 'nhom') { nhomKhoa = r.khoa; veTin('#nhom-khung2', r.ds, t => t.cuaToi); veChonPhong(r); }
     else veTin('#rieng-khung', r.ds, t => t.ben === (S.hlv ? 'HLV' : 'HV'));
   } catch(e){ toast('⚠️ ' + e.message, 3000); o.value = v; }
   finally { o.disabled = false; o.focus(); }
