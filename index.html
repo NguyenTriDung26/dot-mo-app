@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-175030';
+const APP_VER = '20260922-180115';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1295,7 +1295,7 @@ function veLuatHtml(luat, laHLV){
 function veDinhMuc(r){
   const h = r.hv, d = h.dinhMuc, el = $('#dinhmuc');
   if (!d) { el.innerHTML = `<p class="k">Định mức ăn mỗi ngày</p><small>Chưa có vì hồ sơ thiếu cân nặng.</small><br><button class="btn sm" onclick="hien('hoso')">Điền hồ sơ</button>`; return; }
-  const P = h.dam, dauN = h.dau, rauN = h.rau, nuoc = h.nuoc, kcal = h.kcalMucTieu || 0, tb = h.tinhBot || 0;
+  const P = h.dam, dauN = h.dau, rauN = h.rau, nuoc = h.nuoc, kcal = h.kcalMucTieu || 0;
   const pSang = 32, pDau = Math.round(dauN * 0.08);
   const thitTong = Math.round(Math.max(0, P - pSang - pDau) / 0.23 / 10) * 10;
   const thit = Math.round(thitTong / 2 / 10) * 10, dauBua = Math.round(dauN / 2 / 10) * 10;
@@ -1311,19 +1311,19 @@ function veDinhMuc(r){
       <div style="font-size:13px;line-height:1.5;margin-top:3px">${mon}</div>
       ${ghi ? `<div style="font-size:11px;color:var(--mute);margin-top:3px">${ghi}</div>` : ''}</div>`;
   el.innerHTML = `<p class="k">Định mức ăn mỗi ngày · ${esc(h.ten)}</p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      ${o(P, ' g', 'Protein', 'var(--lime)')}${o(dauN, ' g', 'Đậu')}${o(rauN, ' g', 'Rau')}</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
-      ${o(tb, ' g', 'Tinh bột*', tb ? 'var(--cam)' : 'var(--mute)')}${o(nuoc, ' L', 'Nước')}${o(kcal || '—', kcal ? '' : '', 'kcal tối đa')}</div>
-    <div style="font-size:11px;color:var(--mute);margin-top:8px;line-height:1.5">* Chỉ tinh bột KHÔNG trắng: yến mạch, gạo lứt, khoai lang, bí đỏ. Cơm, bún, phở, bánh mì trắng, ngô, sắn thì cấm hẳn.</div>
-    <div style="background:var(--do-nen);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:12px;line-height:1.5;color:var(--do-chu)">
-      Đây là <b>ngưỡng thấp nhất</b>. Ăn hơn được, ăn thấp hơn là mất cơ và tụt trao đổi chất.</div>
+    <div style="background:var(--lime-dim);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:42px;font-weight:800;line-height:1;color:var(--lime)">${kcal || '—'}</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày — KHÔNG ăn dưới mức này</div>
+      <div style="font-size:11px;color:var(--mute);margin-top:4px">Ăn thấp hơn là mất cơ, tụt trao đổi chất, rồi đói cồn cào ăn bù</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px">
+      ${o(P, ' g', 'Protein', 'var(--lime)')}${o(rauN, ' g', 'Rau')}${o(dauN, ' g', 'Đậu')}${o(nuoc, ' L', 'Nước')}</div>
+    <div style="font-size:11px;color:var(--mute);margin-top:8px;line-height:1.5">Đậu chính là phần tinh bột của bữa — đỗ đen, đỏ, lăng, xanh, đổi loại nào cũng được. Không thêm cơm, bún, phở, bánh mì hay nguồn tinh bột nào khác.</div>
 
     <p class="k" style="margin-top:16px">Chia ra từng bữa</p>
     ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 1 hộp sữa chua không đường + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
-    ${bua('12:00', 'Trưa', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, tb ? `Ăn tinh bột không trắng ở bữa này — tối đa ${tb} g cả ngày.` : '')}
+    ${bua('12:00', 'Trưa', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
     ${bua('17:00', 'Chiều', '100 g đậu + 100 g thịt nạc', 'Chỉ ngày có tập. Không tập thì bỏ bữa này.')}
-    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h. Tránh tinh bột ở bữa tối.')}
+    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h.')}
 
     <p class="k" style="margin-top:16px">Quy đổi nhanh</p>
     <div style="font-size:13px;line-height:1.7">
