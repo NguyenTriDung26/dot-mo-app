@@ -424,6 +424,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <!-- HỌC -->
   <div id="v-hoc" class="hide">
     <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
+    <div class="seg" id="hoc-nhanh" style="margin-bottom:12px"><button data-l="kienthuc" class="on">📖 Kiến thức</button><button data-l="thuchanh">🏃 Thực hành</button></div>
     <div id="hoc-ds"></div>
     <div class="card hide" id="hoc-bai">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px"><b id="hoc-ten" style="color:var(--lime);font-size:16px;line-height:1.35;flex:1;min-width:0"></b><button class="chipbtn" style="flex:none;white-space:nowrap" onclick="dongBai()">✕</button></div>
@@ -507,7 +508,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-170523';
+const APP_VER = '20260922-171755';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -885,7 +886,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ----- Khoá học: bài mở dần theo tuần -----
-let hocDL = null, baiDangMo = 0, suaBaiId = 0;
+let hocDL = null, baiDangMo = 0, suaBaiId = 0, hocNhanh = 'kienthuc';
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#hoc-nhanh button').forEach(b => b.onclick = () => {
+    hocNhanh = b.dataset.l;
+    document.querySelectorAll('#hoc-nhanh button').forEach(x => x.classList.toggle('on', x === b));
+    veHoc();
+  });
+});
 async function taiHoc(){
   try {
     const r = await goi('dsBaiHoc', ten, pin);
@@ -896,12 +904,14 @@ async function taiHoc(){
 }
 function veHoc(){
   const r = hocDL; if (!r) return;
+  const cuaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh && b.moKhoa);
+  const xongNhanh = cuaNhanh.filter(b => b.daHoc).length;
   $('#hoc-tomtat').innerHTML = r.tongMo
-    ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · đã mở <b>${r.tongMo}</b> bài · học xong <b>${r.daHoc}</b>` +
-      (r.conLai ? ` · <b style="color:var(--gold)">còn ${r.conLai} bài chưa học</b>` : ' · <b style="color:var(--lime)">xong hết rồi 👏</b>')
+    ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · ${hocNhanh === 'thuchanh' ? 'Thực hành' : 'Kiến thức'}: đã mở <b>${cuaNhanh.length}</b> bài · xong <b>${xongNhanh}</b>` +
+      (cuaNhanh.length - xongNhanh > 0 ? ` · <b style="color:var(--gold)">còn ${cuaNhanh.length - xongNhanh} bài</b>` : (cuaNhanh.length ? ' · <b style="color:var(--lime)">xong hết 👏</b>' : ''))
     : 'HLV đang soạn bài, sắp có.';
   const theoTuan = {};
-  (r.ds || []).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
+  (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
   $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
     <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
       ${theoTuan[t].map(b => `
