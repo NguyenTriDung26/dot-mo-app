@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180230';
+const APP_VER = '20260922-180321';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1300,6 +1300,18 @@ function veDinhMuc(r){
   const thitTong = Math.round(Math.max(0, P - pSang - pDau) / 0.23 / 10) * 10;
   const thit = Math.round(thitTong / 2 / 10) * 10, dauBua = Math.round(dauN / 2 / 10) * 10;
   const rauBua = Math.max(100, Math.round((rauN - 100) / 2 / 50) * 50);
+  // Quy ra bình và chai cho dễ hình dung — "10 ly 250 ml" không ai đếm nổi trong ngày
+  const quyNuoc = (L) => {
+    const ml = Math.round(L * 1000);
+    const binh = Math.floor(ml / 2000);
+    const con = ml - binh * 2000;
+    const chai = Math.round(con / 500);
+    const ph = [];
+    if (binh) ph.push(binh + ' bình 2 L');
+    if (chai) ph.push(chai + ' chai 500 ml');
+    if (!ph.length) ph.push(Math.round(ml / 250) + ' ly 250 ml');
+    return ph.join(' + ');
+  };
   const ly = Math.max(6, Math.round(nuoc / 0.25));
   // Ô số lớn: nhìn một cái biết cả ngày cần gì
   const o = (n, dv, t, mau) => `<div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
@@ -1325,7 +1337,12 @@ function veDinhMuc(r){
       <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày — KHÔNG ăn dưới mức này</div>
       <div style="font-size:11px;color:var(--mute);margin-top:4px">Ăn thấp hơn là mất cơ, tụt trao đổi chất, rồi đói cồn cào ăn bù</div></div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
-      ${o(P, ' g', 'Protein', 'var(--lime)')}${o(rauN, ' g', 'Rau')}${o(dauN, ' g', 'Đậu')}${o(nuoc, ' L', 'Nước')}</div>
+      ${o(P, ' g', 'Protein', 'var(--lime)')}${o(rauN, ' g', 'Rau')}${o(dauN, ' g', 'Đậu')}
+      <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
+        <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Nước</div>
+        <div style="font-size:30px;font-weight:800;line-height:1">${nuoc}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> L</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.4">${quyNuoc(nuoc)}</div>
+      </div></div>
 
     <p class="k" style="margin-top:16px">Chia ra từng bữa</p>
     ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 1 hộp sữa chua không đường + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
@@ -1336,7 +1353,7 @@ function veDinhMuc(r){
     <p class="k" style="margin-top:18px">Quy đổi nhanh</p>
     <div style="background:var(--sf2);border-radius:14px;padding:14px;font-size:13px;line-height:1.8">
       <div><b>25 g protein</b> = 4 quả trứng = 100 g thịt nạc = 120 g cá trắng = 1 muỗng whey</div>
-      <div><b>${nuoc} L nước</b> = ${ly} ly 250 ml, uống rải đều cả ngày</div>
+      <div><b>${nuoc} L nước</b> = ${quyNuoc(nuoc)} — uống rải đều cả ngày, 1 ly ngay khi ngủ dậy</div>
       <div style="color:var(--mute)">Cả ngày cần khoảng <b>${thitTong} g</b> thịt/cá nạc nếu chỉ dùng thịt</div>
     </div>`;
 }
