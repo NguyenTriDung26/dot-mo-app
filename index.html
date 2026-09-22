@@ -401,7 +401,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 
   <!-- CHAT -->
   <div id="v-chat" class="hide">
-    <div class="seg" id="chat-tab" style="margin-bottom:12px"><button data-p="nhom" class="on">👥 Nhóm <span id="tab-nhom-ten"></span></button><button data-p="rieng">💬 Riêng với HLV<span id="tab-rieng-cham" class="hide" style="color:var(--red)"> ●</span></button></div>
+    <div class="seg" id="chat-tab" style="margin-bottom:12px"><button data-p="nhom" class="on">👥 Nhóm <span id="tab-nhom-ten"></span></button><button data-p="rieng">💬 Riêng với HLV<span id="tab-rieng-cham" class="hide" style="color:var(--red)"> ●</span></button><button data-p="ai">🤖 Hỏi AI</button></div>
     <div class="card" id="p-nhom">
       <div class="seg hide" id="nhom-chon2" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
       <div id="nhom-khung2" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
@@ -411,6 +411,12 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Chỉ HLV đọc được. Vướng gì, ốm, đi công tác — nhắn ở đây.</small>
       <div id="rieng-khung" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
       <div class="row"><input id="rieng-o" placeholder="Nhắn riêng cho HLV…" style="flex:3"><button class="btn sm" id="rieng-gui" style="flex:1;margin-top:0">GỬI</button></div>
+    </div>
+    <div class="card hide" id="p-ai">
+      <small style="display:block;margin-bottom:8px;color:var(--mute)">Hỏi bất cứ lúc nào, trả lời theo đúng bộ luật và định mức riêng của bạn. Chuyện bệnh lý, thuốc men thì hỏi bác sĩ và HLV.</small>
+      <div id="ai-khung" style="height:52vh;min-height:280px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div class="seg" id="ai-goiy" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+      <div class="row"><input id="ai-o" placeholder="Hỏi về ăn uống, chững cân, ngủ…" style="flex:3"><button class="btn sm" id="ai-gui" style="flex:1;margin-top:0">HỎI</button></div>
     </div>
     <div class="card hide" id="p-hopthu2"></div>
   </div>
@@ -501,7 +507,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-165839';
+const APP_VER = '20260922-170523';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -818,9 +824,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#chat-tab button').forEach(b => b.onclick = () => {
     phongHien = b.dataset.p;
     document.querySelectorAll('#chat-tab button').forEach(x => x.classList.toggle('on', x === b));
-    ($('#p-nhom')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', phongHien !== 'nhom');
-    ($('#p-rieng')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', phongHien !== 'rieng');
-    lamMoiChat();
+    const an = (id, dk) => { const e = $(id); if (e) e.classList.toggle('hide', dk); };
+    an('#p-nhom', phongHien !== 'nhom');
+    an('#p-rieng', phongHien !== 'rieng');
+    an('#p-ai', phongHien !== 'ai');
+    if (phongHien === 'ai') { if (!$('#ai-khung').innerHTML.trim()) taiLichSuAI(); }
+    else lamMoiChat();
   });
   const g2 = $('#nhom-gui2'); if (g2) g2.onclick = () => guiPhong('nhom');
   const o2 = $('#nhom-o2'); if (o2) o2.addEventListener('keydown', e => { if (e.key === 'Enter') guiPhong('nhom'); });
@@ -840,7 +849,7 @@ function veTin(khung, ds, laCuaToi){
   if (oDay) el.scrollTop = el.scrollHeight;
 }
 async function lamMoiChat(im){
-  if (!S) return;
+  if (!S || phongHien === 'ai') return;
   try {
     if (phongHien === 'nhom') {
       const r = await goi('layTinNhom', ten, pin, nhomKhoa || '');
