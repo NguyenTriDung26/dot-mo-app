@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-204139';
+const APP_VER = '20260922-204346';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -916,10 +916,18 @@ function veHoc(){
   const tatCaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh);
   const soDaMo = tatCaNhanh.filter(b => !b.an).length;
   const xongNhanh = cuaNhanh.filter(b => b.daHoc).length;
-  if (laHLV0) {
-    $('#hoc-tomtat').innerHTML = `<b style="color:var(--lime)">${soDaMo}</b> bài học viên đang thấy · <b>${tatCaNhanh.length - soDaMo}</b> bài còn ẩn`
-      + (soDaMo ? '' : ' — <b style="color:var(--gold)">chưa mở bài nào, học viên thấy trống</b>');
-  } else $('#hoc-tomtat').innerHTML = r.tongMo
+  {
+    const conBB = (r.ds || []).filter(b => b.moKhoa && b.batBuoc && !b.daHoc && b.tuan === r.tuanHienTai).length;
+    const cong = r.coBaiTap && !r.baiTapDat;
+    $('#hoc-tomtat').innerHTML = `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b>`
+      + (conBB || cong
+        ? `<div style="margin-top:8px;padding:10px 12px;background:var(--vang-nen);border-radius:12px;font-size:13px;line-height:1.55;color:var(--vang-chu)">
+            <b>Để mở tuần ${r.tuanHienTai + 1}</b>, bạn cần:${conBB ? `<div>• học xong <b>${conBB}</b> bài bắt buộc còn lại</div>` : '<div>• ✅ đã học xong bài bắt buộc</div>'}
+            ${r.coBaiTap ? (r.baiTapDat ? '<div>• ✅ đã qua bài tập tuần</div>' : `<div>• làm bài tập tuần ${r.tuanHienTai} và đúng ít nhất 4/5 câu — <a onclick="moBaiTap()" style="color:var(--lime);font-weight:700;cursor:pointer">làm ngay</a></div>`) : ''}
+          </div>`
+        : `<div style="margin-top:8px;padding:10px 12px;background:var(--lime-dim);border-radius:12px;font-size:13px;color:var(--lime);font-weight:600">✅ Xong tuần ${r.tuanHienTai}. Tuần sau sẽ mở khi tới ngày.</div>`);
+  }
+  if (false) $('#hoc-tomtat').innerHTML = r.tongMo
     ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · ${hocNhanh === 'thuchanh' ? 'Thực hành' : 'Kiến thức'}: đã mở <b>${cuaNhanh.length}</b> bài · xong <b>${xongNhanh}</b>` +
       (cuaNhanh.length - xongNhanh > 0 ? ` · <b style="color:var(--gold)">còn ${cuaNhanh.length - xongNhanh} bài</b>` : (cuaNhanh.length ? ' · <b style="color:var(--lime)">xong hết 👏</b>' : ''))
     : 'HLV đang soạn bài, sắp có.';
@@ -928,15 +936,10 @@ function veHoc(){
   const laHLV = !!(S && S.hlv);
   $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
     <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
-      ${laHLV ? `<div style="display:flex;gap:6px;margin:0 0 8px">
-        <button class="chipbtn" style="font-size:12px;padding:4px 10px" onclick="moCaTuan(${t},true)">Mở hết</button>
-        <button class="chipbtn" style="font-size:12px;padding:4px 10px" onclick="moCaTuan(${t},false)">Ẩn hết</button></div>` : ''}
       ${theoTuan[t].map(b => `
         <div onclick="${b.moKhoa ? 'moBai(' + b.id + ')' : 'toast(\'🔒 Bài tuần ' + b.tuan + ' mở khi bạn tới tuần đó.\', 2500)'}"
              style="display:flex;gap:10px;padding:11px 0;cursor:pointer;${laHLV ? (b.an ? 'opacity:.45;border-top:1px solid var(--line);' : 'border-top:1px solid var(--line);') : 'border-top:1px solid var(--line);'}${b.moKhoa ? '' : 'opacity:.45'}">
-          ${laHLV
-            ? `<button class="chipbtn" style="flex:none;align-self:center;white-space:nowrap;font-size:11px;font-weight:700;padding:5px 10px;${b.an ? '' : 'background:var(--lime);color:var(--tren-nhan)'}" title="${b.an ? 'Bấm để mở cho học viên' : 'Bấm để ẩn đi'}" onclick="event.stopPropagation();batTat(${b.id})">${b.an ? 'ẨN' : 'MỞ'}</button>`
-            : `<div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>`}
+          <div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>
           <div style="min-width:0;flex:1">
             <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}</div>
             <div style="font-size:12px;color:var(--mute);margin-top:2px">${esc(b.tomtat || '')}</div>
