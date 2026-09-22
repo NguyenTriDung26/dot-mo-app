@@ -106,7 +106,8 @@ small{color:var(--mute)}
 .dm{border-bottom:1px solid var(--line);padding:10px 0}.dm:last-child{border:0}.dm .h{display:flex;justify-content:space-between;font-weight:800;font-size:14px}.dm .h span{color:var(--mute);font-weight:600;font-size:12px}.dm .m{font-size:15px;margin:4px 0 2px}.dm .g{font-size:12px;color:var(--mute)}
 .btn.sm{width:auto;display:inline-block;padding:9px 14px;font-size:13px;margin:8px 8px 0 0}
 .chip-g{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;color:var(--vang-chu);background:rgba(255,200,61,.14);border:1px solid rgba(255,200,61,.35);border-radius:999px;padding:2px 8px;vertical-align:middle}
-.chipbtn{border:0;background:var(--sf);color:var(--ink);border-radius:12px;width:40px;height:40px;padding:0;font:inherit;font-size:18px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center}
+.chipbtn{border:0;background:var(--sf);color:var(--ink);border-radius:12px;min-width:40px;height:40px;padding:0 10px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center;white-space:nowrap}
+.chipbtn.chu{font-size:13px;font-weight:700}
 .tools{display:flex;gap:6px;align-items:center;position:relative;z-index:12}
 .tools .chipbtn,.brand-row .chipbtn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .brand-row{display:flex;gap:10px;align-items:center}
@@ -417,7 +418,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <!-- HỌC VIÊN TRONG MỘT CA -->
   <div id="v-canguoi" class="hide">
     <div class="card"><p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <span id="cn-ten">Ca</span><button class="chipbtn" onclick="hien('ca')">← Các ca</button></p>
+        <span id="cn-ten">Ca</span><button class="chipbtn chu" onclick="hien('ca')">← Các ca</button></p>
       <div id="cn-tom" style="font-size:13px;color:var(--ink2)"></div></div>
     <div class="card"><p class="k">Thêm học viên vào ca này</p>
       <div class="row"><input id="cn-ten-moi" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="cn-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div>
@@ -548,7 +549,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-212723';
+const APP_VER = '20260922-213127';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1982,7 +1983,7 @@ function veThucDon(h){
   e.innerHTML = `
     <p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
       <span>🍽 Thực đơn mẫu hôm nay</span>
-      <button class="chipbtn" style="flex:none" onclick="thucDonMo=!thucDonMo;veThucDon(S&&S.hv)">${thucDonMo ? 'Thu gọn' : 'Xem chi tiết'}</button></p>
+      <button class="chipbtn chu" style="flex:none" onclick="thucDonMo=!thucDonMo;veThucDon(S&&S.hv)">${thucDonMo ? 'Thu gọn' : 'Xem chi tiết'}</button></p>
     <div style="font-size:13px;color:var(--ink2);line-height:1.55">${esc(d.tomTat || '')}</div>
     ${thucDonMo ? bua + `<div style="padding:10px 0;border-top:1px solid var(--line);font-size:12px;color:var(--ink2);line-height:1.55">
         <div>🚫 ${esc(d.tinhBot || '')}</div><div style="margin-top:4px">💧 ${esc(d.nuoc || '')}</div>
