@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180115';
+const APP_VER = '20260922-180205';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1302,9 +1302,9 @@ function veDinhMuc(r){
   const rauBua = Math.max(100, Math.round((rauN - 100) / 2 / 50) * 50);
   const ly = Math.max(6, Math.round(nuoc / 0.25));
   // Ô số lớn: nhìn một cái biết cả ngày cần gì
-  const o = (n, dv, t, mau) => `<div style="background:var(--sf2);border-radius:12px;padding:12px 6px;text-align:center">
-      <div style="font-size:24px;font-weight:800;line-height:1;color:${mau || 'var(--ink)'}">${n}<span style="font-size:12px;font-weight:600;color:var(--mute)">${dv}</span></div>
-      <div style="font-size:11px;color:var(--mute);margin-top:4px;font-weight:600">${t}</div></div>`;
+  const o = (n, dv, t, mau) => `<div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
+      <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">${t}</div>
+      <div style="font-size:30px;font-weight:800;line-height:1;color:${mau || 'var(--ink)'}">${n}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px">${dv}</span></div></div>`;
   const bua = (gio, ten, mon, ghi) => `<div style="padding:11px 0;border-top:1px solid var(--line)">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
         <b style="font-size:14px">${ten}</b><span style="font-size:11px;color:var(--mute);white-space:nowrap">${gio}</span></div>
@@ -1315,9 +1315,8 @@ function veDinhMuc(r){
       <div style="font-size:42px;font-weight:800;line-height:1;color:var(--lime)">${kcal || '—'}</div>
       <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày — KHÔNG ăn dưới mức này</div>
       <div style="font-size:11px;color:var(--mute);margin-top:4px">Ăn thấp hơn là mất cơ, tụt trao đổi chất, rồi đói cồn cào ăn bù</div></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
       ${o(P, ' g', 'Protein', 'var(--lime)')}${o(rauN, ' g', 'Rau')}${o(dauN, ' g', 'Đậu')}${o(nuoc, ' L', 'Nước')}</div>
-    <div style="font-size:11px;color:var(--mute);margin-top:8px;line-height:1.5">Đậu chính là phần tinh bột của bữa — đỗ đen, đỏ, lăng, xanh, đổi loại nào cũng được. Không thêm cơm, bún, phở, bánh mì hay nguồn tinh bột nào khác.</div>
 
     <p class="k" style="margin-top:16px">Chia ra từng bữa</p>
     ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 1 hộp sữa chua không đường + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
