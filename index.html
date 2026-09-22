@@ -262,6 +262,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <!-- GỬI BỮA -->
   <div id="xem-bar" class="hide" style="position:sticky;top:0;z-index:8;background:var(--gold);color:#1a1200;border-radius:12px;padding:10px 12px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px"><span id="xem-ten"></span><button id="btn-vehlv" style="font:inherit;font-weight:900;border:0;background:#1a1200;color:var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer">← VỀ HLV</button></div>
   <div id="v-gui" class="hide">
+    <div class="card hide" id="thuc-don"></div>
     <div id="canh-bao" class="warn hide"></div>
     <div id="sua-bar" class="warn hide" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span id="sua-txt"></span><button id="btn-sua-huy" style="font:inherit;font-weight:800;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap">✕ Huỷ sửa</button></div>
     <div class="card">
@@ -510,7 +511,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-172630';
+const APP_VER = '20260922-173835';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1514,6 +1515,32 @@ const du3 = st => ['truoc','nghieng','sau'].every(g => st[g] && st[g].b64 && st[
 let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 
+// ---------- thực đơn mẫu hôm nay (số gram riêng từng người) ----------
+let thucDonMo = false;
+function veThucDon(h){
+  const e = $('#thuc-don'); if (!e) return;
+  const d = h && h.dinhMuc;
+  if (!d || !d.bua) { e.classList.add('hide'); return; }
+  e.classList.remove('hide');
+  const bua = d.bua.map(b => `
+    <div style="padding:10px 0;border-top:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <b style="font-size:14px">${esc(b.ten)}</b>
+        <span style="font-size:11px;color:var(--mute);white-space:nowrap">${esc(b.gio)}</span></div>
+      <div style="font-size:13px;line-height:1.5;margin-top:3px">${esc(b.mon)}</div>
+      <div style="font-size:11px;color:var(--mute);margin-top:3px">${b.protein ? b.protein + ' g protein' : ''}${b.kcal ? ' · ' + b.kcal + ' kcal' : ''}</div>
+      ${b.ghiChu ? `<div style="font-size:11px;color:var(--ink2);margin-top:2px">${esc(b.ghiChu)}</div>` : ''}
+    </div>`).join('');
+  e.innerHTML = `
+    <p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span>🍽 Thực đơn mẫu hôm nay</span>
+      <button class="chipbtn" style="flex:none" onclick="thucDonMo=!thucDonMo;veThucDon(S&&S.hv)">${thucDonMo ? 'Thu gọn' : 'Xem chi tiết'}</button></p>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.55">${esc(d.tomTat || '')}</div>
+    ${thucDonMo ? bua + `<div style="padding:10px 0;border-top:1px solid var(--line);font-size:12px;color:var(--ink2);line-height:1.55">
+        <div>🚫 ${esc(d.tinhBot || '')}</div><div style="margin-top:4px">💧 ${esc(d.nuoc || '')}</div>
+        <div style="margin-top:4px">${esc(d.khong || '')}</div></div>` : ''}`;
+}
+
 // ---------- gửi bữa ----------
 const coGram = s => /\d/.test(s || '');
 $('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota').value.trim(); const h = $('#gram-hint'); ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
@@ -1636,6 +1663,7 @@ function nhan(r){
         : `Gửi đủ 3 bữa hôm nay là <b style="color:var(--cam)">bắt đầu chuỗi ngày</b> của bạn. Còn ${3 - sb} bữa.`;
   } catch(e){}
   try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
+  try { veThucDon(h); } catch(e){}
   try { ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); }); } catch(e){}
   try { veThem(r); } catch(e){}
   if (r.coChat) {
