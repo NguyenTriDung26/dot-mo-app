@@ -394,6 +394,32 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     </div>
   </div>
 
+  <!-- CA: NĂM → THÁNG → CA -->
+  <div id="v-ca" class="hide">
+    <div class="card"><p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span>🗓 Các ca</span><button class="chipbtn" onclick="moTaoCa()">+ Tạo ca mới</button></p>
+      <div id="ca-tom" style="font-size:13px;color:var(--ink2)"></div></div>
+    <div id="ca-cay"></div>
+    <div class="card hide" id="ca-form"><p class="k">Tạo ca mới</p>
+      <div class="row"><input id="ca-ma" placeholder="Mã (bỏ trống = tự đặt)" style="flex:1"><input id="ca-ngay" placeholder="Ngày xuất phát 2026-10-06" style="flex:1.4"></div>
+      <input id="ca-ten" placeholder="Tên ca, vd: Ca tháng 10 đợt 1" style="margin-top:8px">
+      <input id="ca-ghi" placeholder="Ghi chú (không bắt buộc)" style="margin-top:8px">
+      <div class="row" style="margin-top:8px"><button class="btn ghost sm" id="ca-luu" style="flex:1;margin-top:0">LƯU CA</button><button class="btn ghost sm" onclick="$('#ca-form').classList.add('hide')" style="flex:1;margin-top:0">Huỷ</button></div>
+    </div>
+  </div>
+
+  <!-- HỌC VIÊN TRONG MỘT CA -->
+  <div id="v-canguoi" class="hide">
+    <div class="card"><p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span id="cn-ten">Ca</span><button class="chipbtn" onclick="hien('ca')">← Các ca</button></p>
+      <div id="cn-tom" style="font-size:13px;color:var(--ink2)"></div></div>
+    <div class="card"><p class="k">Thêm học viên vào ca này</p>
+      <div class="row"><input id="cn-ten-moi" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="cn-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div>
+      <button class="btn" id="cn-them">＋ THÊM VÀO CA</button>
+      <div id="cn-kq" class="thay hide"></div></div>
+    <div class="card"><p class="k">Học viên trong ca</p><div style="overflow-x:auto"><table id="cn-bang"></table></div></div>
+  </div>
+
   <!-- THÊM · BẢNG ĐIỀU KHIỂN -->
   <div id="v-them" class="hide">
     <div class="card"><p class="k">Bảng điều khiển</p><div id="them-chao" style="font-size:14px;color:var(--ink2)"></div></div>
@@ -512,7 +538,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-204346';
+const APP_VER = '20260922-204622';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -558,7 +584,7 @@ async function lamMoi(im){
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
 function hien(v, tuBack){
-  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap','so','khach','hopthu'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
+  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap','so','khach','hopthu','ca','canguoi'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
   const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   ($('#xem-bar')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !(S && S.xemBoi) || khoa);
@@ -573,6 +599,7 @@ function hien(v, tuBack){
   manHien = v;
   if (v === 'chat') { try { lamMoiChat(); } catch(e){} }
   if (v === 'them' && S) { try { veThem(S); } catch(e){} }
+  if (v === 'ca' && S) { try { taiCay(); } catch(e){} }
   if (v === 'dua' && S && S.hlv) { try { xemDuaKhoa(duaKhoa || (S.hv && S.hv.khoa) || ''); } catch(e){} }
   if (v === 'doipin') { ($('#btn-dp-huy')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; ($('#dp-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
@@ -813,7 +840,8 @@ function veThem(r){
     o('👤','Hồ sơ của tôi','Chỉ số, số đo, thông tin liên lạc','hien(\'hoso\')'),
   ];
   if (hlv) ds = ds.concat([
-    o('🎛','Điều khiển HLV','Bảng học viên · cờ đỏ · thêm người','hien(\'hlv\')', (r.hlv.filter(x=>x.co.length).length || '')),
+    o('🗓','Các ca','Năm → tháng → ca → học viên','hien(\'ca\')'),
+    o('🎛','Điều khiển HLV','Toàn bộ học viên · cờ đỏ','hien(\'hlv\')', (r.hlv.filter(x=>x.co.length).length || '')),
     o('🎯','Khách tiềm năng','Người làm bài kiểm tra, chờ gọi','hien(\'khach\');taiKhach()'),
     o('🗂','Sổ dữ liệu','Xem và sửa mọi bảng','hien(\'so\');taiSo()'),
     o('💬','Hộp thư học viên','Ai nhắn riêng cho HLV','hien(\'hopthu\');taiHopThu()'),
@@ -1614,6 +1642,84 @@ function chepHomQua(){
   if (!g) { toast('Chưa có bữa cũ cùng loại để chép.', 2500); return; }
   chepVaoMoTa(g.moTa);
 }
+
+// ---------- Ca: Năm → Tháng → Ca → Học viên ----------
+let caHien = '';
+const TT_MAU = { 'đang chạy': 'var(--lime)', 'chưa xuất phát': 'var(--gold)', 'đã về đích': 'var(--mute)', 'đã đóng': 'var(--mute)' };
+async function taiCay(){
+  try {
+    const r = await goi('cayCa', ten, pin);
+    if (r.loi) { $('#ca-cay').innerHTML = '<div class="card"><small>' + esc(r.loi) + '</small></div>'; return; }
+    $('#ca-tom').innerHTML = `<b>${r.tongCa}</b> ca · <b>${r.tongNguoi}</b> học viên. Bấm vào ca để xem người bên trong.`;
+    const nams = Object.keys(r.cay).sort((a,b) => b - a);
+    $('#ca-cay').innerHTML = nams.map(nam => {
+      const thangs = Object.keys(r.cay[nam]).sort((a,b) => b - a);
+      return `<div class="card"><p class="k">Năm ${esc(nam)}</p>` + thangs.map(th => `
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--mute);margin:8px 0 6px">THÁNG ${esc(th)}</div>
+          ${r.cay[nam][th].map(c => `
+            <div onclick="moCa('${esc(c.ma)}')" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:var(--sf2);border-radius:12px;margin-bottom:8px;cursor:pointer">
+              <div style="min-width:0">
+                <div style="font-weight:700;font-size:15px">${esc(c.ma)} · ${esc(c.ten)}</div>
+                <div style="font-size:12px;color:var(--mute);margin-top:3px">xuất phát ${esc(String(c.ngayBatDau || '').slice(8,10) + '/' + String(c.ngayBatDau || '').slice(5,7))} · tuần ${c.tuanHienTai}/6 · ngày ${c.ngayThu}/42</div>
+              </div>
+              <div style="text-align:right;flex:none">
+                <div style="font-size:20px;font-weight:800;line-height:1">${c.soNguoi}</div>
+                <div style="font-size:10px;color:${TT_MAU[c.tinhTrang] || 'var(--mute)'};font-weight:700;margin-top:3px">${esc(c.tinhTrang)}</div>
+              </div>
+            </div>`).join('')}
+        </div>`).join('') + `</div>`;
+    }).join('');
+  } catch(e){ $('#ca-cay').innerHTML = '<div class="card"><small>' + esc(e.message) + '</small></div>'; }
+}
+async function moCa(ma){
+  caHien = ma;
+  hien('canguoi');
+  $('#cn-ten').textContent = 'Ca ' + ma;
+  $('#cn-bang').innerHTML = '';
+  try {
+    const r = await goi('nguoiTrongCa', ten, pin, ma);
+    if (r.loi) { $('#cn-tom').textContent = r.loi; return; }
+    $('#cn-ten').textContent = esc(r.ca.ten || ('Ca ' + ma));
+    $('#cn-tom').innerHTML = `Tuần <b>${r.tuan}/6</b> · <b>${r.ds.length}</b> học viên`
+      + (r.soCoDo ? ` · <b style="color:var(--red)">${r.soCoDo} người có cờ đỏ</b>` : ' · không ai có cờ đỏ');
+    $('#cn-bang').innerHTML = '<tr><th>Tên</th><th class="r">Kg</th><th class="r">🔥</th><th class="r">Nay</th><th class="r">Tuần</th><th>Cờ đỏ</th></tr>'
+      + (r.ds.length ? r.ds.map(x => `<tr style="cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g,'&#39;')}')">
+          <td><b style="color:var(--lime)">${esc(x.ten)}</b></td>
+          <td class="r">${x.canMoi || '–'}</td><td class="r">${x.streak}</td>
+          <td class="r">${x.buaHomNay}/3</td><td class="r">${x.diemTuan}</td>
+          <td style="font-size:12px;color:var(--red)">${x.co.join('<br>')}</td></tr>`).join('')
+        : '<tr><td colspan="6"><small>Chưa có ai trong ca này.</small></td></tr>');
+  } catch(e){ $('#cn-tom').textContent = e.message; }
+}
+function moTaoCa(){ $('#ca-form').classList.remove('hide'); $('#ca-form').scrollIntoView({block:'center'}); }
+async function luuCa(){
+  const c = { ma: $('#ca-ma').value, ngayBatDau: $('#ca-ngay').value, ten: $('#ca-ten').value, ghiChu: $('#ca-ghi').value };
+  try {
+    const r = await goi('taoCa', ten, pin, c);
+    toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 3500);
+    if (!r.loi) { ['#ca-ma','#ca-ngay','#ca-ten','#ca-ghi'].forEach(i => { const e = $(i); if (e) e.value = ''; }); $('#ca-form').classList.add('hide'); taiCay(); }
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+let cnGioi = 'Nam';
+async function themVaoCa(){
+  const t = ($('#cn-ten-moi').value || '').trim();
+  if (!t) { toast('Điền tên đăng nhập đã.', 2500); return; }
+  try {
+    const r = await goi('themHocVien', ten, pin, t, cnGioi, false, caHien);
+    const kq = $('#cn-kq'); kq.classList.remove('hide');
+    kq.innerHTML = r.loi ? '<span style="color:var(--red)">' + esc(r.loi) + '</span>'
+      : `<b style="color:var(--lime)">${esc(r.thongBao)}</b>`;
+    if (!r.loi) { $('#cn-ten-moi').value = ''; moCa(caHien); }
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const l = $('#ca-luu'); if (l) l.onclick = luuCa;
+  const t = $('#cn-them'); if (t) t.onclick = themVaoCa;
+  document.querySelectorAll('#cn-gioi button').forEach(b => b.onclick = () => {
+    cnGioi = b.dataset.g; document.querySelectorAll('#cn-gioi button').forEach(x => x.classList.toggle('on', x === b));
+  });
+});
 
 // ---------- Chúc mừng các mốc: vào đường đua · qua từng tuần · về đích ----------
 const MOC_KEY = 'dm_moc';
