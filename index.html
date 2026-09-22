@@ -425,6 +425,8 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <div id="v-hoc" class="hide">
     <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
     <div class="seg" id="hoc-nhanh" style="margin-bottom:12px"><button data-l="kienthuc" class="on">📖 Kiến thức</button><button data-l="thuchanh">🏃 Thực hành</button></div>
+    <div class="card hide" id="dinhmuc"></div>
+    <div class="card hide" id="luat"></div>
     <div id="hoc-ds"></div>
     <div class="card hide" id="hoc-bai">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px"><b id="hoc-ten" style="color:var(--lime);font-size:16px;line-height:1.35;flex:1;min-width:0"></b><button class="chipbtn" style="flex:none;white-space:nowrap" onclick="dongBai()">✕</button></div>
@@ -442,7 +444,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   </div>
 
   <!-- LỘ TRÌNH -->
-  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card hide" id="moc"></div><div class="card" id="anhtiendo"></div><div class="card" id="videotiendo"></div><div class="card" id="camket"></div><div class="card list" id="nhom-lt"><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="luat"></div></div><button class="btn dx" onclick="dangXuat()">Đăng xuất</button></div>
+  <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card hide" id="moc"></div><div class="card" id="anhtiendo"></div><div class="card" id="videotiendo"></div><div class="card" id="camket"></div><div class="card list" id="nhom-lt"><div class="card" id="bieudo"></div><div class="card" id="luoi"></div></div><button class="btn dx" onclick="dangXuat()">Đăng xuất</button></div>
 </div>
 
 <div class="menu-bg hide" id="menu-bg"></div>
@@ -508,7 +510,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-171949';
+const APP_VER = '20260922-172630';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -890,6 +892,7 @@ let hocDL = null, baiDangMo = 0, suaBaiId = 0, hocNhanh = 'kienthuc';
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#hoc-nhanh button').forEach(b => b.onclick = () => {
     hocNhanh = b.dataset.l;
+    ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); });
     document.querySelectorAll('#hoc-nhanh button').forEach(x => x.classList.toggle('on', x === b));
     veHoc();
   });
@@ -1633,6 +1636,7 @@ function nhan(r){
         : `Gửi đủ 3 bữa hôm nay là <b style="color:var(--cam)">bắt đầu chuỗi ngày</b> của bạn. Còn ${3 - sb} bữa.`;
   } catch(e){}
   try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
+  try { ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); }); } catch(e){}
   try { veThem(r); } catch(e){}
   if (r.coChat) {
     const hocVien = !r.hlv;
