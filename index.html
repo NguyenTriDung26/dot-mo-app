@@ -394,6 +394,12 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     </div>
   </div>
 
+  <!-- HƯỚNG DẪN ĂN UỐNG -->
+  <div id="v-anuong" class="hide">
+    <div class="card" id="dinhmuc"></div>
+    <div class="card" id="luat"></div>
+  </div>
+
   <!-- CA: NĂM → THÁNG → CA -->
   <div id="v-ca" class="hide">
     <div class="card"><p class="k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
@@ -453,8 +459,6 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <div id="v-hoc" class="hide">
     <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
     <div class="seg" id="hoc-nhanh" style="margin-bottom:12px"><button data-l="kienthuc" class="on">📖 Kiến thức</button><button data-l="thuchanh">🏃 Thực hành</button></div>
-    <div class="card hide" id="dinhmuc"></div>
-    <div class="card hide" id="luat"></div>
     <div id="hoc-ds"></div>
     <div class="card hide" id="hoc-bai">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px"><b id="hoc-ten" style="color:var(--lime);font-size:16px;line-height:1.35;flex:1;min-width:0"></b><button class="chipbtn" style="flex:none;white-space:nowrap" onclick="dongBai()">✕</button></div>
@@ -538,7 +542,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-204622';
+const APP_VER = '20260922-204643';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -584,7 +588,7 @@ async function lamMoi(im){
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
 function hien(v, tuBack){
-  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap','so','khach','hopthu','ca','canguoi'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
+  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc','chat','them','baitap','so','khach','hopthu','ca','canguoi','anuong'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
   const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   ($('#xem-bar')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !(S && S.xemBoi) || khoa);
@@ -835,7 +839,8 @@ function veThem(r){
     `<div class="o" onclick="${di}">${badge ? `<span class="ob">${badge}</span>` : ''}<div class="ot">${icon}</div><div class="on">${ten}</div><div class="om">${mo}</div></div>`;
   let ds = [
     o('🏁','Bảng đua','Thứ hạng cả khoá 7 ngày','hien(\'dua\')'),
-    o('📈','Lộ trình','6 mốc cân · định mức · ảnh tiến độ','hien(\'lotrinh\')'),
+    o('🍽','Hướng dẫn ăn uống','Định mức mỗi ngày · bộ luật · thực đơn','hien(\'anuong\')'),
+    o('📈','Lộ trình','6 mốc cân · ảnh và video tiến độ','hien(\'lotrinh\')'),
     o('📝','Bài tập tuần','Làm xong mới mở tuần sau','moBaiTap()', r.baiTapDat === false && r.coBaiTap ? '!' : ''),
     o('👤','Hồ sơ của tôi','Chỉ số, số đo, thông tin liên lạc','hien(\'hoso\')'),
   ];
@@ -924,7 +929,6 @@ let hocDL = null, baiDangMo = 0, suaBaiId = 0, hocNhanh = 'kienthuc';
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#hoc-nhanh button').forEach(b => b.onclick = () => {
     hocNhanh = b.dataset.l;
-    ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); });
     document.querySelectorAll('#hoc-nhanh button').forEach(x => x.classList.toggle('on', x === b));
     veHoc();
   });
@@ -1952,7 +1956,6 @@ function nhan(r){
     if (!daChonBuaTay && (!oMota || !oMota.value.trim())) chonBua(buaTheoGio());
     capNhatChepNhanh();
   } catch(e){}
-  try { ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); }); } catch(e){}
   try { veThem(r); } catch(e){}
   if (r.coChat) {
     const hocVien = !r.hlv;
