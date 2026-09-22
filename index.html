@@ -508,7 +508,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-171755';
+const APP_VER = '20260922-171949';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -912,12 +912,16 @@ function veHoc(){
     : 'HLV đang soạn bài, sắp có.';
   const theoTuan = {};
   (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
+  const laHLV = !!(S && S.hlv);
   $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
-    <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
+    <div class="card"><p class="k" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</span>
+      ${laHLV ? `<span><button class="chipbtn" onclick="moCaTuan(${t},true)">Mở cả tuần</button> <button class="chipbtn" onclick="moCaTuan(${t},false)">Ẩn</button></span>` : ''}</p>
       ${theoTuan[t].map(b => `
         <div onclick="${b.moKhoa ? 'moBai(' + b.id + ')' : 'toast(\'🔒 Bài tuần ' + b.tuan + ' mở khi bạn tới tuần đó.\', 2500)'}"
              style="display:flex;gap:10px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;${b.moKhoa ? '' : 'opacity:.45'}">
           <div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>
+          ${laHLV ? `<button class="chipbtn" style="flex:none;align-self:flex-start" title="${b.an ? 'Đang ẩn — bấm để mở' : 'Đang mở — bấm để ẩn'}" onclick="event.stopPropagation();batTat(${b.id})">${b.an ? '🚫' : '👁'}</button>` : ''}
           <div style="min-width:0;flex:1">
             <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}${b.an ? ' <span style="color:var(--mute);font-size:11px">· đang ẩn</span>' : ''}</div>
             <div style="font-size:12px;color:var(--mute);margin-top:2px">${esc(b.tomtat || '')}</div>
@@ -925,6 +929,14 @@ function veHoc(){
           </div>
         </div>`).join('')}
     </div>`).join('');
+}
+async function batTat(id){
+  try { const r = await goi('batTatBai', ten, pin, id); toast(r.loi ? '⚠️ ' + r.loi : r.thongBao, 2500); if (!r.loi) taiHoc(); }
+  catch(e){ toast('⚠️ ' + e.message, 2500); }
+}
+async function moCaTuan(tuan, mo){
+  try { const r = await goi('batTatTuan', ten, pin, tuan, hocNhanh, mo); toast(r.loi ? '⚠️ ' + r.loi : r.thongBao, 3000); if (!r.loi) taiHoc(); }
+  catch(e){ toast('⚠️ ' + e.message, 2500); }
 }
 async function moBai(id){
   baiDangMo = id;
