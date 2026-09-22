@@ -281,11 +281,12 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       </div>
       <img id="preview" alt="">
       <div class="row hide" id="anh-act" style="margin-top:8px"><button class="btn ghost sm" id="btn-anh-doi" style="margin:0;flex:1">Đổi ảnh khác</button><button class="btn ghost sm" id="btn-anh-xoa" style="margin:0;flex:1">Bỏ ảnh</button></div>
-      <label>Mô tả và số gram từng món</label>
+<p class="k" style="margin-top:4px">Thói quen bữa này</p><div class="row hbs"><label class="chk"><input type="checkbox" id="ck-nhai"> Nhai mỗi miếng 20 lần</label><label class="chk"><input type="checkbox" id="ck-chanh"> Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> Đi bộ 100 bước sau ăn</label></div>
+            <label>Mô tả và số gram từng món</label>
+      <div class="row" id="chep-nhanh" style="gap:6px;margin-bottom:8px"><button type="button" class="chipbtn" id="chep-mau" style="flex:1">🍽 Theo thực đơn mẫu</button><button type="button" class="chipbtn hide" id="chep-homqua" style="flex:1">🔁 Giống hôm qua</button></div>
       <textarea id="in-mota" placeholder="Ức gà 150g, đỗ đen 100g, rau cải 150g, 4 quả trứng"></textarea>
       <small id="gram-hint" style="display:block;margin-top:8px">Ghi số gram thì máy chấm đúng hơn.</small>
       <div class="warn hide" id="gram-xacnhan" style="margin:10px 0 0"><b>Chưa thấy số gram.</b> Cân từng món rồi ghi (vd: ức gà 150g, đỗ đen 100g) để chấm đúng. Không có cân thì ghi số lượng (4 quả trứng, 1 bát rau).<div class="row" style="margin-top:10px"><button class="btn sm" id="gram-bosung" style="margin:0;flex:1.2">Bổ sung gram</button><button class="btn ghost sm" id="gram-guiluon" style="margin:0;flex:1">Gửi luôn, máy ước lượng</button></div></div>
-      <p class="k" style="margin-top:12px">Thói quen bữa này</p><div class="row hbs"><label class="chk"><input type="checkbox" id="ck-nhai"> Nhai mỗi miếng 20 lần</label><label class="chk"><input type="checkbox" id="ck-chanh"> Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> Đi bộ 100 bước sau ăn</label></div>
       <button class="btn cta" id="btn-gui">Gửi bữa để chấm</button>
       <div id="gui-err" class="err hide"></div>
     </div>
@@ -511,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-173835';
+const APP_VER = '20260922-174126';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -578,8 +579,10 @@ function hien(v, tuBack){
   window.scrollTo(0,0);
 }
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => hien(b.dataset.v));
-document.querySelectorAll('#seg-bua button').forEach(b => { b.classList.toggle('on', b.dataset.b === bua); b.onclick = () => { bua = b.dataset.b; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x === b)); capNhatNutGui(); luuNhap(); }; }); capNhatNutGui();
+document.querySelectorAll('#seg-bua button').forEach(b => { b.classList.toggle('on', b.dataset.b === bua); b.onclick = () => { daChonBuaTay = true; bua = b.dataset.b; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x === b)); capNhatNutGui(); luuNhap(); }; }); capNhatNutGui();
 ['#ck-nhai','#ck-chanh','#ck-dibo'].forEach(s => $(s).addEventListener('change', luuNhap));
+{ const m = $('#chep-mau'); if (m) m.onclick = chepTuMau; }
+{ const q = $('#chep-homqua'); if (q) q.onclick = chepHomQua; }
 
 // ---------- đăng nhập ----------
 $('#in-ten').value = ten; $('#in-pin').value = pin;
@@ -1515,6 +1518,50 @@ const du3 = st => ['truoc','nghieng','sau'].every(g => st[g] && st[g].b64 && st[
 let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 
+// ---------- Bốn cách rút ngắn việc gửi bữa (Dũng chốt 22/09) ----------
+// Gõ mô tả bằng tay là chỗ người ta lười nhất rồi bỏ cuộc — nên cho chép sẵn.
+let daChonBuaTay = false;
+function buaTheoGio(){
+  const g = new Date().getHours();
+  if (g >= 5 && g < 11) return 'sang';
+  if (g >= 11 && g < 15) return 'trua';
+  if (g >= 15 && g < 18) return 'chieu';
+  return 'toi';
+}
+function chonBua(b){
+  bua = b;
+  document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x.dataset.b === b));
+  capNhatChepNhanh();
+  try { capNhatNutGui(); } catch(e){}
+}
+function capNhatChepNhanh(){
+  const n = $('#chep-homqua'); if (!n || !S) return;
+  const g = (S.buaGanNhat || {})[bua];
+  n.classList.toggle('hide', !g);
+  if (g) n.textContent = '🔁 Giống ' + (g.ngay ? g.ngay.slice(8,10) + '/' + g.ngay.slice(5,7) : 'hôm qua');
+  const m = $('#chep-mau');
+  if (m) { const d = S.hv && S.hv.dinhMuc; m.classList.toggle('hide', !d || !d.bua); }
+}
+function chepVaoMoTa(txt){
+  const o = $('#in-mota'); if (!o || !txt) return;
+  o.value = txt; o.dispatchEvent(new Event('input', { bubbles: true }));
+  o.focus();
+  try { luuNhap(); capNhatNutGui(); } catch(e){}
+  toast('Đã điền sẵn — sửa lại cho đúng bữa của bạn nhé.', 3000);
+}
+function chepTuMau(){
+  const d = S && S.hv && S.hv.dinhMuc; if (!d || !d.bua) return;
+  const ten = { sang: 'Sáng', trua: 'Trưa', chieu: 'Chiều', toi: 'Tối' }[bua];
+  const b = d.bua.find(x => x.ten === ten);
+  if (!b) { toast('Thực đơn mẫu không có bữa này.', 2500); return; }
+  chepVaoMoTa(b.mon);
+}
+function chepHomQua(){
+  const g = S && (S.buaGanNhat || {})[bua];
+  if (!g) { toast('Chưa có bữa cũ cùng loại để chép.', 2500); return; }
+  chepVaoMoTa(g.moTa);
+}
+
 // ---------- thực đơn mẫu hôm nay (số gram riêng từng người) ----------
 let thucDonMo = false;
 function veThucDon(h){
@@ -1570,9 +1617,17 @@ function hienDangCham(){ const el = $('#ket-qua'); el.className = 'card kq cho';
   el.innerHTML = `<div class="row" style="align-items:center;justify-content:space-between"><span class="den cho">⏳ ĐÃ NHẬN · ĐANG CHẤM</span><span class="spin" style="border-color:#aaa;border-top-color:transparent;flex:0 0 16px"></span></div><div class="quote">Bữa đã lưu chắc vào sổ, không mất. HLV máy đang chấm, khoảng 10–20 giây…</div>`; }
 function hienChamLoi(ma, m){ const el = $('#ket-qua'); el.className = 'card kq cho'; el.classList.remove('hide');
   el.innerHTML = `<span class="den cho">⏳ BỮA ĐÃ LƯU · CHƯA CHẤM</span><div class="quote">${esc(m)}</div><button class="btn sm" onclick="chamLai('${esc(ma)}')">Chấm lại</button>`; lamMoi(true); }
+let lanChoCham = 0;
 async function chamTiep(ma, a64, mime){
   try {
     const r = await goiBen('chamBua', [ten, pin, ma, a64, mime], 2, 90);
+    // Máy chủ mới chấm ở nền: nếu đang chấm dở thì tự hỏi lại, KHÔNG bắt học viên kéo làm mới
+    if (r.dangCham) {
+      lanChoCham = (lanChoCham || 0) + 1;
+      if (lanChoCham <= 8) { hienDangCham(); setTimeout(() => chamTiep(ma, a64, mime), 8000); return; }
+      lanChoCham = 0; hienChamLoi(ma, 'Máy chấm lâu hơn thường lệ. Bữa đã lưu, tối 21h máy chấm nốt.'); return;
+    }
+    lanChoCham = 0;
     if (r.loi) { if (/Phiên hết hạn/.test(r.loi)) return; hienChamLoi(ma, r.loi); return; }
     try { const c = docCham(); if (c && c.ma === ma) localStorage.removeItem(CHAM_KEY); } catch(e){}
     nhan(r); hienKetQua(r.ketQua);
@@ -1664,6 +1719,11 @@ function nhan(r){
   } catch(e){}
   try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
   try { veThucDon(h); } catch(e){}
+  try {
+    const oMota = $('#in-mota');
+    if (!daChonBuaTay && (!oMota || !oMota.value.trim())) chonBua(buaTheoGio());
+    capNhatChepNhanh();
+  } catch(e){}
   try { ['#dinhmuc', '#luat'].forEach(id => { const e = $(id); if (e) e.classList.toggle('hide', hocNhanh !== 'kienthuc'); }); } catch(e){}
   try { veThem(r); } catch(e){}
   if (r.coChat) {
