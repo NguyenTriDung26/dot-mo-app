@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180321';
+const APP_VER = '20260922-180500';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1337,7 +1337,12 @@ function veDinhMuc(r){
       <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày — KHÔNG ăn dưới mức này</div>
       <div style="font-size:11px;color:var(--mute);margin-top:4px">Ăn thấp hơn là mất cơ, tụt trao đổi chất, rồi đói cồn cào ăn bù</div></div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
-      ${o(P, ' g', 'Protein', 'var(--lime)')}${o(rauN, ' g', 'Rau')}${o(dauN, ' g', 'Đậu')}
+      ${o(P, ' g', 'Protein', 'var(--lime)')}
+      <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
+        <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Rau</div>
+        <div style="font-size:30px;font-weight:800;line-height:1">${rauN}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> g+</span></div>
+        <div style="font-size:12px;color:var(--lime);margin-top:6px;font-weight:600;line-height:1.4">ăn thoải mái</div>
+      </div>${o(dauN, ' g', 'Đậu')}
       <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
         <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Nước</div>
         <div style="font-size:30px;font-weight:800;line-height:1">${nuoc}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> L</span></div>
