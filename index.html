@@ -346,6 +346,25 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     </div>
   </div>
 
+  <!-- HỌC -->
+  <div id="v-hoc" class="hide">
+    <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
+    <div id="hoc-ds"></div>
+    <div class="card hide" id="hoc-bai">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="hoc-ten" style="color:var(--lime);font-size:16px"></b><button class="chipbtn" onclick="dongBai()">✕ Đóng</button></div>
+      <div id="hoc-noi"></div>
+      <button class="btn" id="hoc-xong">✓ ĐÃ HỌC XONG BÀI NÀY</button>
+    </div>
+    <div class="card hide" id="hoc-soan"><p class="k">✏️ Soạn bài (HLV)</p>
+      <div class="row"><input id="sb-tuan" inputmode="numeric" placeholder="Tuần 1-6" style="flex:1"><input id="sb-thutu" inputmode="numeric" placeholder="Thứ tự" style="flex:1"></div>
+      <input id="sb-tieude" placeholder="Tên bài" style="margin-top:8px">
+      <input id="sb-tomtat" placeholder="Tóm tắt một câu" style="margin-top:8px">
+      <input id="sb-video" placeholder="Link video (YouTube/Drive), bỏ trống nếu chưa có" style="margin-top:8px">
+      <input id="sb-pdf" placeholder="Link PDF, bỏ trống nếu chưa có" style="margin-top:8px">
+      <div class="row" style="margin-top:8px"><button class="btn ghost sm" id="sb-luu" style="flex:1;margin-top:0">LƯU BÀI</button><button class="btn ghost sm" id="sb-huy" style="flex:1;margin-top:0">Huỷ</button></div>
+    </div>
+  </div>
+
   <!-- LỘ TRÌNH -->
   <div id="v-lotrinh" class="hide"><div class="card" id="hoso"></div><div class="card hide" id="moc"></div><div class="card" id="anhtiendo"></div><div class="card" id="videotiendo"></div><div class="card" id="camket"></div><div class="card list" id="nhom-lt"><div class="card" id="dinhmuc"></div><div class="card" id="bieudo"></div><div class="card" id="luoi"></div><div class="card" id="luat"></div></div><button class="btn dx" onclick="dangXuat()">Đăng xuất</button></div>
 </div>
@@ -364,6 +383,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <button data-v="gui" class="on"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Gửi bữa</button>
   <button data-v="homnay"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-11"/></svg></span>Hôm nay</button>
   <button data-v="dua"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M6 21V4h11l-2 4 2 4H6"/></svg></span>Bảng đua</button>
+  <button data-v="hoc"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M3 6.5 12 4l9 2.5v11L12 20l-9-2.5z"/><path d="M12 4v16"/></svg></span>Học<span id="hoc-cham" class="hide" style="position:absolute;transform:translate(14px,-14px);width:8px;height:8px;border-radius:99px;background:var(--lime)"></span></button>
   <button data-v="lotrinh"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg></span>Lộ trình</button>
   <button data-v="hlv" id="tab-hlv" class="hide"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M16 4.5a3.5 3.5 0 0 1 0 7M21 20a6 6 0 0 0-4.5-5.8"/></svg></span>HLV</button>
 </div>
@@ -413,7 +433,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-161315';
+const APP_VER = '20260922-161942';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -459,7 +479,7 @@ async function lamMoi(im){
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && MAN_CHINH.has(manHien) && Date.now() - lanCapNhat > 5 * 60 * 1000) lamMoi(true); });
 function hien(v, tuBack){
-  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv'].forEach(x => $('#v-'+x).classList.toggle('hide', x !== v));
+  ['login','doipin','huongdan','hoso','gui','homnay','dua','lotrinh','hlv','hoc'].forEach(x => { const e = $('#v-'+x); if (e) e.classList.toggle('hide', x !== v); });
   const cn0 = $('#cau-ngay'); if (cn0) cn0.classList.toggle('hide', v === 'login' || !S);
   const khoa = v === 'login' || v === 'huongdan' || v === 'hoso' || (v === 'doipin' && S && S.hv.phaiDoiPin);
   $('#xem-bar').classList.toggle('hide', !(S && S.xemBoi) || khoa);
@@ -613,6 +633,81 @@ async function khoiPhucSo(id){
 $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
+
+// ----- Khoá học: bài mở dần theo tuần -----
+let hocDL = null, baiDangMo = 0, suaBaiId = 0;
+async function taiHoc(){
+  try {
+    const r = await goi('dsBaiHoc', ten, pin);
+    if (r.loi) return;
+    hocDL = r; veHoc();
+    const cham = $('#hoc-cham'); if (cham) cham.classList.toggle('hide', !(r.conLai > 0));
+  } catch(e){}
+}
+function veHoc(){
+  const r = hocDL; if (!r) return;
+  $('#hoc-tomtat').innerHTML = r.tongMo
+    ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · đã mở <b>${r.tongMo}</b> bài · học xong <b>${r.daHoc}</b>` +
+      (r.conLai ? ` · <b style="color:var(--gold)">còn ${r.conLai} bài chưa học</b>` : ' · <b style="color:var(--lime)">xong hết rồi 👏</b>')
+    : 'HLV đang soạn bài, sắp có.';
+  const theoTuan = {};
+  (r.ds || []).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
+  $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
+    <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
+      ${theoTuan[t].map(b => `
+        <div onclick="${b.moKhoa ? 'moBai(' + b.id + ')' : 'toast(\'🔒 Bài tuần ' + b.tuan + ' mở khi bạn tới tuần đó.\', 2500)'}"
+             style="display:flex;gap:10px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;${b.moKhoa ? '' : 'opacity:.45'}">
+          <div style="flex:none;font-size:18px">${b.daHoc ? '✅' : b.moKhoa ? '📖' : '🔒'}</div>
+          <div style="min-width:0;flex:1">
+            <div style="font-weight:600;font-size:14px;line-height:1.4">${esc(b.tieude)}${b.batBuoc ? ' <span style="color:var(--gold);font-size:11px">· bắt buộc</span>' : ''}${b.an ? ' <span style="color:var(--mute);font-size:11px">· đang ẩn</span>' : ''}</div>
+            <div style="font-size:12px;color:var(--mute);margin-top:2px">${esc(b.tomtat || '')}</div>
+            <div style="font-size:11px;color:var(--mute);margin-top:3px">${b.soAnh ? b.soAnh + ' ảnh · ' : ''}${b.coVideo ? 'có video · ' : ''}${b.coPdf ? 'có PDF · ' : ''}${b.phut ? b.phut + ' phút' : ''}</div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+async function moBai(id){
+  baiDangMo = id;
+  try {
+    const r = await goi('xemBaiHoc', ten, pin, id);
+    if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
+    const b = r.bai;
+    $('#hoc-ten').textContent = 'Tuần ' + b.tuan + ' · ' + b.tieude;
+    const anh = (b.anh || []).map(u => `<img src="${esc(u)}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:8px">`).join('');
+    const vid = b.video ? `<a href="${esc(b.video)}" target="_blank" class="btn ghost sm" style="display:block;text-align:center;text-decoration:none">▶ Xem video bài giảng</a>` : '';
+    const pdf = b.pdf ? `<a href="${esc(b.pdf)}" target="_blank" class="btn ghost sm" style="display:block;text-align:center;text-decoration:none">📄 Mở tài liệu PDF</a>` : '';
+    const noi = b.noiDung ? `<div style="font-size:14px;line-height:1.65;white-space:pre-wrap;margin-bottom:10px">${esc(b.noiDung)}</div>` : '';
+    $('#hoc-noi').innerHTML = (b.tomtat ? `<div style="font-size:14px;color:var(--ink2);margin-bottom:10px">${esc(b.tomtat)}</div>` : '') + noi + anh + vid + pdf
+      || '<div style="color:var(--mute);font-size:13px">Bài này HLV chưa gắn nội dung.</div>';
+    $('#hoc-xong').textContent = r.daHoc ? '✓ ĐÃ HỌC — bấm để bỏ đánh dấu' : '✓ ĐÃ HỌC XONG BÀI NÀY';
+    $('#hoc-xong').dataset.xong = r.daHoc ? '1' : '';
+    $('#hoc-bai').classList.remove('hide');
+    $('#hoc-bai').scrollIntoView({block:'start'});
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+function dongBai(){ $('#hoc-bai').classList.add('hide'); baiDangMo = 0; }
+async function xongBai(){
+  if (!baiDangMo) return;
+  const bo = $('#hoc-xong').dataset.xong === '1';
+  try {
+    const r = await goi('danhDauHoc', ten, pin, baiDangMo, bo);
+    if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
+    hocDL = r; veHoc();
+    toast(bo ? 'Đã bỏ đánh dấu.' : '✅ Hay lắm, xong bài rồi!', 2500);
+    dongBai();
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+async function luuBai(){
+  const b = { id: suaBaiId || 0, tuan: $('#sb-tuan').value, thutu: $('#sb-thutu').value, tieude: $('#sb-tieude').value,
+    tomtat: $('#sb-tomtat').value, video: $('#sb-video').value, pdf: $('#sb-pdf').value, an: 0 };
+  try { const r = await goi('luuBaiHoc', ten, pin, b); toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 3000); if (!r.loi) { suaBaiId = 0; $('#hoc-soan').classList.add('hide'); taiHoc(); } }
+  catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const x = $('#hoc-xong'); if (x) x.onclick = xongBai;
+  const l = $('#sb-luu'); if (l) l.onclick = luuBai;
+  const h = $('#sb-huy'); if (h) h.onclick = () => { suaBaiId = 0; $('#hoc-soan').classList.add('hide'); };
+});
 
 // ----- Khách tiềm năng từ bài kiểm tra -----
 const NHAN_TT = {moi:'🆕 mới', da_goi:'📞 đã gọi', hen_lai:'⏳ hẹn lại', da_mua:'✅ đã mua', tu_choi:'✖️ từ chối'};
@@ -1253,6 +1348,7 @@ function nhan(r){
   $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
   { const ts = $('#the-so'); if (ts) ts.classList.toggle('hide', !(r.hlv && r.coSoDuLieu)); }
   try { chaoNguoiMoi(r); } catch(e){}
+  try { taiHoc(); if (r.hlv) $('#hoc-soan').classList.remove('hide'); } catch(e){}
   if (r.coChat) {
     const hocVien = !r.hlv;
     { const c = $('#the-chat'); if (c) c.classList.toggle('hide', !hocVien); }
