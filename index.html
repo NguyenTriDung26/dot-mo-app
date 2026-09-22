@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180205';
+const APP_VER = '20260922-180230';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1305,11 +1305,20 @@ function veDinhMuc(r){
   const o = (n, dv, t, mau) => `<div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
       <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">${t}</div>
       <div style="font-size:30px;font-weight:800;line-height:1;color:${mau || 'var(--ink)'}">${n}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px">${dv}</span></div></div>`;
-  const bua = (gio, ten, mon, ghi) => `<div style="padding:11px 0;border-top:1px solid var(--line)">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-        <b style="font-size:14px">${ten}</b><span style="font-size:11px;color:var(--mute);white-space:nowrap">${gio}</span></div>
-      <div style="font-size:13px;line-height:1.5;margin-top:3px">${mon}</div>
-      ${ghi ? `<div style="font-size:11px;color:var(--mute);margin-top:3px">${ghi}</div>` : ''}</div>`;
+  // Mỗi bữa một màu nhận diện — nhìn màu là biết đang xem bữa nào
+  const MAU_BUA = {
+    'Sáng':  { nen: 'rgba(234,179,8,.12)',  cham: '#b8860b', icon: '🌅' },
+    'Trưa':  { nen: 'var(--lime-dim)',      cham: 'var(--lime)', icon: '☀️' },
+    'Chiều': { nen: 'rgba(234,88,12,.10)',  cham: '#c2410c', icon: '🏋️' },
+    'Tối':   { nen: 'rgba(99,102,241,.10)', cham: '#4f46e5', icon: '🌙' },
+  };
+  const bua = (gio, ten, mon, ghi) => { const m = MAU_BUA[ten] || MAU_BUA['Trưa']; return `
+    <div style="background:${m.nen};border-radius:14px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+        <b style="font-size:15px;color:${m.cham}">${m.icon} ${ten}</b>
+        <span style="font-size:11px;color:var(--mute);white-space:nowrap;font-weight:600">${gio}</span></div>
+      <div style="font-size:14px;line-height:1.55;font-weight:500">${mon}</div>
+      ${ghi ? `<div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5">${ghi}</div>` : ''}</div>`; };
   el.innerHTML = `<p class="k">Định mức ăn mỗi ngày · ${esc(h.ten)}</p>
     <div style="background:var(--lime-dim);border-radius:14px;padding:16px;text-align:center">
       <div style="font-size:42px;font-weight:800;line-height:1;color:var(--lime)">${kcal || '—'}</div>
@@ -1324,8 +1333,8 @@ function veDinhMuc(r){
     ${bua('17:00', 'Chiều', '100 g đậu + 100 g thịt nạc', 'Chỉ ngày có tập. Không tập thì bỏ bữa này.')}
     ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h.')}
 
-    <p class="k" style="margin-top:16px">Quy đổi nhanh</p>
-    <div style="font-size:13px;line-height:1.7">
+    <p class="k" style="margin-top:18px">Quy đổi nhanh</p>
+    <div style="background:var(--sf2);border-radius:14px;padding:14px;font-size:13px;line-height:1.8">
       <div><b>25 g protein</b> = 4 quả trứng = 100 g thịt nạc = 120 g cá trắng = 1 muỗng whey</div>
       <div><b>${nuoc} L nước</b> = ${ly} ly 250 ml, uống rải đều cả ngày</div>
       <div style="color:var(--mute)">Cả ngày cần khoảng <b>${thitTong} g</b> thịt/cá nạc nếu chỉ dùng thịt</div>
