@@ -512,7 +512,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-180500';
+const APP_VER = '20260922-180602';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1353,7 +1353,7 @@ function veDinhMuc(r){
     ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 1 hộp sữa chua không đường + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
     ${bua('12:00', 'Trưa', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
     ${bua('17:00', 'Chiều', '100 g đậu + 100 g thịt nạc', 'Chỉ ngày có tập. Không tập thì bỏ bữa này.')}
-    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h.')}
+    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h. Thêm 1 hộp sữa chua không đường trước 21h.')}
 
     <p class="k" style="margin-top:18px">Quy đổi nhanh</p>
     <div style="background:var(--sf2);border-radius:14px;padding:14px;font-size:13px;line-height:1.8">
