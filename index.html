@@ -318,6 +318,11 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <!-- BẢNG ĐUA -->
   <div id="v-dua" class="hide">
     <div class="card"><p class="k" id="bang-title">Bảng đua · điểm 7 ngày gần nhất</p><div class="podium" id="podium"></div><table id="bang"></table></div>
+    <div class="card hide" id="the-nhom"><p class="k">💬 Phòng chat <span id="nhom-ten"></span></p><small style="display:block;margin-bottom:8px">Cả khoá nói chuyện ở đây. Khoá khác không đọc được.</small>
+      <div class="seg hide" id="nhom-chon" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+      <div id="nhom-khung" style="max-height:340px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div class="row"><input id="nhom-o" placeholder="Nhắn cho cả khoá…" style="flex:3"><button class="btn sm" id="nhom-gui" style="flex:1;margin-top:0">GỬI</button></div>
+    </div>
   </div>
 
   <!-- HLV -->
@@ -351,7 +356,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
     <div id="hoc-ds"></div>
     <div class="card hide" id="hoc-bai">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="hoc-ten" style="color:var(--lime);font-size:16px"></b><button class="chipbtn" onclick="dongBai()">✕ Đóng</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px"><b id="hoc-ten" style="color:var(--lime);font-size:16px;line-height:1.35;flex:1;min-width:0"></b><button class="chipbtn" style="flex:none;white-space:nowrap" onclick="dongBai()">✕</button></div>
       <div id="hoc-noi"></div>
       <button class="btn" id="hoc-xong">✓ ĐÃ HỌC XONG BÀI NÀY</button>
     </div>
@@ -433,7 +438,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-161942';
+const APP_VER = '20260922-162550';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -633,6 +638,33 @@ async function khoiPhucSo(id){
 $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
+
+// ----- Chat nhóm theo khoá -----
+function veLaiChonKhoa(){ document.querySelectorAll('#nhom-chon button').forEach(b => b.classList.toggle('on', b.textContent === nhomKhoa)); }
+let nhomKhoa = '';
+function veNhom(r){
+  $('#nhom-ten').textContent = r.khoa;
+  const el = $('#nhom-khung');
+  if (!r.ds.length) { el.innerHTML = '<div style="color:var(--mute);font-size:13px;text-align:center;padding:14px">Chưa ai nói gì. Mở hàng đi!</div>'; return; }
+  el.innerHTML = r.ds.map(t => t.cuaToi
+    ? `<div style="display:flex;justify-content:flex-end;margin-bottom:6px"><div style="max-width:82%;background:var(--lime-dim);border-radius:12px;padding:8px 10px;font-size:13px;line-height:1.5">${esc(t.noiDung)}<div style="font-size:10px;color:var(--mute);margin-top:3px">bạn · ${gioNgan(t.luc)}</div></div></div>`
+    : `<div style="display:flex;justify-content:flex-start;margin-bottom:6px"><div style="max-width:82%;background:var(--sf);border-radius:12px;padding:8px 10px;font-size:13px;line-height:1.5"><b style="color:${t.ben==='HLV'?'var(--gold)':'var(--lime)'};font-size:12px">${esc(t.ten)}${t.ben==='HLV'?' · HLV':''}</b><div>${esc(t.noiDung)}</div><div style="font-size:10px;color:var(--mute);margin-top:3px">${gioNgan(t.luc)}</div></div></div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+async function taiNhom(khoa){
+  try { const r = await goi('layTinNhom', ten, pin, khoa || nhomKhoa || ''); if (r.loi) return; nhomKhoa = r.khoa; veNhom(r); } catch(e){}
+}
+async function guiNhom(){
+  const o = $('#nhom-o'); const v = (o.value||'').trim(); if (!v) return;
+  o.value = ''; o.disabled = true;
+  try { const r = await goi('guiTinNhom', ten, pin, v, nhomKhoa); if (r.loi) toast('⚠️ ' + r.loi, 3000); else { nhomKhoa = r.khoa; veNhom(r); } }
+  catch(e){ toast('⚠️ ' + e.message, 3000); o.value = v; }
+  finally { o.disabled = false; }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const g = $('#nhom-gui'); if (g) g.onclick = guiNhom;
+  const o = $('#nhom-o'); if (o) o.addEventListener('keydown', e => { if (e.key === 'Enter') guiNhom(); });
+});
 
 // ----- Khoá học: bài mở dần theo tuần -----
 let hocDL = null, baiDangMo = 0, suaBaiId = 0;
@@ -1349,6 +1381,19 @@ function nhan(r){
   { const ts = $('#the-so'); if (ts) ts.classList.toggle('hide', !(r.hlv && r.coSoDuLieu)); }
   try { chaoNguoiMoi(r); } catch(e){}
   try { taiHoc(); if (r.hlv) $('#hoc-soan').classList.remove('hide'); } catch(e){}
+  try {
+    const tn = $('#the-nhom');
+    if (tn && r.coChat) {
+      tn.classList.remove('hide');
+      if (r.hlv) {
+        const ks = [...new Set(r.hlv.map(x => x.khoa || 'K1'))].sort();
+        nhomKhoa = nhomKhoa || ks[0] || 'K1';
+        $('#nhom-chon').classList.remove('hide');
+        $('#nhom-chon').innerHTML = ks.map(k => `<button class="${k===nhomKhoa?'on':''}" onclick="nhomKhoa='${k}';taiNhom('${k}');veLaiChonKhoa()">${k}</button>`).join('');
+      } else nhomKhoa = (r.hv && r.hv.khoa) || 'K1';
+      taiNhom(nhomKhoa);
+    }
+  } catch(e){}
   if (r.coChat) {
     const hocVien = !r.hlv;
     { const c = $('#the-chat'); if (c) c.classList.toggle('hide', !hocVien); }
