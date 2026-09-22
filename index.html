@@ -458,7 +458,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <!-- HỌC -->
   <div id="v-hoc" class="hide">
     <div class="card"><p class="k">📚 Khoá học</p><div id="hoc-tomtat" style="font-size:14px;color:var(--ink2)"></div></div>
-    <div class="seg" id="hoc-nhanh" style="margin-bottom:12px"><button data-l="kienthuc" class="on">📖 Kiến thức</button><button data-l="thuchanh">🏃 Thực hành</button></div>
+    <div id="hoc-chude" style="margin-bottom:14px"></div>
     <div id="hoc-ds"></div>
     <div class="card hide" id="hoc-bai">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px"><b id="hoc-ten" style="color:var(--lime);font-size:16px;line-height:1.35;flex:1;min-width:0"></b><button class="chipbtn" style="flex:none;white-space:nowrap" onclick="dongBai()">✕</button></div>
@@ -542,7 +542,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-204643';
+const APP_VER = '20260922-205422';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -925,14 +925,34 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ----- Khoá học: bài mở dần theo tuần -----
-let hocDL = null, baiDangMo = 0, suaBaiId = 0, hocNhanh = 'kienthuc';
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('#hoc-nhanh button').forEach(b => b.onclick = () => {
-    hocNhanh = b.dataset.l;
-    document.querySelectorAll('#hoc-nhanh button').forEach(x => x.classList.toggle('on', x === b));
-    veHoc();
-  });
-});
+const CHU_DE = [
+  { ma: 'tuduy',     icon: '🧭', ten: 'Tư duy xuyên suốt', mo: 'Tối giản — làm ít nhất để ra kết quả lớn nhất' },
+  { ma: 'dinhduong', icon: '🍽', ten: 'Dinh dưỡng',        mo: 'Slow-Carb · Keto Cycling · bộ luật từng tuần' },
+  { ma: 'thuchanh',  icon: '🏃', ten: 'Thực hành hằng ngày', mo: 'Đi bộ · nước chanh · phiên bếp · tắm nước đá' },
+  { ma: 'tapluyen',  icon: '🏋️', ten: 'Tập luyện',          mo: 'Nguyên lý cơ bản · Occam\'s Protocol' },
+  { ma: 'giacngu',   icon: '😴', ten: 'Giấc ngủ',           mo: '7 tiếng · sâu 20% · REM 20%' },
+  { ma: 'truongtho', icon: '🌱', ten: 'Trường thọ',         mo: 'Thiết kế cuộc sống sau 42 ngày' },
+];
+let hocDL = null, baiDangMo = 0, suaBaiId = 0, hocNhanh = 'dinhduong';
+function veChuDe(){
+  const e = $('#hoc-chude'); if (!e || !hocDL) return;
+  const dem = {};
+  (hocDL.ds || []).forEach(b => { const c = b.chuDe || 'dinhduong'; dem[c] = dem[c] || { tong: 0, xong: 0, mo: 0 };
+    dem[c].tong++; if (b.moKhoa) dem[c].mo++; if (b.daHoc) dem[c].xong++; });
+  e.innerHTML = CHU_DE.filter(c => dem[c.ma]).map(c => {
+    const d = dem[c.ma], dang = c.ma === hocNhanh;
+    return `<div onclick="chonChuDe('${c.ma}')" style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;margin-bottom:8px;cursor:pointer;background:${dang ? 'var(--lime-dim)' : 'var(--sf)'};${dang ? 'box-shadow:inset 0 0 0 1.5px var(--lime)' : ''}">
+        <div style="font-size:24px;flex:none">${c.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:15px;${dang ? 'color:var(--lime)' : ''}">${c.ten}</div>
+          <div style="font-size:12px;color:var(--mute);margin-top:2px">${c.mo}</div></div>
+        <div style="flex:none;text-align:right">
+          <div style="font-size:16px;font-weight:800">${d.xong}<span style="font-size:12px;color:var(--mute)">/${d.mo}</span></div>
+          <div style="font-size:10px;color:var(--mute)">đã học</div></div>
+      </div>`;
+  }).join('');
+}
+function chonChuDe(ma){ hocNhanh = ma; veChuDe(); veHoc(); const e = $('#hoc-ds'); if (e) e.scrollIntoView({ block: 'start' }); }
 async function taiHoc(){
   try {
     const r = await goi('dsBaiHoc', ten, pin);
@@ -943,9 +963,10 @@ async function taiHoc(){
 }
 function veHoc(){
   const r = hocDL; if (!r) return;
-  const cuaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh && b.moKhoa);
+  veChuDe();
+  const cuaNhanh = (r.ds || []).filter(b => (b.chuDe || 'dinhduong') === hocNhanh && b.moKhoa);
   const laHLV0 = !!(S && S.hlv);
-  const tatCaNhanh = (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh);
+  const tatCaNhanh = (r.ds || []).filter(b => (b.chuDe || 'dinhduong') === hocNhanh);
   const soDaMo = tatCaNhanh.filter(b => !b.an).length;
   const xongNhanh = cuaNhanh.filter(b => b.daHoc).length;
   {
@@ -964,7 +985,7 @@ function veHoc(){
       (cuaNhanh.length - xongNhanh > 0 ? ` · <b style="color:var(--gold)">còn ${cuaNhanh.length - xongNhanh} bài</b>` : (cuaNhanh.length ? ' · <b style="color:var(--lime)">xong hết 👏</b>' : ''))
     : 'HLV đang soạn bài, sắp có.';
   const theoTuan = {};
-  (r.ds || []).filter(b => (b.loai || 'kienthuc') === hocNhanh).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
+  (r.ds || []).filter(b => (b.chuDe || 'dinhduong') === hocNhanh).forEach(b => { (theoTuan[b.tuan] = theoTuan[b.tuan] || []).push(b); });
   const laHLV = !!(S && S.hlv);
   $('#hoc-ds').innerHTML = Object.keys(theoTuan).sort((a,b)=>a-b).map(t => `
     <div class="card"><p class="k">Tuần ${t}${Number(t) === r.tuanHienTai ? ' · đang ở đây' : ''}</p>
