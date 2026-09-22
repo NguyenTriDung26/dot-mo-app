@@ -302,6 +302,17 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card" id="thoiquen"></div>
     <div class="card"><p class="k">Các bữa hôm nay</p><small style="display:block;margin-bottom:8px">Ghi sai? Bấm <b>✏️ Sửa</b> để chỉnh lại nội dung, hoặc <b>🗑 Xoá</b> để bỏ dòng đó.</small><div id="logs"></div></div>
     <div class="card hide" id="feed-card"><p class="k">🍽 Cả nhóm ăn gì hôm nay</p><small style="display:block;margin-bottom:8px">Xem đĩa của nhau để học cách xếp đĩa đúng: đạm + đậu + rau, có ghi gram.</small><div id="feed"></div></div>
+
+    <div class="card hide" id="the-chat"><p class="k">💬 Nhắn riêng cho HLV</p><small style="display:block;margin-bottom:8px">Vướng gì, ăn ngoài, ốm, đi công tác — nhắn ở đây. Chỉ HLV đọc được, cả nhóm không thấy.</small>
+      <div id="chat-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div class="row"><input id="chat-o" placeholder="Nhắn cho HLV…" style="flex:3"><button class="btn sm" id="chat-gui" style="flex:1;margin-top:0">GỬI</button></div>
+    </div>
+    <div class="card hide" id="the-ttin"><p class="k">📇 Thông tin liên lạc</p><small style="display:block;margin-bottom:8px" id="ttin-nhac">Để HLV gọi được khi cần, và gửi giấy chứng nhận lúc về đích. Ngày sinh ghi kiểu <b>1990-05-21</b>.</small>
+      <div class="row"><input id="tt-sdt" placeholder="Số điện thoại" inputmode="tel" style="flex:1"><input id="tt-ns" placeholder="Ngày sinh" inputmode="numeric" style="flex:1"></div>
+      <div class="row" style="margin-top:8px"><input id="tt-email" placeholder="Email (Gmail)" inputmode="email" style="flex:1"></div>
+      <div class="row" style="margin-top:8px"><input id="tt-nghe" placeholder="Nghề nghiệp" style="flex:1"><input id="tt-dc" placeholder="Tỉnh/thành" style="flex:1"></div>
+      <button class="btn ghost sm" id="tt-luu">LƯU THÔNG TIN</button>
+    </div>
   </div>
 
   <!-- BẢNG ĐUA -->
@@ -320,6 +331,14 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div id="so-tt" style="font-size:12px;color:var(--mute);margin-top:8px"></div>
       <div style="overflow-x:auto;margin-top:6px"><table id="so-bangdl" style="width:100%;border-collapse:collapse;font-size:12px"></table></div>
       <div class="row" style="margin-top:8px"><button class="btn ghost sm" id="so-truoc" style="flex:1;margin-top:0">← Trước</button><button class="btn ghost sm" id="so-sau" style="flex:1;margin-top:0">Sau →</button></div>
+    </div>
+    <div class="card" id="the-hopthu"><p class="k">💬 Hộp thư học viên</p><small style="display:block;margin-bottom:8px">Ai nhắn mà chưa đọc thì nằm trên cùng, có chấm đỏ.</small>
+      <div id="ht-ds"></div>
+      <div id="ht-chat" class="hide" style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b id="ht-ten" style="color:var(--lime)"></b><button class="chipbtn" onclick="dongHopThu()">✕ Đóng</button></div>
+        <div id="ht-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+        <div class="row"><input id="ht-o" placeholder="Trả lời…" style="flex:3"><button class="btn sm" id="ht-gui" style="flex:1;margin-top:0">GỬI</button></div>
+      </div>
     </div>
   </div>
 
@@ -390,7 +409,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-155246';
+const APP_VER = '20260922-160559';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -590,6 +609,106 @@ async function khoiPhucSo(id){
 $('#so-tai').onclick = () => { soTu = 0; taiSo(); };
 $('#so-truoc').onclick = () => { if (soTu > 0) { soTu = Math.max(0, soTu - 25); taiSo(); } };
 $('#so-sau').onclick = () => { if (soDL && soTu + 25 < soDL.tong) { soTu += 25; taiSo(); } };
+
+// ----- Chat riêng HLV ↔ học viên + thông tin liên lạc -----
+const gioNgan = l => String(l || '').slice(11, 16) + ' ' + String(l || '').slice(8, 10) + '/' + String(l || '').slice(5, 7);
+function veChat(khung, ds, benToi){
+  const el = $(khung);
+  if (!ds.length) { el.innerHTML = '<div style="color:var(--mute);font-size:13px;text-align:center;padding:12px">Chưa có tin nhắn nào.</div>'; return; }
+  el.innerHTML = ds.map(t => {
+    const toi = t.ben === benToi;
+    return `<div style="display:flex;justify-content:${toi ? 'flex-end' : 'flex-start'};margin-bottom:6px">
+      <div style="max-width:80%;background:${toi ? 'var(--lime-dim)' : 'var(--sf)'};color:var(--ink);border-radius:12px;padding:8px 10px;font-size:13px;line-height:1.5">
+        ${esc(t.noiDung)}<div style="font-size:10px;color:var(--mute);margin-top:3px">${toi ? 'bạn' : esc(t.ten)} · ${gioNgan(t.luc)}</div>
+      </div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+async function taiChatHV(){
+  try { const r = await goi('layTinNhan', ten, pin, ''); if (!r.loi) veChat('#chat-khung', r.ds || [], 'HV'); } catch(e){}
+}
+async function guiChatHV(){
+  const o = $('#chat-o'); const v = (o.value || '').trim(); if (!v) return;
+  o.value = ''; o.disabled = true;
+  try { const r = await goi('guiTinNhan', ten, pin, v, ''); if (r.loi) toast('⚠️ ' + r.loi, 3000); else veChat('#chat-khung', r.ds || [], 'HV'); }
+  catch(e){ toast('⚠️ ' + e.message, 3000); o.value = v; }
+  finally { o.disabled = false; }
+}
+async function luuTTin(){
+  const t = { sdt: $('#tt-sdt').value, ngaysinh: $('#tt-ns').value, email: $('#tt-email').value, nghenghiep: $('#tt-nghe').value, diachi: $('#tt-dc').value };
+  try { const r = await goi('luuThongTin', ten, pin, t, ''); toast(r.loi ? '⚠️ ' + r.loi : '✅ ' + r.thongBao, 3000); if (!r.loi) $('#ttin-nhac').textContent = 'Đã lưu. Sửa lại lúc nào cũng được.'; }
+  catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+let htAi = '';
+async function taiHopThu(){
+  try {
+    const r = await goi('hopThu', ten, pin); if (r.loi) return;
+    const ds = r.ds || [];
+    $('#ht-ds').innerHTML = !ds.length
+      ? '<div style="color:var(--mute);font-size:13px">Chưa ai nhắn gì.</div>'
+      : ds.map(x => `<div onclick="moHopThu('${esc(x.hocvien).replace(/'/g,'&#39;')}')" style="cursor:pointer;padding:8px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px">
+          <div style="min-width:0"><b style="color:${x.chuaDoc ? 'var(--lime)' : 'var(--ink)'}">${esc(x.hocvien)}</b>${x.chuaDoc ? ' <span style="color:var(--red)">●</span>' : ''}
+            <div style="font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(x.cuoi && x.cuoi.ben === 'HLV' ? 'Bạn: ' : '')}${esc((x.cuoi || {}).noiDung || '')}</div></div>
+          <div style="font-size:11px;color:var(--mute);white-space:nowrap">${gioNgan((x.cuoi || {}).luc)}</div></div>`).join('');
+  } catch(e){}
+}
+async function moHopThu(ai){
+  htAi = ai; $('#ht-ten').textContent = '💬 ' + ai; $('#ht-chat').classList.remove('hide');
+  try { const r = await goi('layTinNhan', ten, pin, ai); if (!r.loi) veChat('#ht-khung', r.ds || [], 'HLV'); } catch(e){}
+  taiHopThu();
+}
+function dongHopThu(){ $('#ht-chat').classList.add('hide'); htAi = ''; }
+async function guiHopThu(){
+  const o = $('#ht-o'); const v = (o.value || '').trim(); if (!v || !htAi) return;
+  o.value = ''; o.disabled = true;
+  try { const r = await goi('guiTinNhan', ten, pin, v, htAi); if (r.loi) toast('⚠️ ' + r.loi, 3000); else { veChat('#ht-khung', r.ds || [], 'HLV'); taiHopThu(); } }
+  catch(e){ toast('⚠️ ' + e.message, 3000); o.value = v; }
+  finally { o.disabled = false; }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const g = $('#chat-gui'); if (g) g.onclick = guiChatHV;
+  const o = $('#chat-o'); if (o) o.addEventListener('keydown', e => { if (e.key === 'Enter') guiChatHV(); });
+  const l = $('#tt-luu'); if (l) l.onclick = luuTTin;
+  const hg = $('#ht-gui'); if (hg) hg.onclick = guiHopThu;
+  const ho = $('#ht-o'); if (ho) ho.addEventListener('keydown', e => { if (e.key === 'Enter') guiHopThu(); });
+});
+
+// ----- Chào người mới vào đường đua: hiện băng chúc mừng + một tiếng chuông nhẹ -----
+function chuongNhe(){
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ac = new AC(); const t0 = ac.currentTime;
+    [[784, 0], [1047, 0.14]].forEach(([tan, tre]) => {          // Sol5 rồi Đô6, như tiếng chuông gió
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = tan;
+      g.gain.setValueAtTime(0, t0 + tre);
+      g.gain.linearRampToValueAtTime(0.13, t0 + tre + 0.03);     // nhỏ thôi, không giật mình
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + tre + 1.1);
+      o.connect(g); g.connect(ac.destination); o.start(t0 + tre); o.stop(t0 + tre + 1.2);
+    });
+    setTimeout(() => { try { ac.close(); } catch(e){} }, 1800);
+  } catch(e){}
+}
+function chaoNguoiMoi(r){
+  const ds = (r && r.nguoiMoi) || []; if (!ds.length) return;
+  let daChao = {}; try { daChao = JSON.parse(localStorage.getItem('dm_chao') || '{}'); } catch(e){}
+  const moi = ds.filter(x => !daChao[x.ten + '|' + x.luc]);
+  if (!moi.length) return;
+  moi.forEach(x => { daChao[x.ten + '|' + x.luc] = 1; });
+  try { localStorage.setItem('dm_chao', JSON.stringify(daChao)); } catch(e){}
+  const ten = moi.map(x => x.ten).join(', ');
+  const cau = moi.length === 1
+    ? ten + ' vừa vào đường đua ' + (moi[0].khoa || '') + '. Chào vận động viên mới!'
+    : moi.length + ' người vừa vào đường đua: ' + ten;
+  const b = document.createElement('div');
+  b.style.cssText = 'position:sticky;top:0;z-index:60;background:var(--lime);color:#06130a;padding:12px 14px;border-radius:14px;margin:0 0 12px;font-weight:800;font-size:14px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer';
+  b.textContent = '🎉 ' + cau;
+  b.onclick = () => b.remove();
+  const noi = document.querySelector('#v-homnay') || document.querySelector('main') || document.body;
+  noi.insertBefore(b, noi.firstChild);
+  chuongNhe();
+  setTimeout(() => { if (b.parentNode) b.remove(); }, 12000);
+}
 
 let thGioi = 'Nam', thKhoa = 'K1';
 document.querySelectorAll('#th-khoa button').forEach(b => b.onclick = () => { thKhoa = b.dataset.k; document.querySelectorAll('#th-khoa button').forEach(x => x.classList.toggle('on', x === b)); });
@@ -1097,6 +1216,19 @@ function nhan(r){
   if (r.xemBoi) $('#xem-ten').textContent = '👁 Đang xem: ' + h.ten;
   $('#tab-hlv').classList.toggle('hide', !(r.hlv || r.xemBoi));
   { const ts = $('#the-so'); if (ts) ts.classList.toggle('hide', !(r.hlv && r.coSoDuLieu)); }
+  try { chaoNguoiMoi(r); } catch(e){}
+  if (r.coChat) {
+    const hocVien = !r.hlv;
+    { const c = $('#the-chat'); if (c) c.classList.toggle('hide', !hocVien); }
+    { const t = $('#the-ttin'); if (t) t.classList.toggle('hide', !hocVien); }
+    if (hocVien) {
+      taiChatHV();
+      const h2 = r.hv || {};
+      const dat = (id, v) => { const e = $(id); if (e && !e.value) e.value = v || ''; };
+      dat('#tt-sdt', h2.sdt); dat('#tt-ns', h2.ngaySinh); dat('#tt-email', h2.email); dat('#tt-nghe', h2.ngheNghiep); dat('#tt-dc', h2.diaChi);
+      if (r.thieuThongTin) { const n = $('#ttin-nhac'); if (n) n.innerHTML = '<b style="color:var(--red)">Chưa có số điện thoại</b> — HLV không gọi được khi bạn im lặng. Điền giúp nhé.'; }
+    } else if (r.hlv) taiHopThu();
+  }
   if (r.hlv) {
     const tong = r.hlv.length, guiHomNay = r.hlv.filter(x => x.buaHomNay > 0).length, coDo = r.hlv.filter(x => x.co.length).length;
     $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
