@@ -396,9 +396,9 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card hide" id="tongket"></div>
     <div class="card"><div class="stat" id="stat"></div></div>
     <div class="card" id="thoiquen"></div>
-    <div class="card"><p class="k">Các bữa hôm nay</p><small style="display:block;margin-bottom:8px">Ghi sai? Bấm <b>✏️ Sửa</b> để chỉnh lại nội dung, hoặc <b>🗑 Xoá</b> để bỏ dòng đó.</small><div id="logs"></div></div>
     <div class="card" id="can-card"></div>
     <div class="card" id="tien-do"></div>
+    <div class="card"><p class="k">Các bữa hôm nay</p><small style="display:block;margin-bottom:8px">Ghi sai? Bấm <b>✏️ Sửa</b> để chỉnh lại nội dung, hoặc <b>🗑 Xoá</b> để bỏ dòng đó.</small><div id="logs"></div></div>
     <div class="card hide" id="the-chat"><p class="k">💬 Nhắn riêng cho HLV</p><small style="display:block;margin-bottom:8px">Vướng gì, ăn ngoài, ốm, đi công tác — nhắn ở đây. Chỉ HLV đọc được, cả nhóm không thấy.</small>
       <div id="chat-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
       <div class="row"><input id="chat-o" placeholder="Nhắn cho HLV…" style="flex:3"><button class="btn sm" id="chat-gui" style="flex:1;margin-top:0">GỬI</button></div>
@@ -632,7 +632,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-180744';
+const APP_VER = '20260923-181401';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
