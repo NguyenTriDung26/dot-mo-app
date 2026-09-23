@@ -613,7 +613,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-160249';
+const APP_VER = '20260923-160343';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -942,7 +942,9 @@ document.addEventListener('DOMContentLoaded', () => {
     an('#p-nhom', phongHien !== 'nhom');
     an('#p-rieng', phongHien !== 'rieng');
     an('#p-ai', phongHien !== 'ai');
-    noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng'); noiEmoji('nhom'); noiEmoji('rieng');
+{ const ag = $('#ai-gui'); if (ag && !ag.dataset.noi) { ag.dataset.noi = 1; ag.onclick = guiHoiAI; } }
+  { const ao = $('#ai-o'); if (ao && !ao.dataset.noi) { ao.dataset.noi = 1; ao.addEventListener('keydown', e => { if (e.key === 'Enter') guiHoiAI(); }); } }
+  noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng'); noiEmoji('nhom'); noiEmoji('rieng');
     if (phongHien === 'ai') { if (!$('#ai-khung').innerHTML.trim()) taiLichSuAI(); }
     else lamMoiChat();
   });
@@ -1021,7 +1023,73 @@ function damTag(t){
     '<b style="color:var(--lime2);background:var(--lime-dim);border-radius:5px;padding:0 3px">@$1</b>');
 }
 
+// ---------- Hỏi AI ----------
+// Trả lời dựa trên bộ luật + từ điển kiến thức + chỉ số riêng của người hỏi.
+// Câu hỏi y tế (thuốc, bệnh nền, thai kỳ) máy tự từ chối và đẩy sang HLV.
+const AI_GOIY = ['Chững cân 4 ngày rồi, làm sao?', 'Tối nay đi ăn cưới thì sao?',
+  'Không mua được đỗ thì thay gì?', 'Sáng nay đói quá, ăn thêm được không?',
+  'Tập gym xong có cần ăn thêm?', 'Sữa chua ăn lúc nào tốt nhất?'];
+
+function veTinAI(ds){
+  const el = $('#ai-khung'); if (!el) return;
+  if (!ds.length) { el.innerHTML = '<div style="color:var(--mute);font-size:13px;text-align:center;padding:16px">Hỏi câu đầu tiên đi. Máy trả lời theo đúng bộ luật và định mức riêng của bạn.</div>'; return; }
+  el.innerHTML = ds.map(t => `
+    <div class="hang phai"><div class="bong toi">${esc(t.cauHoi)}<div style="font-size:10px;margin-top:3px;text-align:right">${gioNgan(t.luc)}</div></div></div>
+    <div class="hang trai"><span class="av" style="background:var(--gold)">🤖</span>
+      <div style="max-width:86%"><div class="bong ho" style="cursor:default">${damDauMuc(t.traLoi)}
+        <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+          <button class="chipbtn" style="width:28px;height:28px;font-size:13px;background:${t.huuIch === 1 ? 'var(--lime-dim)' : 'var(--sf2)'}" onclick="chamAI(${t.id},1)" title="Hữu ích">👍</button>
+          <button class="chipbtn" style="width:28px;height:28px;font-size:13px;background:${t.huuIch === 0 && t.huuIch !== null ? 'var(--do-nen)' : 'var(--sf2)'}" onclick="chamAI(${t.id},0)" title="Chưa đúng">👎</button>
+        </div></div></div></div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function taiLichSuAI(){
+  const el = $('#ai-khung'); if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:16px"><span class="spin"></span></div>';
+  try {
+    const r = await goi('lichSuHoiDap', ten, pin, S && S.hlv ? (htAi || '') : '');
+    veTinAI(r.loi ? [] : (r.ds || []).reverse());
+  } catch(e){ el.innerHTML = '<div class="err">Lỗi mạng: ' + esc(e.message) + '</div>'; }
+  veGoiYAI();
+}
+
+function veGoiYAI(){
+  const g = $('#ai-goiy'); if (!g || g.dataset.noi) return;
+  g.dataset.noi = 1;
+  g.innerHTML = AI_GOIY.map(q => `<button type="button" style="font-size:12px">${esc(q)}</button>`).join('');
+  g.querySelectorAll('button').forEach(b => b.onclick = () => { $('#ai-o').value = b.textContent; guiHoiAI(); });
+}
+
+window.chamAI = async function(id, ok){
+  try { await goi('chamHoiDap', ten, pin, id, ok); taiLichSuAI(); } catch(e){}
+};
+
+async function guiHoiAI(){
+  const o = $('#ai-o'), b = $('#ai-gui');
+  const q = (o.value || '').trim();
+  if (q.length < 3) { toast('Hỏi rõ hơn một chút nhé.', 2500); return; }
+  o.value = ''; o.disabled = true; b.disabled = true;
+  const el = $('#ai-khung');
+  // Hiện ngay câu hỏi + chấm chờ, đừng để người ta nhìn màn hình đứng im
+  el.insertAdjacentHTML('beforeend', `<div class="hang phai"><div class="bong toi">${esc(q)}</div></div>
+    <div class="hang trai" id="ai-cho"><span class="av" style="background:var(--gold)">🤖</span><div class="bong ho" style="cursor:default"><span class="spin"></span> đang nghĩ…</div></div>`);
+  el.scrollTop = el.scrollHeight;
+  try {
+    const r = await goi('hoiAI', ten, pin, q);
+    const cho = $('#ai-cho'); if (cho) cho.remove();
+    if (r.loi) { toast('⚠️ ' + r.loi, 4000); o.value = q; }
+    else taiLichSuAI();
+  } catch(e){ const cho = $('#ai-cho'); if (cho) cho.remove(); toast('⚠️ ' + e.message, 3000); o.value = q; }
+  finally { o.disabled = false; b.disabled = false; o.focus(); }
+}
+
 async function lamMoiChat(im){
+  // Nối các nút một lần khi vào chat — trước đây chỉ nối lúc BẤM chuyển phòng nên
+  // vào thẳng tab Chat thì nút ảnh/emoji/@tên chưa ăn (bắt được 23/09)
+  noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng'); noiEmoji('nhom'); noiEmoji('rieng');
+  { const ag = $('#ai-gui'); if (ag && !ag.dataset.noi) { ag.dataset.noi = 1; ag.onclick = guiHoiAI; } }
+  { const ao = $('#ai-o'); if (ao && !ao.dataset.noi) { ao.dataset.noi = 1; ao.addEventListener('keydown', e => { if (e.key === 'Enter') guiHoiAI(); }); } }
   if (!S || phongHien === 'ai') return;
   try {
     if (phongHien === 'nhom') {
