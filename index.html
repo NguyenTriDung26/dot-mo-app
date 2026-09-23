@@ -629,7 +629,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-172226';
+const APP_VER = '20260923-172654';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2231,6 +2231,21 @@ async function veNguyCo(){
     el.innerHTML = h;
     el.classList.remove('hide');
   } catch(e){ ncDaNap = 0; }
+}
+
+// Ô cân chỉ hiện lúc cần: buổi sáng và hôm nay chưa cân (Dũng chốt 23/09 — bớt nút thừa).
+// Cân xong rồi hoặc đã quá trưa thì giấu đi, chiều tối không ai cân nữa.
+function veOCan(){
+  const o = $('#o-can'); if (!o) return;
+  const g = new Date().getHours();
+  const daCan = !!(S && S.thongKe && S.thongKe.ngayCanMoi === homNayJS());
+  o.classList.toggle('hide', daCan || g >= 12);
+  const h = $('#can-hint');
+  if (h && daCan && S.thongKe.canMoi) h.textContent = '✓ Sáng nay đã cân ' + S.thongKe.canMoi + ' kg';
+}
+function homNayJS(){
+  const d = new Date(Date.now() + 7 * 3600e3);
+  return d.toISOString().slice(0, 10);
 }
 
 // ---------- MỘT CHẠM (Dũng chốt 23/09, sau góp ý "nhiều nút quá") ----------
