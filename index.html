@@ -361,10 +361,18 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card">
       <p class="k">Ghi nhanh</p>
       <div class="row"><button class="btn ghost" data-ml="250" style="margin:0">+250 ml nước</button><button class="btn ghost" data-ml="500" style="margin:0">+500 ml nước</button></div>
-      <button class="btn ghost" id="btn-gym">Hôm nay đã tập gym</button>
-      <div class="row" style="margin-top:16px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="Cân sáng lúc đói (kg), vd 63.0" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">Ghi cân</button></div>
+      <div id="o-can" class="hide"><div class="row" style="margin-top:16px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="Cân sáng lúc đói (kg), vd 63.0" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">Ghi cân</button></div></div>
       <small id="can-hint" style="display:block;margin-top:6px"></small>
-      <label>Giấc ngủ đêm qua</label>
+
+    </div>
+  </div>
+
+  <!-- HÔM NAY -->
+  <div id="v-homnay" class="hide">
+        <div class="card">
+      <p class="k">Ghi buổi tập &amp; giấc ngủ</p>
+      <button class="btn ghost" id="btn-gym" style="margin-top:0">Hôm nay đã tập gym</button>
+      <label style="margin-top:14px">Giấc ngủ đêm qua</label>
       <button type="button" class="pick" id="btn-ngu-anh">
         <svg class="ic-s" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 9.6V12l1.7 1"/></svg>Chụp màn hình đồng hồ<span class="pk-sub">Garmin · Apple Watch · Oura — máy tự đọc số</span>
       </button>
@@ -377,11 +385,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       </div>
       <button class="btn ghost" id="btn-ngu">Ghi giấc ngủ</button><small id="ngu-hint" style="display:block;margin-top:8px">Ghi giờ và phút ngủ, cùng số phút ngủ sâu và REM trên đồng hồ. Máy tự quy ra % và chấm. Chuẩn: từ 7 giờ · sâu từ 20% (≈85 phút) · REM từ 20%. Không có đồng hồ thì chỉ ghi giờ.</small>
     </div>
-  </div>
-
-  <!-- HÔM NAY -->
-  <div id="v-homnay" class="hide">
-    <div class="card" id="the-chuoi" style="padding:18px 16px">
+<div class="card" id="the-chuoi" style="padding:18px 16px">
       <div style="display:flex;align-items:center;gap:16px">
         <div style="flex:none;text-align:center;min-width:96px">
           <div style="font-size:30px;line-height:1">🔥</div>
@@ -639,7 +643,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-163618';
+const APP_VER = '20260923-165311';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2235,6 +2239,21 @@ function noiNguAnh(){
   };
 }
 
+// Ô cân chỉ hiện lúc cần: buổi sáng và hôm nay chưa cân (Dũng chốt 23/09 — bớt nút thừa).
+// Cân xong rồi hoặc đã quá trưa thì giấu đi, chiều tối không ai cân nữa.
+function veOCan(){
+  const o = $('#o-can'); if (!o) return;
+  const g = new Date().getHours();
+  const daCan = !!(S && S.thongKe && S.thongKe.ngayCanMoi === homNayJS());
+  o.classList.toggle('hide', daCan || g >= 12);
+  const h = $('#can-hint');
+  if (h && daCan && S.thongKe.canMoi) h.textContent = '✓ Sáng nay đã cân ' + S.thongKe.canMoi + ' kg';
+}
+function homNayJS(){
+  const d = new Date(Date.now() + 7 * 3600e3);
+  return d.toISOString().slice(0, 10);
+}
+
 // ---------- MỘT CHẠM (Dũng chốt 23/09, sau góp ý "nhiều nút quá") ----------
 // Việc học viên làm 126 lần trong 6 tuần phải gọn nhất có thể: một nút giữa màn,
 // máy tự biết là bữa nào theo giờ, chụp xong GỬI LUÔN — không bắt bấm GỬI riêng.
@@ -2731,7 +2750,7 @@ function nhan(r){
     const o = $('#hlv-tim'); if (o && !o.dataset.noi) { o.dataset.noi = 1; o.addEventListener('input', veBangHLV); }
     veBangHLV();
   }
-  veMotCham(); noiNguAnh();
+  veMotCham(); noiNguAnh(); veOCan();
   $('#sub').textContent = `${THU[new Date().getDay()]} · Chặng ${r.tuan}/6`;
   const cn = $('#cau-ngay'); if (cn) { cn.textContent = cauMoNgay(r); cn.classList.remove('hide'); }
   $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; ($('#chip-ngay')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
