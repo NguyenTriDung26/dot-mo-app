@@ -330,8 +330,11 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <button type="button" class="chipbtn chu" id="mc-mo" style="margin-top:12px;background:var(--sf2)">Mở chi tiết ▾</button>
     </div>
     <div class="card hide" id="khoi-chitiet">
-      <p class="k">Bữa nào?</p>
-      <div class="seg" id="seg-bua">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:13px;color:var(--ink2)">Đang ghi cho <b id="bua-ten" style="color:var(--lime2)"></b></span>
+        <button type="button" class="chipbtn chu" id="bua-doi" style="background:var(--sf2);margin-left:auto">Đổi bữa</button>
+      </div>
+      <div class="seg hide" id="seg-bua" style="margin-bottom:8px">
         <button data-b="sang">Sáng</button><button data-b="trua">Trưa</button><button data-b="chieu">Chiều</button><button data-b="toi">Tối</button>
       </div>
       <p class="nhac hide" id="bua-tt"></p>
@@ -362,7 +365,16 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div class="row" style="margin-top:16px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="Cân sáng lúc đói (kg), vd 63.0" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">Ghi cân</button></div>
       <small id="can-hint" style="display:block;margin-top:6px"></small>
       <label>Giấc ngủ đêm qua</label>
-      <div class="row"><input id="in-ngu-gio" inputmode="numeric" placeholder="Ngủ: giờ"><input id="in-ngu-phut" inputmode="numeric" placeholder="Ngủ: phút"></div><div class="row" style="margin-top:8px"><input id="in-ngu-sau" inputmode="numeric" placeholder="Ngủ sâu (phút)"><input id="in-ngu-rem" inputmode="numeric" placeholder="REM (phút)"></div>
+      <button type="button" class="pick" id="btn-ngu-anh">
+        <svg class="ic-s" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 9.6V12l1.7 1"/></svg>Chụp màn hình đồng hồ<span class="pk-sub">Garmin · Apple Watch · Oura — máy tự đọc số</span>
+      </button>
+      <input id="in-ngu-anh" type="file" accept="image/*" style="display:none">
+      <div id="ngu-doc" class="thay hide" style="margin-top:8px"></div>
+      <button type="button" class="chipbtn chu" id="ngu-tay" style="background:var(--sf2);margin-top:8px">Gõ tay ▾</button>
+      <div id="ngu-o" class="hide" style="margin-top:8px">
+        <div class="row"><input id="in-ngu-gio" inputmode="numeric" placeholder="Ngủ: giờ"><input id="in-ngu-phut" inputmode="numeric" placeholder="Ngủ: phút"></div>
+        <div class="row" style="margin-top:8px"><input id="in-ngu-sau" inputmode="numeric" placeholder="Ngủ sâu (phút)"><input id="in-ngu-rem" inputmode="numeric" placeholder="REM (phút)"></div>
+      </div>
       <button class="btn ghost" id="btn-ngu">Ghi giấc ngủ</button><small id="ngu-hint" style="display:block;margin-top:8px">Ghi giờ và phút ngủ, cùng số phút ngủ sâu và REM trên đồng hồ. Máy tự quy ra % và chấm. Chuẩn: từ 7 giờ · sâu từ 20% (≈85 phút) · REM từ 20%. Không có đồng hồ thì chỉ ghi giờ.</small>
     </div>
   </div>
@@ -515,6 +527,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 
   <!-- CHAT -->
   <div id="v-chat" class="hide">
+    <div class="card" id="bao-tin" style="margin-bottom:12px"></div>
     <div class="seg" id="chat-tab" style="margin-bottom:12px"><button data-p="nhom" class="on">👥 Nhóm <span id="tab-nhom-ten"></span></button><button data-p="rieng"><span class="av av-hlv" id="av-hlv-tab">D</span> Riêng với HLV<span id="tab-rieng-cham" class="hide" style="color:var(--red)"> ●</span></button><button data-p="ai">🤖 Hỏi AI</button></div>
     <div class="card" id="p-nhom">
       <div class="seg hide" id="nhom-chon2" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
@@ -626,7 +639,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-163036';
+const APP_VER = '20260923-163618';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1098,6 +1111,7 @@ async function guiHoiAI(){
 }
 
 async function lamMoiChat(im){
+  veNutBaoTin();
   // Nối các nút một lần khi vào chat — trước đây chỉ nối lúc BẤM chuyển phòng nên
   // vào thẳng tab Chat thì nút ảnh/emoji/@tên chưa ăn (bắt được 23/09)
   noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng'); noiEmoji('nhom'); noiEmoji('rieng');
@@ -2097,6 +2111,130 @@ let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 // ---------- Bốn cách rút ngắn việc gửi bữa (Dũng chốt 22/09) ----------
 // Gõ mô tả bằng tay là chỗ người ta lười nhất rồi bỏ cuộc — nên cho chép sẵn.
+// ---------- THÔNG BÁO VỀ ĐIỆN THOẠI (Dũng chốt 23/09) ----------
+// Học viên gửi bữa xong đóng app, nhóm có tin thì họ không biết. Phần này làm
+// điện thoại rung lên như Messenger, kể cả khi app đã đóng hẳn.
+// iPhone chỉ cho phép sau khi app được GHIM ra màn hình chính — nhắc rõ chỗ đó.
+const KHOA_BAO = 'BB7aXzGZ885xgihvX6KzUq0xQaEW3VmvQKX6lEf7mBnoAlA96KoVqRxjRWP2S59vslpZHndtt89jHxdk-g0Gy8E';
+let swDaDangKy = null;
+
+function hoTroBaoTin(){
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+}
+function laIPhone(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function daGhimManHinh(){ return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+
+async function nhoServiceWorker(){
+  if (!hoTroBaoTin()) return null;
+  if (swDaDangKy) return swDaDangKy;
+  try { swDaDangKy = await navigator.serviceWorker.register('/sw.js', { scope: '/' }); return swDaDangKy; }
+  catch(e){ return null; }
+}
+
+// Bật thông báo: xin quyền rồi gửi "địa chỉ nhận tin" lên máy chủ
+async function batBaoTin(imLang){
+  if (!hoTroBaoTin()) { if (!imLang) toast('Trình duyệt này chưa nhận được thông báo.', 3500); return false; }
+  if (laIPhone() && !daGhimManHinh()) {
+    if (!imLang) toast('iPhone cần ghim app ra màn hình chính trước: nút Chia sẻ → Thêm vào MH chính.', 6000);
+    return false;
+  }
+  try {
+    const quyen = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+    if (quyen !== 'granted') { if (!imLang) toast('Bạn đã từ chối thông báo. Mở lại trong Cài đặt trình duyệt.', 4500); return false; }
+    const reg = await nhoServiceWorker();
+    if (!reg) return false;
+    await navigator.serviceWorker.ready;
+    let dk = await reg.pushManager.getSubscription();
+    if (!dk) {
+      dk = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: doiKhoa(KHOA_BAO),
+      });
+    }
+    const r = await goi('dangKyBaoTin', ten, pin, dk.toJSON(), navigator.userAgent.slice(0, 110));
+    if (r.loi) { if (!imLang) toast('⚠️ ' + r.loi, 3500); return false; }
+    try { localStorage.setItem('dm_baotin', '1'); } catch(e){}
+    veNutBaoTin();
+    if (!imLang) toast('🔔 Xong. Có tin nhóm là điện thoại báo ngay.', 3500);
+    return true;
+  } catch(e){ if (!imLang) toast('⚠️ ' + (e.message || e), 4000); return false; }
+}
+
+function doiKhoa(s){
+  const t = (s + '='.repeat((4 - s.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+  const b = atob(t); const u = new Uint8Array(b.length);
+  for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+  return u;
+}
+
+async function tatBaoTin(){
+  try {
+    const reg = await nhoServiceWorker();
+    const dk = reg && await reg.pushManager.getSubscription();
+    if (dk) { await goi('huyBaoTin', ten, pin, dk.endpoint); await dk.unsubscribe(); }
+    try { localStorage.removeItem('dm_baotin'); } catch(e){}
+    veNutBaoTin();
+    toast('Đã tắt thông báo trên máy này.', 3000);
+  } catch(e){ toast('⚠️ ' + e.message, 3000); }
+}
+
+function veNutBaoTin(){
+  const el = $('#bao-tin'); if (!el) return;
+  if (!hoTroBaoTin()) { el.innerHTML = '<small style="color:var(--mute)">Trình duyệt này chưa nhận được thông báo.</small>'; return; }
+  const bat = Notification.permission === 'granted' && (() => { try { return localStorage.getItem('dm_baotin') === '1'; } catch(e){ return false; } })();
+  if (bat) {
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🔔</span>'
+      + '<div style="flex:1"><b style="font-size:14px">Thông báo đang bật</b><div style="font-size:12px;color:var(--mute)">Có tin nhóm là máy này báo ngay</div></div>'
+      + '<button class="chipbtn chu" id="bt-tat" style="background:var(--sf2)">Tắt</button></div>';
+    const n = $('#bt-tat'); if (n) n.onclick = tatBaoTin;
+  } else if (laIPhone() && !daGhimManHinh()) {
+    el.innerHTML = '<div style="font-size:13px;line-height:1.55"><b>Muốn nhận thông báo trên iPhone?</b><br>'
+      + 'Bấm nút <b>Chia sẻ</b> ở thanh dưới Safari → <b>Thêm vào MH chính</b>. Mở app từ icon đó rồi bật lại ở đây.</div>';
+  } else {
+    el.innerHTML = '<button class="btn sm" id="bt-bat" style="margin-top:0">🔔 BẬT THÔNG BÁO VỀ MÁY</button>'
+      + '<small style="display:block;margin-top:6px;color:var(--mute)">Có tin nhóm, HLV nhắn riêng, hoặc ai nhắc tên bạn — máy sẽ báo.</small>';
+    const n = $('#bt-bat'); if (n) n.onclick = () => batBaoTin(false);
+  }
+}
+
+// ---------- Giấc ngủ: chụp màn hình đồng hồ thay vì gõ 4 số (Dũng chốt 23/09) ----------
+// Gõ tay mỗi sáng là việc ai cũng bỏ sau vài ngày. Chụp màn hình Garmin thì một chạm,
+// Gemini đọc số ra hộ, điền sẵn vào ô rồi ghi luôn. Sai thì vẫn sửa tay được.
+function noiNguAnh(){
+  const nut = $('#btn-ngu-anh'), file = $('#in-ngu-anh'), tay = $('#ngu-tay');
+  if (tay && !tay.dataset.noi) {
+    tay.dataset.noi = 1;
+    tay.onclick = () => {
+      const o = $('#ngu-o'); const an = o.classList.contains('hide');
+      o.classList.toggle('hide', !an);
+      tay.textContent = an ? 'Thu lại ▴' : 'Gõ tay ▾';
+    };
+  }
+  if (!nut || !file || nut.dataset.noi) return;
+  nut.dataset.noi = 1;
+  nut.onclick = () => file.click();
+  file.onchange = (e) => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const hop = $('#ngu-doc');
+    hop.classList.remove('hide');
+    hop.innerHTML = '<span class="spin"></span> Đang đọc ảnh…';
+    thuNhoAnh(f, 900, async (d) => {
+      try {
+        const r = await goi('docAnhNgu', ten, pin, d.split(',')[1], 'image/jpeg');
+        if (r.loi) { hop.innerHTML = '<span style="color:var(--red)">' + esc(r.loi) + '</span>'; return; }
+        $('#in-ngu-gio').value = r.gio;
+        $('#in-ngu-phut').value = r.phut;
+        $('#in-ngu-sau').value = r.sauPhut || '';
+        $('#in-ngu-rem').value = r.remPhut || '';
+        hop.innerHTML = '<b style="color:var(--lime2)">✓ ' + esc(r.thongBao) + '</b>'
+          + '<div style="font-size:12px;color:var(--mute);margin-top:4px">Đang ghi vào sổ…</div>';
+        $('#btn-ngu').click();
+      } catch(err){ hop.innerHTML = '<span style="color:var(--red)">Lỗi mạng: ' + esc(err.message || err) + '</span>'; }
+    });
+    file.value = '';
+  };
+}
+
 // ---------- MỘT CHẠM (Dũng chốt 23/09, sau góp ý "nhiều nút quá") ----------
 // Việc học viên làm 126 lần trong 6 tuần phải gọn nhất có thể: một nút giữa màn,
 // máy tự biết là bữa nào theo giờ, chụp xong GỬI LUÔN — không bắt bấm GỬI riêng.
@@ -2119,6 +2257,19 @@ function veMotCham(){
     nut.dataset.noi = 1;
     nut.onclick = () => { motChamDangChay = 1; $('#btn-anh').click(); };
   }
+  // Máy đã đoán bữa theo giờ nên 4 nút chọn bữa là thừa (Dũng chốt 23/09).
+  // Chỉ hiện tên bữa; ai cần gửi bù bữa khác thì bấm "Đổi bữa" mới xổ ra.
+  { const bt = $('#bua-ten'); if (bt) bt.textContent = 'bữa ' + (LBL[b] || '').toLowerCase(); }
+  { const bd = $('#bua-doi');
+    if (bd && !bd.dataset.noi) {
+      bd.dataset.noi = 1;
+      bd.onclick = () => {
+        const sg = $('#seg-bua');
+        const an = sg.classList.contains('hide');
+        sg.classList.toggle('hide', !an);
+        bd.textContent = an ? 'Thu lại' : 'Đổi bữa';
+      };
+    } }
   const mo = $('#mc-mo');
   if (mo && !mo.dataset.noi) {
     mo.dataset.noi = 1;
@@ -2523,6 +2674,7 @@ function nhan(r){
       t.classList.toggle('hide', !(r.canDienHoSo && ds.length));
       if (r.canDienHoSo && ds.length) t.innerHTML = '<b>Cần điền nốt:</b> ' + ds.join(' · ');
     } }
+  { try { if (localStorage.getItem('dm_baotin') === '1' && Notification.permission === 'granted') batBaoTin(true); } catch(e){} }
   if (!daKhoiPhuc && !r.xemBoi && ten) { daKhoiPhuc = true; setTimeout(() => { khoiPhucNhap(); tiepChamTreo(); }, 300); }
   if (!r.xemBoi) { try { localStorage.setItem('dm_state', JSON.stringify(r)); } catch(e){} } /* nhớ để lần sau mở là hiện ngay */
   const h = r.hv, tk = r.thongKe, t = tk.homNay;
@@ -2579,7 +2731,7 @@ function nhan(r){
     const o = $('#hlv-tim'); if (o && !o.dataset.noi) { o.dataset.noi = 1; o.addEventListener('input', veBangHLV); }
     veBangHLV();
   }
-  veMotCham();
+  veMotCham(); noiNguAnh();
   $('#sub').textContent = `${THU[new Date().getDay()]} · Chặng ${r.tuan}/6`;
   const cn = $('#cau-ngay'); if (cn) { cn.textContent = cauMoNgay(r); cn.classList.remove('hide'); }
   $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; ($('#chip-ngay')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
