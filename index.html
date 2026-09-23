@@ -642,7 +642,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-170028';
+const APP_VER = '20260923-170057';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2296,6 +2296,11 @@ function veMotCham(){
       const dangAn = k.classList.contains('hide');
       k.classList.toggle('hide', !dangAn);
       mo.textContent = dangAn ? 'Thu gọn ▴' : 'Mở chi tiết ▾';
+      // Nút "Thêm ảnh" bình thường giấu đi vì nút tròn đã lo việc đó. Nhưng ai mở chi
+      // tiết ra mà chưa chụp gì thì vẫn phải có đường thêm ảnh ở trong này.
+      { const ba = $('#btn-anh'), na = $('#nhan-anh'), can = dangAn && !anhB64;
+        if (ba) ba.style.display = can ? '' : 'none';
+        if (na) na.style.display = can ? '' : 'none'; }
       if (dangAn) k.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     };
   }
