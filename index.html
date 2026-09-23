@@ -632,7 +632,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-213404';
+const APP_VER = '20260923-213746';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2601,6 +2601,7 @@ $('#in-mota').addEventListener('input', () => { luuNhap(); const v = $('#in-mota
   else if (coGram(v)) { h.textContent = 'Có định lượng rồi, máy chấm theo đúng số bạn ghi.'; h.style.color = 'var(--lime)'; }
   else { h.textContent = '⚠️ Chưa thấy số gram. Thêm số vào từng món nhé, vd: ức gà 150g, rau 150g.'; h.style.color = '#ffe28a'; } });
 let boQuaGram = false;
+let xacNhanTrung = false;   // đã cảnh báo trùng bữa một lần rồi thì lần bấm sau cho qua
 $('#gram-bosung').onclick = () => { ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-mota').focus(); };
 $('#gram-guiluon').onclick = () => { boQuaGram = true; ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#btn-gui').click(); };
 // ---------- nháp bữa (giữ trong máy, mất mạng không mất bài) + việc chấm còn treo ----------
@@ -2647,6 +2648,20 @@ $('#btn-gui').onclick = async () => {
   if (!moTa && !anhB64) { loiGui('Chụp ảnh hoặc gõ vài chữ mô tả nhé.'); return; }
   if (!coGram(moTa) && !boQuaGram) { ($('#gram-xacnhan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); $('#gram-xacnhan').scrollIntoView({behavior:'smooth', block:'center'}); return; }
   boQuaGram = false;
+  // Hôm nay đã có bữa cùng loại rồi thì hỏi lại — 12 lần trùng bữa trong sổ từ 05/09
+  // đến nay đều do gửi hai lần mà không ai chặn (Phương Anh báo 23/09: "máy ghi nhận
+  // hn c gửi 5 bữa"). Sửa bữa cũ thì bấm ✏️ Sửa, đừng gửi thêm dòng mới.
+  if (!SUA_KEY && S && Array.isArray(S.feedHomNay)) {
+    const daCo = S.feedHomNay.filter(l => l.ten === ten && l.bua === bua);
+    if (daCo.length && !xacNhanTrung) {
+      const c = $('#gram-xacnhan');
+      loiGui('Hôm nay bạn đã gửi bữa ' + (LBL[bua] || '').toLowerCase() + ' rồi ("' + esc((daCo[daCo.length-1].mon || '').slice(0, 40)) + '"). Muốn sửa bữa đó thì bấm ✏️ Sửa ở tab Hôm nay. Vẫn muốn thêm một bữa nữa thì bấm GỬI lần nữa.');
+      xacNhanTrung = true;
+      setTimeout(() => { xacNhanTrung = false; }, 20000);
+      return;
+    }
+  }
+  xacNhanTrung = false;
   const b = $('#btn-gui'); b.disabled = true; b.innerHTML = '<span class="spin"></span>Đang gửi bữa lên sổ…';
   const g = { bua, moTa, anhB64, anhMime, nhai: $('#ck-nhai').checked, chanh: $('#ck-chanh').checked, dibo: $('#ck-dibo').checked };
   if (!maBuaHienTai) maBuaHienTai = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); // giữ nguyên mã khi gửi lại → máy chủ không ghi trùng
