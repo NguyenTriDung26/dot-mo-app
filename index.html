@@ -320,7 +320,16 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card hide" id="thuc-don"></div>
     <div id="canh-bao" class="warn hide"></div>
     <div id="sua-bar" class="warn hide" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span id="sua-txt"></span><button id="btn-sua-huy" style="font:inherit;font-weight:800;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap">✕ Huỷ sửa</button></div>
-    <div class="card">
+    <div class="card" id="mot-cham" style="text-align:center;padding:22px 16px">
+      <div style="font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.3px" id="mc-gio"></div>
+      <button type="button" id="mc-nut" style="width:200px;height:200px;border-radius:50%;border:0;background:var(--lime);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 28px rgba(24,169,87,.3);font:inherit;margin:14px auto 0">
+        <svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+        <span id="mc-nhan" style="font-size:19px;font-weight:800"></span>
+      </button>
+      <div style="font-size:13px;color:var(--mute);margin-top:14px;line-height:1.55">Chụp xong máy chấm luôn.<br>Muốn ghi gram thì mở phần chi tiết bên dưới.</div>
+      <button type="button" class="chipbtn chu" id="mc-mo" style="margin-top:12px;background:var(--sf2)">Mở chi tiết ▾</button>
+    </div>
+    <div class="card hide" id="khoi-chitiet">
       <p class="k">Bữa nào?</p>
       <div class="seg" id="seg-bua">
         <button data-b="sang">Sáng</button><button data-b="trua">Trưa</button><button data-b="chieu">Chiều</button><button data-b="toi">Tối</button>
@@ -617,7 +626,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-160836';
+const APP_VER = '20260923-163036';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2057,7 +2066,11 @@ function thuNhoAnh(f, max, cb, q){
 }
 function chonAnhBua(e){
   const f = e.target.files[0]; if (!f) return;
-  thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
+  thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block';
+    /* Một chạm: chụp xong gửi thẳng. Bỏ qua hộp hỏi gram vì hộp đó nằm trong khối
+       chi tiết đang thu lại — hiện ra cũng không ai thấy. Máy tự ước lượng, chấm xong
+       nếu thiếu gram thì nhắc ngay trên kết quả. */
+    if (motChamDangChay) { motChamDangChay = 0; boQuaGram = true; setTimeout(() => $('#btn-gui').click(), 60); } ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
 }
 function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
@@ -2084,6 +2097,43 @@ let hsAnh3 = {}; ganAnh3('#hs-anh3', hsAnh3);
 
 // ---------- Bốn cách rút ngắn việc gửi bữa (Dũng chốt 22/09) ----------
 // Gõ mô tả bằng tay là chỗ người ta lười nhất rồi bỏ cuộc — nên cho chép sẵn.
+// ---------- MỘT CHẠM (Dũng chốt 23/09, sau góp ý "nhiều nút quá") ----------
+// Việc học viên làm 126 lần trong 6 tuần phải gọn nhất có thể: một nút giữa màn,
+// máy tự biết là bữa nào theo giờ, chụp xong GỬI LUÔN — không bắt bấm GỬI riêng.
+// Ai muốn ghi gram, đổi bữa, chép thực đơn thì mở "chi tiết" ra, mọi thứ cũ còn nguyên.
+function veMotCham(){
+  const nut = $('#mc-nut'), nhan = $('#mc-nhan'), gio = $('#mc-gio');
+  if (!nut) return;
+  const b = daChonBuaTay ? bua : buaTheoGio();
+  bua = b;
+  const g = new Date();
+  const hh = String(g.getHours()).padStart(2, '0') + ':' + String(g.getMinutes()).padStart(2, '0');
+  if (nhan) nhan.textContent = 'CHỤP BỮA ' + (LBL[b] || '').toUpperCase();
+  if (gio) gio.textContent = 'BÂY GIỜ ' + hh + ' · BỮA ' + (LBL[b] || '').toUpperCase();
+
+  // Đã gửi đủ 3 bữa rồi thì đổi nút thành "gửi thêm", đỡ làm người ta tưởng phải gửi nữa
+  const t = S && S.thongKe && S.thongKe.homNay;
+  if (t && t.soBua >= 3 && nhan) nhan.textContent = 'GỬI THÊM BỮA';
+
+  if (!nut.dataset.noi) {
+    nut.dataset.noi = 1;
+    nut.onclick = () => { motChamDangChay = 1; $('#btn-anh').click(); };
+  }
+  const mo = $('#mc-mo');
+  if (mo && !mo.dataset.noi) {
+    mo.dataset.noi = 1;
+    mo.onclick = () => {
+      const k = $('#khoi-chitiet');
+      const dangAn = k.classList.contains('hide');
+      k.classList.toggle('hide', !dangAn);
+      mo.textContent = dangAn ? 'Thu gọn ▴' : 'Mở chi tiết ▾';
+      if (dangAn) k.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    };
+  }
+}
+
+// Cờ này bật khi người ta đi vào bằng nút tròn: chọn ảnh xong là gửi thẳng.
+let motChamDangChay = 0;
 let daChonBuaTay = false;
 function buaTheoGio(){
   const g = new Date().getHours();
@@ -2529,6 +2579,7 @@ function nhan(r){
     const o = $('#hlv-tim'); if (o && !o.dataset.noi) { o.dataset.noi = 1; o.addEventListener('input', veBangHLV); }
     veBangHLV();
   }
+  veMotCham();
   $('#sub').textContent = `${THU[new Date().getDay()]} · Chặng ${r.tuan}/6`;
   const cn = $('#cau-ngay'); if (cn) { cn.textContent = cauMoNgay(r); cn.classList.remove('hide'); }
   $('#chip-ngay').textContent = `Ngày ${ngayThu(r)}/42`; ($('#chip-ngay')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide');
