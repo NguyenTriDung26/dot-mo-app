@@ -632,7 +632,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-181844';
+const APP_VER = '20260923-213404';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2074,10 +2074,23 @@ function thuNhoAnh(f, max, cb, q){
 function chonAnhBua(e){
   const f = e.target.files[0]; if (!f) return;
   thuNhoAnh(f, 720, d => { anhB64 = d.split(',')[1]; anhMime = 'image/jpeg'; $('#preview').src = d; $('#preview').style.display = 'block';
-    /* Một chạm: chụp xong gửi thẳng. Bỏ qua hộp hỏi gram vì hộp đó nằm trong khối
-       chi tiết đang thu lại — hiện ra cũng không ai thấy. Máy tự ước lượng, chấm xong
-       nếu thiếu gram thì nhắc ngay trên kết quả. */
-    if (motChamDangChay) { motChamDangChay = 0; boQuaGram = true; setTimeout(() => $('#btn-gui').click(), 60); } ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
+    /* Một chạm: chụp xong MỞ Ô GHI MÓN ra, KHÔNG gửi thẳng.
+       Gửi thẳng khi ô mô tả còn trống thì sinh ra bữa rỗng: máy chấm mù, cho 0/10
+       "Không có mô tả và ảnh", rồi học viên gõ lại và gửi lần nữa — một bữa thành
+       hai ba dòng rác. Phương Anh dính đúng cảnh này tối 23/09.
+       Giờ: ảnh vào → mở phần chi tiết, con trỏ nhảy vào ô mô tả, người ta gõ rồi bấm GỬI. */
+    if (motChamDangChay) {
+      motChamDangChay = 0;
+      const k = $('#khoi-chitiet');
+      if (k && k.classList.contains('hide')) {
+        k.classList.remove('hide');
+        const mo = $('#mc-mo'); if (mo) mo.textContent = 'Thu gọn ▴';
+      }
+      setTimeout(() => {
+        const o = $('#in-mota');
+        if (o) { o.focus(); o.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      }, 120);
+    } ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
 }
 function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
@@ -2894,17 +2907,20 @@ function tongKetNgay(h, t, tk, gio){
   el.classList.remove('hide');
 }
 function dongLog(l, feed){
-  const html = dongLog0(l, feed); LOGMAP[l.thoiGian] = l;
+  // Khoá theo ID: hai dòng gửi trong cùng một giây thì khoá theo thời gian sẽ đè
+  // nhau, bấm Xoá là báo "không tìm thấy dòng" (Phương Anh gặp tối 23/09).
+  const kh = l.id != null ? String(l.id) : l.thoiGian;
+  const html = dongLog0(l, feed); LOGMAP[kh] = l;
   const cuaMinh = l.ten === ten && !(S && S.xemBoi) && l.bua !== 'anh' && l.bua !== 'sodo' && l.bua !== 'video';
   if (!cuaMinh) return html;
   const laBua = ['sang','trua','chieu','toi','ngu','can'].indexOf(l.bua) >= 0;
-  const act = `<div class="act">${laBua ? `<button onclick="suaLog('${l.thoiGian}')">✏️ Sửa</button>` : ''}<button class="xoa" onclick="xoaLog('${l.thoiGian}')">🗑 Xoá</button></div>`;
+  const act = `<div class="act">${laBua ? `<button onclick="suaLog('${kh}')">✏️ Sửa</button>` : ''}<button class="xoa" onclick="xoaLog('${kh}')">🗑 Xoá</button></div>`;
   return html.replace(/<\/div><\/div>$/, act + '</div></div>');
 }
 async function xoaLog(k, imLang){
   const l = LOGMAP[k]; if (!l) return;
   if (!imLang && !confirm('Xoá dòng "' + (l.mon || l.moTa || l.bua) + '"? Không hoàn tác được.')) return;
-  try { const r = await goi('xoaNhatKy', ten, pin, k); if (r.loi) { toast(r.loi, 3000); return false; } nhan(r); if (!imLang) toast('🗑 Đã xoá'); return true; }
+  try { const r = await goi('xoaNhatKy', ten, pin, l.thoiGian, l.id); if (r.loi) { toast(r.loi, 3000); return false; } nhan(r); if (!imLang) toast('🗑 Đã xoá'); return true; }
   catch (e) { toast('Lỗi: ' + (e.message || e), 3000); return false; }
 }
 let SUA_KEY = null; // dòng đang sửa: xoá dòng cũ chỉ sau khi dòng mới ghi thành công
