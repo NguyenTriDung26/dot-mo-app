@@ -139,6 +139,14 @@ small{color:var(--mute)}
 .goiy-ten button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:8px 10px;
   font:inherit;font-size:14px;cursor:pointer;text-align:left}
 .goiy-ten button:hover,.goiy-ten button.on{background:var(--lime-dim)}
+/* Bảng biểu cảm để chèn vào tin — Dũng chốt 23/09, giống nút mặt cười của Messenger */
+.emo-bang{position:absolute;bottom:100%;left:0;right:0;background:var(--sf);border:1px solid var(--line);
+  border-radius:14px;padding:8px;box-shadow:0 -4px 16px rgba(0,0,0,.14);z-index:45;margin-bottom:6px;max-height:210px;overflow-y:auto}
+.emo-nhom{font-size:11px;color:var(--mute);font-weight:700;margin:6px 2px 3px;text-transform:uppercase;letter-spacing:.3px}
+.emo-nhom:first-child{margin-top:0}
+.emo-luoi{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.emo-luoi button{border:0;background:none;font-size:21px;cursor:pointer;padding:4px 0;border-radius:8px;line-height:1.1}
+.emo-luoi button:hover{background:var(--lime-dim);transform:scale(1.25)}
 .nut-anh{border:0;background:var(--sf2);border-radius:10px;width:40px;height:40px;font-size:17px;cursor:pointer;flex:none}
 .chipbtn{border:0;background:var(--sf);color:var(--ink);border-radius:12px;min-width:40px;height:40px;padding:0 10px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center;white-space:nowrap}
 .chipbtn.chu{font-size:13px;font-weight:700}
@@ -500,14 +508,14 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div id="nhom-khung2" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
       <div id="nhom-tra" class="tra-bar hide"></div>
       <div id="nhom-anh-xem" class="hide" style="margin-bottom:6px;position:relative;display:inline-block"></div>
-      <div class="row" style="position:relative"><button class="nut-anh" id="nhom-anh-nut" title="Gửi ảnh">🖼</button><input id="nhom-o2" placeholder="Nhắn cho cả khoá… gõ @ để nhắc tên" style="flex:3" autocomplete="off"><button class="btn sm" id="nhom-gui2" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="nhom-anh-file" style="display:none"></div>
+      <div class="row" style="position:relative"><button class="nut-anh" id="nhom-anh-nut" title="Gửi ảnh">🖼</button><button class="nut-anh" id="nhom-emo-nut" title="Biểu cảm">😊</button><input id="nhom-o2" placeholder="Nhắn cho cả khoá… gõ @ để nhắc tên" style="flex:3" autocomplete="off"><button class="btn sm" id="nhom-gui2" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="nhom-anh-file" style="display:none"></div>
     </div>
     <div class="card hide" id="p-rieng">
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Chỉ HLV đọc được. Vướng gì, ốm, đi công tác — nhắn ở đây.</small>
       <div id="rieng-khung" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
       <div id="rieng-tra" class="tra-bar hide"></div>
       <div id="rieng-anh-xem" class="hide" style="margin-bottom:6px;position:relative;display:inline-block"></div>
-      <div class="row" style="position:relative"><button class="nut-anh" id="rieng-anh-nut" title="Gửi ảnh">🖼</button><input id="rieng-o" placeholder="Nhắn riêng cho HLV…" style="flex:3" autocomplete="off"><button class="btn sm" id="rieng-gui" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="rieng-anh-file" style="display:none"></div>
+      <div class="row" style="position:relative"><button class="nut-anh" id="rieng-anh-nut" title="Gửi ảnh">🖼</button><button class="nut-anh" id="rieng-emo-nut" title="Biểu cảm">😊</button><input id="rieng-o" placeholder="Nhắn riêng cho HLV…" style="flex:3" autocomplete="off"><button class="btn sm" id="rieng-gui" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="rieng-anh-file" style="display:none"></div>
     </div>
     <div class="card hide" id="p-ai">
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Hỏi bất cứ lúc nào, trả lời theo đúng bộ luật và định mức riêng của bạn. Chuyện bệnh lý, thuốc men thì hỏi bác sĩ và HLV.</small>
@@ -605,7 +613,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-153632';
+const APP_VER = '20260923-160053';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -934,7 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
     an('#p-nhom', phongHien !== 'nhom');
     an('#p-rieng', phongHien !== 'rieng');
     an('#p-ai', phongHien !== 'ai');
-    noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng');
+    noiAnhChat('nhom'); noiAnhChat('rieng'); noiGoiYTen('nhom'); noiGoiYTen('rieng'); noiEmoji('nhom'); noiEmoji('rieng');
     if (phongHien === 'ai') { if (!$('#ai-khung').innerHTML.trim()) taiLichSuAI(); }
     else lamMoiChat();
   });
@@ -1157,6 +1165,41 @@ window.boAnhChat = function(p){
   anhChoGui[p] = null;
   const xem = $('#' + p + '-anh-xem'); if (xem) { xem.classList.add('hide'); xem.innerHTML = ''; }
 };
+
+// Bảng biểu cảm chèn vào tin nhắn. Gom theo nhóm hay dùng trong nhóm giảm mỡ,
+// để học viên không phải lục bàn phím hệ thống.
+const EMO_NHOM = [
+  ['Hay dùng', '😀 😄 😁 😂 🤣 🥲 😊 😍 🥰 😘 😉 😌 😎 🤩 🥳 😇 🙂 🤗 🤔 🤨 😏 😅 😬 🙃'.split(' ')],
+  ['Cảm xúc', '😢 😭 😤 😠 😡 🥺 😳 😱 😰 😓 😩 😫 🥱 😴 🤒 🤕 🤢 🤯 😵 🫠 😶 😑 🙄 😒'.split(' ')],
+  ['Động viên', '👍 👎 👏 🙌 🤝 💪 🔥 ⭐ ✨ 🎉 🎊 🏆 🥇 🎯 ✅ ❌ ⚡ 💯 ❤️ 🧡 💚 💙 💜 🤍'.split(' ')],
+  ['Đốt mỡ', '🥗 🥦 🥬 🍅 🥕 🌽 🥒 🫑 🍳 🥚 🍗 🍖 🐟 🦐 🫘 🥜 🥛 🧊 💧 🍋 ☕ 🏃 🚶 🏋️'.split(' ')],
+  ['Đường đua', '🏁 📉 📈 ⚖️ 😴 🛌 📸 📷 🥵 🥶 ⏰ 📅 🔔 👀 🙏 🤞 👌 ✌️ 🫶 🤙 👋 🫵 🧘 🧠'.split(' ')],
+];
+function noiEmoji(p){
+  const nut = $('#' + p + '-emo-nut'), o = $(p === 'nhom' ? '#nhom-o2' : '#rieng-o');
+  if (!nut || !o || nut.dataset.noi) return;
+  nut.dataset.noi = 1;
+  nut.onclick = (e) => {
+    e.stopPropagation();
+    const co = o.parentElement.querySelector('.emo-bang');
+    if (co) { co.remove(); return; }
+    const b = document.createElement('div');
+    b.className = 'emo-bang';
+    b.innerHTML = EMO_NHOM.map(([ten, ds]) =>
+      `<div class="emo-nhom">${ten}</div><div class="emo-luoi">${ds.map(x => `<button type="button">${x}</button>`).join('')}</div>`).join('');
+    o.parentElement.appendChild(b);
+    b.querySelectorAll('button').forEach(n => n.onclick = (ev) => {
+      ev.stopPropagation();
+      // Chèn đúng chỗ con trỏ đang đứng, không đẩy xuống cuối
+      const v = o.value, vt = o.selectionStart == null ? v.length : o.selectionStart;
+      o.value = v.slice(0, vt) + n.textContent + v.slice(o.selectionEnd == null ? vt : o.selectionEnd);
+      const moi = vt + n.textContent.length;
+      o.focus(); o.setSelectionRange(moi, moi);
+    });
+    b.onclick = (ev) => ev.stopPropagation();
+    setTimeout(() => document.addEventListener('click', function d(){ b.remove(); document.removeEventListener('click', d); }, { once: true }), 60);
+  };
+}
 
 // Gõ @ thì bày danh sách người cùng phòng, chọn là chèn tên vào ô nhập
 let dsTenGoiY = [];
