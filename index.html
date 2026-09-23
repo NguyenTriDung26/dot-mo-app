@@ -642,7 +642,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-170057';
+const APP_VER = '20260923-170316';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2763,7 +2763,9 @@ function nhan(r){
   if (!r.coKhoa) { cb.textContent = 'HLV chưa bật máy chấm (chưa dán khoá Gemini).'; cb.classList.remove('hide'); } else cb.classList.add('hide');
   const bt = $('#bua-tt'); if (bt) { bt.textContent = gio >= 20 && t.soBua < 3 ? `Mới ${t.soBua}/3 bữa hôm nay · gửi nốt trước khi ngủ để giữ chuỗi ${tk.streak} ngày` : `Hôm nay đã gửi ${t.soBua}/3 bữa · chuỗi ${tk.streak} ngày`; bt.classList.toggle('hide', !!r.xemBoi); }
 
-  $('#stat').innerHTML = ring(t.diem) + `<div class="big"><b class="fire">🔥${tk.streak}</b><span>ngày liên tiếp</span></div><div class="big"><b>${t.soBua}<small style="font-size:16px;color:var(--mute)">/3</small></b><span>bữa đã gửi</span></div>`;
+  // Chuỗi ngày và số bữa đã nằm ở thẻ lớn phía trên (#the-chuoi) — ở đây chỉ còn
+  // điểm hôm nay, đỡ lặp hai lần cùng một con số (Dũng bắt được 23/09).
+  $('#stat').innerHTML = ring(t.diem) + `<div class="big" style="flex:1"><b style="font-size:15px;font-weight:700;color:var(--ink2);line-height:1.5">${t.diem === null ? 'Chưa có bữa nào được chấm hôm nay' : 'Điểm trung bình ' + t.soBua + ' bữa hôm nay'}</b></div>`;
   const canTxt = tk.canMoi ? `<b>${tk.canMoi} kg</b> · xuất phát ${tk.canDau || '?'} kg · <b style="color:${tk.giam > 0 ? 'var(--lime)' : 'var(--amber)'}">${tk.giam > 0 ? '−' : '+'}${Math.abs(tk.giam)} kg</b>${h.mucTieu ? ` / mục tiêu ${h.mucTieu} kg` : ''}${tk.ngayCanMoi ? ` · cân ${tk.ngayCanMoi.slice(5).replace('-', '/')}` : ''}` : `<b>Chưa có số cân.</b> Sáng mai cân đói rồi ghi ở tab Gửi bữa.`;
   $('#can-card').innerHTML = `<p class="k">Cân nặng</p><div style="font-size:15px">${canTxt}</div>`;
   $('#can-hint').textContent = tk.canMoi ? `Lần cân gần nhất: ${tk.canMoi} kg (${tk.ngayCanMoi})` : 'Cân mỗi sáng thứ 2, lúc đói, sau khi đi vệ sinh.';
