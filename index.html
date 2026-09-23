@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0c0b">
+<meta name="theme-color" content="#F6F5F3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Đốt Mỡ 6 Tuần</title>
@@ -13,12 +13,32 @@
 <meta name="apple-mobile-web-app-title" content="Đốt Mỡ">
 <meta name="application-name" content="Đốt Mỡ 6 Tuần">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f6f4;--sf:#ffffff;--sf2:#eaeee9;--line:#dde3dc;--ink:#101713;--ink2:#3c4a43;--mute:#5f6f67;--lime:#18a957;--lime2:#0f8a45;--lime-dim:rgba(24,169,87,.13);--gold:#a86f00;--cam:#e06f00;--red:#c9342c;--amber:#a86f00;--r:16px;--tren-nhan:#ffffff;--do-nen:#fdecec;--do-chu:#a3231d;--do-chu2:#c9342c;--vang-nen:#fdf3dd;--vang-chu:#7a5800;--thanh:rgba(255,255,255,.97);--nen-anh:#000;--sf3:#f0f3ef;--sf4:#e8ece7;--sf5:#eef2ed;--ink3:#3c4a43}
+/* ===== VẠCH XUẤT PHÁT — xem app/dot-mo-app/DESIGN.md =====
+   Nền SÁNG là ràng buộc cứng: học viên chụp ảnh bữa ăn ngoài trời (chốt 22/09/2026).
+   Một màu thương hiệu duy nhất: Cam Vạch Đích. --lime giữ tên cũ vì đang dùng 78 chỗ. */
+:root{
+  /* nền và mực */
+  --bg:#F6F5F3;--sf:#FFFFFF;--sf2:#EDEBE7;--sf3:#F2F0EC;--sf4:#E8E5E0;--sf5:#F4F2EF;
+  --line:#DFDCD6;--ink:#0B0D0C;--ink2:#3A403C;--ink3:#3A403C;--mute:#6E756F;
+  /* thương hiệu — cam vạch đích */
+  --lime:#CE3409;--lime2:#A82806;--lime-dim:rgba(206,52,9,.12);--cam:#CE3409;
+  --cam-ruc:#FF4D1F;--tren-nhan:#FFFFFF;
+  /* ngữ nghĩa */
+  --dat:#14713F;--red:#A81208;--do-nen:#FBE9E7;--do-chu:#8E1008;--do-chu2:#A81208;
+  --gold:#8A6100;--amber:#8A6100;--vang-nen:#FBF2C4;--vang-chu:#6B5600;
+  /* khác */
+  --r:10px;--thanh:rgba(246,245,243,.97);--nen-anh:#000;
+  --font:Barlow,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-so:"Barlow Condensed",Barlow,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-body{background:radial-gradient(900px 500px at 50% -200px,#1b2a1e 0%,var(--bg) 60%)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font)}
+body{background:var(--bg)}
+/* con số luôn dùng phông nén — luật cứng, xem DESIGN.md mục Typography */
+.score,.n,.m,.h,.ot,.p,.brand{font-family:var(--font-so);font-variant-numeric:tabular-nums}
 .wrap{max-width:520px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px 100px}
 #v-gui{padding-bottom:56px}
 .hero{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 16px}
@@ -32,7 +52,7 @@ body{background:radial-gradient(900px 500px at 50% -200px,#1b2a1e 0%,var(--bg) 6
    Trước đây xám nhạt + viết hoa nên nhìn như chú thích, mắt lướt qua không thấy. */
 .k{font-size:15px;font-weight:800;letter-spacing:-.01em;color:var(--ink);margin:0 0 10px}
 label{display:block;font-size:14px;font-weight:600;color:var(--ink2);margin:12px 0 8px}
-input,textarea,select{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid transparent;border-radius:12px;background:var(--sf2);color:var(--ink);outline:none}
+input,textarea,select{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid transparent;border-radius:10px;background:var(--sf2);color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--lime)}
 textarea{min-height:72px;resize:vertical}
 .btn{display:block;width:100%;font:inherit;font-weight:800;font-size:16px;line-height:1.3;padding:14px 16px;border:0;border-radius:14px;background:var(--lime);color:var(--tren-nhan);cursor:pointer;margin-top:16px;transition:transform .08s}
@@ -44,12 +64,12 @@ textarea{min-height:72px;resize:vertical}
 .btn:active{transform:scale(.98)}.btn:disabled{opacity:.55}
 .btn.ghost{background:var(--sf2);color:var(--ink);border:0;font-weight:600}
 .row{display:flex;gap:8px}.row>*{flex:1}
-.seg{display:flex;gap:8px}.seg button{flex:1;font:inherit;font-weight:600;font-size:15px;padding:0 4px;height:44px;border:0;background:var(--sf2);color:var(--mute);border-radius:12px;cursor:pointer}
+.seg{display:flex;gap:8px}.seg button{flex:1;font:inherit;font-weight:600;font-size:15px;padding:0 4px;height:44px;border:0;background:var(--sf2);color:var(--mute);border-radius:10px;cursor:pointer}
 .seg button.on{background:var(--lime-dim);color:var(--lime);box-shadow:inset 0 0 0 1.5px var(--lime)}
-.pick{display:flex;align-items:center;justify-content:flex-start;gap:12px;border:0;border-radius:12px;padding:0 16px;min-height:56px;width:100%;font-family:inherit;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;background:var(--sf2)}.pick .ic-s{color:var(--lime)}.pick .pk-sub{margin-left:auto;color:var(--mute);font-weight:500;font-size:12px;white-space:nowrap}#btn-anh{white-space:nowrap}
-.pick input{display:none}.anh-chon{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:8px;border:0;border-radius:12px;background:var(--sf2)}.anh-chon button{font:inherit;font-weight:600;font-size:15px;padding:12px;border-radius:10px;border:0;background:var(--sf);color:var(--ink);cursor:pointer}.anh-chon button.huy{background:transparent;color:var(--mute);font-weight:600;padding:10px}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:13px;flex-direction:column;justify-content:center;gap:6px;position:relative;overflow:hidden;min-height:110px;color:var(--mute)}.pick.sm span{display:flex;flex-direction:column;align-items:center;gap:6px}.chips{display:flex;gap:8px;flex-wrap:wrap}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{box-shadow:inset 0 0 0 1.5px var(--lime);color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--muted)}.vid-pick{margin-top:10px;padding:14px}.vid-pick.co{box-shadow:inset 0 0 0 1.5px var(--lime)}#hs-video-xem,#tdv-xem{width:100%;max-height:260px;border-radius:12px;margin-top:8px;display:none;background:var(--nen-anh);border:1px solid var(--line)}#hs-video-xem.co,#tdv-xem.co{display:block}#tdv-frame{display:block;width:100%;aspect-ratio:9/16;max-height:65vh;border:0;border-radius:12px;background:var(--nen-anh);margin-top:8px}.vid-info{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--ink3)}.vid-info button{font:inherit;font-weight:800;font-size:13px;background:transparent;border:1px solid #3a463d;color:var(--mute);border-radius:10px;padding:6px 10px;cursor:pointer}
+.pick{display:flex;align-items:center;justify-content:flex-start;gap:12px;border:0;border-radius:10px;padding:0 16px;min-height:56px;width:100%;font-family:inherit;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;background:var(--sf2)}.pick .ic-s{color:var(--lime)}.pick .pk-sub{margin-left:auto;color:var(--mute);font-weight:500;font-size:12px;white-space:nowrap}#btn-anh{white-space:nowrap}
+.pick input{display:none}.anh-chon{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:8px;border:0;border-radius:10px;background:var(--sf2)}.anh-chon button{font:inherit;font-weight:600;font-size:15px;padding:12px;border-radius:10px;border:0;background:var(--sf);color:var(--ink);cursor:pointer}.anh-chon button.huy{background:transparent;color:var(--mute);font-weight:600;padding:10px}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:13px;flex-direction:column;justify-content:center;gap:6px;position:relative;overflow:hidden;min-height:110px;color:var(--mute)}.pick.sm span{display:flex;flex-direction:column;align-items:center;gap:6px}.chips{display:flex;gap:8px;flex-wrap:wrap}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{box-shadow:inset 0 0 0 1.5px var(--lime);color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--mute)}.vid-pick{margin-top:10px;padding:14px}.vid-pick.co{box-shadow:inset 0 0 0 1.5px var(--lime)}#hs-video-xem,#tdv-xem{width:100%;max-height:260px;border-radius:10px;margin-top:8px;display:none;background:var(--nen-anh);border:1px solid var(--line)}#hs-video-xem.co,#tdv-xem.co{display:block}#tdv-frame{display:block;width:100%;aspect-ratio:9/16;max-height:65vh;border:0;border-radius:10px;background:var(--nen-anh);margin-top:8px}.vid-info{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--ink3)}.vid-info button{font:inherit;font-weight:800;font-size:13px;background:transparent;border:1px solid #3a463d;color:var(--mute);border-radius:10px;padding:6px 10px;cursor:pointer}
 #preview{width:100%;border-radius:14px;margin-top:10px;display:none;max-height:280px;object-fit:cover;border:1px solid var(--line)}
-.chk{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;color:var(--ink);margin:0;padding:0 14px;min-height:44px;border:0;border-radius:12px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}.row.hbs{flex-direction:column;gap:8px}
+.chk{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;color:var(--ink);margin:0;padding:0 14px;min-height:44px;border:0;border-radius:10px;background:var(--sf2);text-transform:none;letter-spacing:0;cursor:pointer}.row.hbs{flex-direction:column;gap:8px}
 .chk input{width:22px;height:22px;margin:0;accent-color:var(--lime)}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--thanh);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;height:calc(60px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);z-index:9}
 .tabs button{flex:1;font:inherit;font-size:12px;font-weight:600;border:0;background:none;color:var(--mute);padding:0 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
@@ -60,7 +80,7 @@ textarea{min-height:72px;resize:vertical}
 .kq.xanh:before{background:var(--lime)}.kq.vang:before{background:var(--amber)}.kq.do:before{background:var(--red)}.btn.dx{background:var(--sf2);color:var(--red);border:0;font-size:16px;font-weight:600;margin:0 0 24px}
 .score{font-size:46px;font-weight:800;line-height:1;letter-spacing:-1px}.score small{font-size:16px;color:var(--mute);font-weight:600}
 .quote{font-size:16px;line-height:1.5;margin:12px 0 8px;font-weight:600}
-.thay{background:var(--sf2);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:8px}
+.thay{background:var(--sf2);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:8px}
 .thay b{color:var(--lime)}
 .uoc{font-size:12px;color:var(--mute);margin-top:10px}
 .stat{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;align-items:center}
@@ -74,17 +94,17 @@ textarea{min-height:72px;resize:vertical}
 .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);font-weight:600}.meta b{color:var(--ink)}
 .tq{display:grid;gap:8px;margin-top:6px;font-size:14px;font-weight:600}.tq span{display:flex;gap:8px;align-items:center}
 .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin:6px 0 14px}
-.pd{background:var(--sf2);border:0;border-radius:12px;padding:12px 8px;text-align:center}
+.pd{background:var(--sf2);border:0;border-radius:10px;padding:12px 8px;text-align:center}
 .pd.first{background:linear-gradient(180deg,#2a2610,#1a1a12);border-color:var(--vang-nen);padding-top:18px}
 .pd .m{font-size:26px}.pd .t{font-weight:800;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pd .p{font-size:22px;font-weight:800;color:var(--gold);line-height:1.1}.pd .s{font-size:11px;color:var(--mute)}
 table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}td,th{padding:10px 6px;border-bottom:1px solid #1e2420;text-align:left}#moc table{font-size:15px}#moc td,#moc th{padding:10px 8px}th{color:var(--mute);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 td.r,th.r{text-align:right}tr.me td{background:var(--lime-dim);font-weight:800}.bad{color:var(--red);font-size:12px;font-weight:600;margin-left:6px}.okk{color:var(--lime);font-weight:800}
 .log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:var(--ink2)}.tk-ok,.tk-no{margin:6px 0 0;padding-left:0;list-style:none;font-size:14px}.tk-ok li{padding:3px 0;color:var(--lime)}.tk-no li{padding:3px 0;color:var(--amber)}.tk-h{font-weight:800;margin-top:10px;font-size:13px;letter-spacing:.3px}.log .la{display:block;width:100%;max-width:220px;border-radius:10px;margin:6px 0;border:1px solid var(--line)}.log .act{display:flex;gap:6px;margin-top:6px}.log .act button{font:inherit;font-size:13px;font-weight:600;border:0;background:var(--sf2);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer}.log .act button.xoa{color:var(--do-chu2);border-color:var(--do-nen)}
-.lg{border:0;border-radius:12px;margin:8px 0;background:var(--sf2)}.lg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:14px;color:var(--lime);letter-spacing:.03em}.lg summary::-webkit-details-marker{display:none}.lg summary span{font-size:11px;color:var(--mute);font-weight:600}.lg summary::after{content:'▾';color:var(--mute);margin-left:8px}.lg[open] summary::after{content:'▴'}.lm{padding:0 14px 12px}.lt{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;color:var(--ink)}.ld{margin:0;padding-left:20px;font-size:15px;color:var(--ink3);line-height:1.55}.ld li{margin:2px 0}.muc{font-weight:800;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:var(--ink3);line-height:1.55}
-.err{background:rgba(255,90,90,.12);color:var(--do-chu);border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:12px;margin-top:10px;font-size:14px;font-weight:600}
-.warn{background:rgba(255,200,61,.12);border:1px solid rgba(255,200,61,.35);color:var(--vang-chu);padding:12px 14px;border-radius:12px;font-size:14px;font-weight:600;margin-bottom:12px}
+.lg{border:0;border-radius:10px;margin:8px 0;background:var(--sf2)}.lg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:14px;color:var(--lime);letter-spacing:.03em}.lg summary::-webkit-details-marker{display:none}.lg summary span{font-size:11px;color:var(--mute);font-weight:600}.lg summary::after{content:'▾';color:var(--mute);margin-left:8px}.lg[open] summary::after{content:'▴'}.lm{padding:0 14px 12px}.lt{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;color:var(--ink)}.ld{margin:0;padding-left:20px;font-size:15px;color:var(--ink3);line-height:1.55}.ld li{margin:2px 0}.muc{font-weight:800;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:var(--ink3);line-height:1.55}
+.err{background:rgba(255,90,90,.12);color:var(--do-chu);border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:10px;margin-top:10px;font-size:14px;font-weight:600}
+.warn{background:rgba(255,200,61,.12);border:1px solid rgba(255,200,61,.35);color:var(--vang-chu);padding:12px 14px;border-radius:10px;font-size:14px;font-weight:600;margin-bottom:12px}
 .hide{display:none!important}
-.spin{display:inline-block;width:16px;height:16px;border:3px solid #06130a;border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px;margin-right:8px}
+.spin{display:inline-block;width:16px;height:16px;border:3px solid var(--lime);border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px;margin-right:8px}
 @keyframes s{to{transform:rotate(360deg)}}
 .login-hero{text-align:center;padding:26px 0 10px}.login-hero .h{font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-1px;text-transform:uppercase}.login-hero .h b{color:var(--lime)}.login-hero p{color:var(--mute);margin:10px 0 0;font-weight:600}
 .luoi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
@@ -94,7 +114,7 @@ td.r,th.r{text-align:right}tr.me td{background:var(--lime-dim);font-weight:800}.
 .o .om{font-size:11px;color:var(--mute);line-height:1.4}
 .o .ob{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:2px 7px}
 .o.rong{grid-column:1 / -1;min-height:auto;flex-direction:row;align-items:center}
-.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.rules div{background:var(--sf2);border:0;border-radius:12px;padding:10px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}.rules div i{display:block;font-style:normal;font-size:20px;margin-bottom:4px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.rules div{background:var(--sf2);border:0;border-radius:10px;padding:10px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}.rules div i{display:block;font-style:normal;font-size:20px;margin-bottom:4px}
 small{color:var(--mute)}
 .g42{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
 .g42 .d{aspect-ratio:1;border-radius:8px;background:var(--sf3);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--mute);border:1px solid transparent}
@@ -102,9 +122,9 @@ small{color:var(--mute)}
 .g42 .d.tl{opacity:.35}.g42 .d.hn{outline:2px solid var(--lime)}.g42 .d.co{background:var(--sf5)}
 .wk{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mute);margin:10px 0 2px;font-weight:600}.wk b{color:var(--ink)}
 .step{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.step:last-child{border:0}.step .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--lime);color:var(--tren-nhan);font-weight:800;display:flex;align-items:center;justify-content:center}.step .t{font-size:15px;line-height:1.5}.step .t b{color:var(--lime)}
-.ok-ghim{background:rgba(163,255,91,.12);border:1px solid rgba(163,255,91,.4);color:var(--lime);padding:12px;border-radius:12px;font-weight:800;margin-top:10px;text-align:center}
+.ok-ghim{background:rgba(163,255,91,.12);border:1px solid rgba(163,255,91,.4);color:var(--lime);padding:12px;border-radius:10px;font-weight:800;margin-top:10px;text-align:center}
 .fld{margin-top:10px}.fld label{margin:0 0 4px}.fld small{display:block;margin-top:4px;font-size:12px}
-.calc{background:var(--sf2);border:0;border-radius:12px;padding:12px 14px;margin-top:14px;font-size:15px;line-height:1.6}.calc b{color:var(--lime)}
+.calc{background:var(--sf2);border:0;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:15px;line-height:1.6}.calc b{color:var(--lime)}
 .dm{border-bottom:1px solid var(--line);padding:10px 0}.dm:last-child{border:0}.dm .h{display:flex;justify-content:space-between;font-weight:800;font-size:14px}.dm .h span{color:var(--mute);font-weight:600;font-size:12px}.dm .m{font-size:15px;margin:4px 0 2px}.dm .g{font-size:12px;color:var(--mute)}
 .btn.sm{width:auto;display:inline-block;padding:9px 14px;font-size:13px;margin:8px 8px 0 0}
 .chip-g{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;color:var(--vang-chu);background:rgba(255,200,61,.14);border:1px solid rgba(255,200,61,.35);border-radius:999px;padding:2px 8px;vertical-align:middle}
@@ -126,7 +146,7 @@ small{color:var(--mute)}
 .bong.toi div[style*="color:var(--mute)"]{color:rgba(255,255,255,.75)!important}
 .bong.ho{background:var(--sf);border-bottom-left-radius:5px}
 .cx-bar{position:absolute;right:6px;bottom:-11px;display:flex;gap:2px}
-.cx{background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:1px 5px;font-size:11px;
+.cx{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:1px 5px;font-size:11px;
   box-shadow:0 1px 3px rgba(0,0,0,.12);display:inline-flex;align-items:center;gap:2px}
 .cx i{font-style:normal;font-size:10px;color:var(--mute);font-weight:700}
 .cx-chon{position:absolute;top:-42px;right:0;background:var(--sf);border:1px solid var(--line);border-radius:22px;
@@ -137,7 +157,7 @@ small{color:var(--mute)}
   border-radius:10px;padding:6px 10px;margin-bottom:6px;font-size:12px;color:var(--ink2)}
 .tra-bar button{border:0;background:none;font-size:16px;cursor:pointer;color:var(--mute);padding:0 4px}
 .goiy-ten{position:absolute;bottom:100%;left:0;right:0;background:var(--sf);border:1px solid var(--line);
-  border-radius:12px;max-height:170px;overflow-y:auto;box-shadow:0 -4px 14px rgba(0,0,0,.12);z-index:40;margin-bottom:4px}
+  border-radius:10px;max-height:170px;overflow-y:auto;box-shadow:0 -4px 14px rgba(0,0,0,.12);z-index:40;margin-bottom:4px}
 .goiy-ten button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:8px 10px;
   font:inherit;font-size:14px;cursor:pointer;text-align:left}
 .goiy-ten button:hover,.goiy-ten button.on{background:var(--lime-dim)}
@@ -153,7 +173,7 @@ small{color:var(--mute)}
 /* Dấu * đánh dấu ô bắt buộc — Dũng chốt 23/09 để nhìn phát biết phải điền gì */
 .sao{color:var(--red);font-weight:900;margin-left:2px}
 .ghi-chu-sao{font-size:12px;color:var(--mute);margin:-4px 0 10px}
-.chipbtn{border:0;background:var(--sf);color:var(--ink);border-radius:12px;min-width:40px;height:40px;padding:0 10px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center;white-space:nowrap}
+.chipbtn{border:0;background:var(--sf);color:var(--ink);border-radius:10px;min-width:40px;height:40px;padding:0 10px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center;white-space:nowrap}
 .chipbtn.chu{font-size:13px;font-weight:700}
 .tools{display:flex;gap:6px;align-items:center;position:relative;z-index:12}
 .tools .chipbtn,.brand-row .chipbtn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
@@ -178,7 +198,7 @@ small{color:var(--mute)}
 .hero-n .n{font-size:40px;font-weight:800;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}.hero-n .n small{font-size:16px;font-weight:600;color:var(--mute);margin-left:3px}
 .hero-n .n.dim{color:var(--ink2)}.hero-n .l{font-size:12px;color:var(--mute);font-weight:600;margin-top:6px}.hero-n .arr{color:var(--mute);padding-bottom:26px}
 .bar.lt{height:8px;margin:16px 0 8px}
-.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}.stats3 div{background:var(--sf2);border-radius:12px;padding:12px 8px;text-align:center}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}.stats3 div{background:var(--sf2);border-radius:10px;padding:12px 8px;text-align:center}
 .stats3 b{display:block;font-size:20px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}.stats3 b small{font-size:12px;font-weight:600;color:var(--mute)}.stats3 span{display:block;font-size:12px;color:var(--mute);margin-top:4px}
 details.more{margin-top:16px}details.more summary{list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:var(--ink2);cursor:pointer;padding:8px 0}
 details.more summary::-webkit-details-marker{display:none}details.more summary .ic-s{color:var(--mute);width:18px;height:18px;transition:transform .15s}details.more[open] summary .ic-s{transform:rotate(180deg)}
@@ -309,7 +329,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
         <div class="fld"><label>Ngày sinh</label><input id="hs-ns" type="date"></div>
       </div>
       <div class="fld"><label>Email (không bắt buộc)</label><input id="hs-email" inputmode="email" placeholder="ten@gmail.com"></div>
-      <div id="hs-thieu" class="hide" style="margin:10px 0;padding:10px;background:var(--do-nen);border-radius:12px;font-size:13px;color:var(--do-chu)"></div>
+      <div id="hs-thieu" class="hide" style="margin:10px 0;padding:10px;background:var(--do-nen);border-radius:10px;font-size:13px;color:var(--do-chu)"></div>
       <button class="btn" id="btn-hs-luu">LƯU HỒ SƠ & NHẬN LỘ TRÌNH ⚡</button>
       <button class="btn ghost hide" id="btn-hs-huy">← Quay lại</button>
       <div id="hs-err" class="err hide"></div>
@@ -317,7 +337,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   </div>
 
   <!-- GỬI BỮA -->
-  <div id="xem-bar" class="hide" style="position:sticky;top:0;z-index:8;background:var(--gold);color:#1a1200;border-radius:12px;padding:10px 12px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px"><span id="xem-ten"></span><button id="btn-vehlv" style="font:inherit;font-weight:900;border:0;background:#1a1200;color:var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer">← VỀ HLV</button></div>
+  <div id="xem-bar" class="hide" style="position:sticky;top:0;z-index:8;background:var(--gold);color:#1a1200;border-radius:10px;padding:10px 12px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px"><span id="xem-ten"></span><button id="btn-vehlv" style="font:inherit;font-weight:900;border:0;background:#1a1200;color:var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer">← VỀ HLV</button></div>
   <div id="v-gui" class="hide">
     <div class="card hide" id="thuc-don"></div>
     <div id="canh-bao" class="warn hide"></div>
@@ -400,7 +420,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card" id="tien-do"></div>
     <div class="card"><p class="k">Các bữa hôm nay</p><small style="display:block;margin-bottom:8px">Ghi sai? Bấm <b>✏️ Sửa</b> để chỉnh lại nội dung, hoặc <b>🗑 Xoá</b> để bỏ dòng đó.</small><div id="logs"></div></div>
     <div class="card hide" id="the-chat"><p class="k">💬 Nhắn riêng cho HLV</p><small style="display:block;margin-bottom:8px">Vướng gì, ăn ngoài, ốm, đi công tác — nhắn ở đây. Chỉ HLV đọc được, cả nhóm không thấy.</small>
-      <div id="chat-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div id="chat-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:10px;padding:10px;margin-bottom:8px"></div>
       <div class="row"><input id="chat-o" placeholder="Nhắn cho HLV…" style="flex:3"><button class="btn sm" id="chat-gui" style="flex:1;margin-top:0">GỬI</button></div>
     </div>
     <div class="card hide" id="feed-card"><p class="k">🍽 Cả nhóm ăn gì hôm nay</p><small style="display:block;margin-bottom:8px">Xem đĩa của nhau để học cách xếp đĩa đúng: đạm + đậu + rau, có ghi gram.</small><div id="feed"></div></div>
@@ -425,7 +445,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card"><p class="k">Thêm học viên mới</p><div class="row"><input id="th-ten" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="th-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div><div style="margin-top:8px;font-size:12px;color:var(--mute)">Vào ca nào?</div>
       <div class="seg" id="th-khoa" style="margin-top:4px;flex-wrap:wrap;gap:6px"></div>
       <button class="chipbtn chu" id="th-them-ca" style="margin-top:8px;background:var(--lime-dim);color:var(--lime2)">＋ Tạo ca mới</button>
-      <div id="th-ca-form" class="hide" style="margin-top:8px;padding:10px;background:var(--sf2);border-radius:12px">
+      <div id="th-ca-form" class="hide" style="margin-top:8px;padding:10px;background:var(--sf2);border-radius:10px">
         <div class="row"><input id="th-ca-ma" placeholder="Mã ca" style="flex:1"><input id="th-ca-ngay" type="date" style="flex:1.4;margin-top:0"></div>
         <input id="th-ca-ten" placeholder="Tên ca, vd: Ca tháng 11" style="margin-top:8px">
         <div class="row" style="margin-top:8px"><button class="btn sm" id="th-ca-luu" style="flex:2;margin-top:0">LƯU CA</button><button class="chipbtn chu" id="th-ca-huy" style="flex:1">Huỷ</button></div>
@@ -466,7 +486,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <div id="ht-ds"></div>
       <div id="ht-chat" class="hide" style="margin-top:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b id="ht-ten" style="color:var(--lime)"></b><button class="chipbtn" onclick="dongHopThu()">✕ Đóng</button></div>
-        <div id="ht-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+        <div id="ht-khung" style="max-height:320px;overflow-y:auto;background:var(--sf2);border-radius:10px;padding:10px;margin-bottom:8px"></div>
         <div class="row"><input id="ht-o" placeholder="Trả lời…" style="flex:3"><button class="btn sm" id="ht-gui" style="flex:1;margin-top:0">GỬI</button></div>
       </div>
     </div>
@@ -504,7 +524,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card"><p class="k">Học viên trong ca</p>
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Bấm tên để mở hồ sơ. Tích ô vuông để chọn người rồi chuyển sang ca khác.</small>
       <div style="overflow-x:auto"><table id="cn-bang"></table></div>
-      <div id="cn-chuyen" class="hide" style="margin-top:10px;padding:10px;background:var(--lime-dim);border-radius:12px">
+      <div id="cn-chuyen" class="hide" style="margin-top:10px;padding:10px;background:var(--lime-dim);border-radius:10px">
         <div style="font-size:13px;margin-bottom:8px"><b id="cn-dem">0</b> người đang chọn — chuyển sang:</div>
         <div class="row"><select id="cn-ca-dich" style="flex:1;margin-top:0"></select><button class="btn sm" id="cn-chuyen-nut" style="flex:1;margin-top:0">CHUYỂN</button></div>
         <button class="chipbtn chu" id="cn-xoa-nut" style="margin-top:8px;width:100%;background:var(--do-nen);color:var(--do-chu)">🗑 Xoá khỏi hệ thống</button>
@@ -524,21 +544,21 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="seg" id="chat-tab" style="margin-bottom:12px"><button data-p="nhom" class="on">👥 Nhóm <span id="tab-nhom-ten"></span></button><button data-p="rieng"><span class="av av-hlv" id="av-hlv-tab">D</span> Riêng với HLV<span id="tab-rieng-cham" class="hide" style="color:var(--red)"> ●</span></button><button data-p="ai">🤖 Hỏi AI</button></div>
     <div class="card" id="p-nhom">
       <div class="seg hide" id="nhom-chon2" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-      <div id="nhom-khung2" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div id="nhom-khung2" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:10px;padding:10px;margin-bottom:8px"></div>
       <div id="nhom-tra" class="tra-bar hide"></div>
       <div id="nhom-anh-xem" class="hide" style="margin-bottom:6px;position:relative;display:inline-block"></div>
       <div class="row" style="position:relative"><button class="nut-anh" id="nhom-anh-nut" title="Gửi ảnh">🖼</button><button class="nut-anh" id="nhom-emo-nut" title="Biểu cảm">😊</button><input id="nhom-o2" placeholder="Nhắn cho cả khoá… gõ @ để nhắc tên" style="flex:3" autocomplete="off"><button class="btn sm" id="nhom-gui2" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="nhom-anh-file" style="display:none"></div>
     </div>
     <div class="card hide" id="p-rieng">
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Chỉ HLV đọc được. Vướng gì, ốm, đi công tác — nhắn ở đây.</small>
-      <div id="rieng-khung" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div id="rieng-khung" style="height:56vh;min-height:300px;overflow-y:auto;background:var(--sf2);border-radius:10px;padding:10px;margin-bottom:8px"></div>
       <div id="rieng-tra" class="tra-bar hide"></div>
       <div id="rieng-anh-xem" class="hide" style="margin-bottom:6px;position:relative;display:inline-block"></div>
       <div class="row" style="position:relative"><button class="nut-anh" id="rieng-anh-nut" title="Gửi ảnh">🖼</button><button class="nut-anh" id="rieng-emo-nut" title="Biểu cảm">😊</button><input id="rieng-o" placeholder="Nhắn riêng cho HLV…" style="flex:3" autocomplete="off"><button class="btn sm" id="rieng-gui" style="flex:1;margin-top:0">GỬI</button><input type="file" accept="image/*" id="rieng-anh-file" style="display:none"></div>
     </div>
     <div class="card hide" id="p-ai">
       <small style="display:block;margin-bottom:8px;color:var(--mute)">Hỏi bất cứ lúc nào, trả lời theo đúng bộ luật và định mức riêng của bạn. Chuyện bệnh lý, thuốc men thì hỏi bác sĩ và HLV.</small>
-      <div id="ai-khung" style="height:52vh;min-height:280px;overflow-y:auto;background:var(--sf2);border-radius:12px;padding:10px;margin-bottom:8px"></div>
+      <div id="ai-khung" style="height:52vh;min-height:280px;overflow-y:auto;background:var(--sf2);border-radius:10px;padding:10px;margin-bottom:8px"></div>
       <div class="seg" id="ai-goiy" style="flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
       <div class="row"><input id="ai-o" placeholder="Hỏi về ăn uống, chững cân, ngủ…" style="flex:3"><button class="btn sm" id="ai-gui" style="flex:1;margin-top:0">HỎI</button></div>
     </div>
@@ -632,7 +652,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-213746';
+const APP_VER = '20260923-223019';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -892,7 +912,7 @@ function veCauHoi(){
   $('#bt-cau').innerHTML = btDL.cau.map((c, i) => `
     <div class="card"><p style="font-weight:700;font-size:15px;line-height:1.45;margin:0 0 10px">${i+1}. ${esc(c.hoi)}</p>
       ${c.chon.map((x, k) => `<div onclick="chonDapAn(${i},${k})" id="da-${i}-${k}"
-        style="padding:11px 12px;border-radius:12px;background:var(--sf2);margin-bottom:6px;cursor:pointer;font-size:14px;line-height:1.45;border:1.5px solid transparent">${esc(x)}</div>`).join('')}
+        style="padding:11px 12px;border-radius:10px;background:var(--sf2);margin-bottom:6px;cursor:pointer;font-size:14px;line-height:1.45;border:1.5px solid transparent">${esc(x)}</div>`).join('')}
     </div>`).join('');
 }
 function chonDapAn(i, k){
@@ -1391,11 +1411,11 @@ function veHoc(){
       + (!r.congBat
         ? `<div style="margin-top:8px;font-size:13px;color:var(--ink2);line-height:1.5">Bài mở dần theo tuần. Học lúc nào cũng được, không ảnh hưởng việc thực hành.</div>`
         : (conBB || cong
-        ? `<div style="margin-top:8px;padding:10px 12px;background:var(--vang-nen);border-radius:12px;font-size:13px;line-height:1.55;color:var(--vang-chu)">
+        ? `<div style="margin-top:8px;padding:10px 12px;background:var(--vang-nen);border-radius:10px;font-size:13px;line-height:1.55;color:var(--vang-chu)">
             <b>Để mở tuần ${r.tuanHienTai + 1}</b>, bạn cần:${conBB ? `<div>• học xong <b>${conBB}</b> bài bắt buộc còn lại</div>` : '<div>• ✅ đã học xong bài bắt buộc</div>'}
             ${r.coBaiTap ? (r.baiTapDat ? '<div>• ✅ đã qua bài tập tuần</div>' : `<div>• làm bài tập tuần ${r.tuanHienTai} và đúng ít nhất 4/5 câu — <a onclick="moBaiTap()" style="color:var(--lime);font-weight:700;cursor:pointer">làm ngay</a></div>`) : ''}
           </div>`
-        : `<div style="margin-top:8px;padding:10px 12px;background:var(--lime-dim);border-radius:12px;font-size:13px;color:var(--lime);font-weight:600">✅ Xong tuần ${r.tuanHienTai}. Tuần sau sẽ mở khi tới ngày.</div>`));
+        : `<div style="margin-top:8px;padding:10px 12px;background:var(--lime-dim);border-radius:10px;font-size:13px;color:var(--lime);font-weight:600">✅ Xong tuần ${r.tuanHienTai}. Tuần sau sẽ mở khi tới ngày.</div>`));
   }
   if (false) $('#hoc-tomtat').innerHTML = r.tongMo
     ? `Bạn đang ở <b style="color:var(--lime)">tuần ${r.tuanHienTai}/6</b> · ${hocNhanh === 'thuchanh' ? 'Thực hành' : 'Kiến thức'}: đã mở <b>${cuaNhanh.length}</b> bài · xong <b>${xongNhanh}</b>` +
@@ -1433,7 +1453,7 @@ async function moBai(id){
     if (r.loi) { toast('⚠️ ' + r.loi, 3000); return; }
     const b = r.bai;
     $('#hoc-ten').textContent = 'Tuần ' + b.tuan + ' · ' + b.tieude;
-    const anh = (b.anh || []).map(u => `<img src="${esc(u)}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:8px">`).join('');
+    const anh = (b.anh || []).map(u => `<img src="${esc(u)}" loading="lazy" style="width:100%;border-radius:10px;margin-bottom:8px">`).join('');
     const vid = b.video ? `<a href="${esc(b.video)}" target="_blank" class="btn ghost sm" style="display:block;text-align:center;text-decoration:none">▶ Xem video bài giảng</a>` : '';
     const pdf = b.pdf ? `<a href="${esc(b.pdf)}" target="_blank" class="btn ghost sm" style="display:block;text-align:center;text-decoration:none">📄 Mở tài liệu PDF</a>` : '';
     const noi = b.noiDung ? `<div style="font-size:14px;line-height:1.65;white-space:pre-wrap;margin-bottom:10px">${esc(b.noiDung)}</div>` : '';
@@ -1508,7 +1528,7 @@ function veChat(khung, ds, benToi){
   el.innerHTML = ds.map(t => {
     const toi = t.ben === benToi;
     return `<div style="display:flex;justify-content:${toi ? 'flex-end' : 'flex-start'};margin-bottom:6px">
-      <div style="max-width:80%;background:${toi ? 'var(--lime-dim)' : 'var(--sf)'};color:var(--ink);border-radius:12px;padding:8px 10px;font-size:13px;line-height:1.5">
+      <div style="max-width:80%;background:${toi ? 'var(--lime-dim)' : 'var(--sf)'};color:var(--ink);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.5">
         ${esc(t.noiDung)}<div style="font-size:10px;color:var(--mute);margin-top:3px">${toi ? 'bạn' : esc(t.ten)} · ${gioNgan(t.luc)}</div>
       </div></div>`;
   }).join('');
@@ -2220,7 +2240,7 @@ async function veNguyCo(){
       const nut = sdt
         ? `<a href="tel:${esc(sdt)}" style="flex:none;background:${mau};color:#fff;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:800;text-decoration:none">GỌI</a>`
         : `<span style="flex:none;background:var(--sf2);color:var(--mute);border-radius:9px;padding:6px 9px;font-size:11px;font-weight:700" title="Chưa có số điện thoại">📵 chưa có số</span>`;
-      return `<div style="display:flex;align-items:center;gap:9px;background:var(--sf);border-radius:12px;padding:9px 11px;margin-bottom:6px">
+      return `<div style="display:flex;align-items:center;gap:9px;background:var(--sf);border-radius:10px;padding:9px 11px;margin-bottom:6px">
         ${avatar(x.ten)}
         <div style="flex:1;min-width:0;cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g,'&#39;')}')">
           <div style="font-size:14px;font-weight:700;color:var(--ink)">${esc(x.ten)} <span style="font-size:11px;color:var(--mute);font-weight:600">${esc(x.khoa)}</span></div>
@@ -2383,7 +2403,7 @@ async function taiCay(){
             <div style="margin-bottom:10px">
               <div style="font-size:11px;color:var(--mute);margin:0 0 6px 2px">Tuần ${esc(w)} trong năm</div>
               ${r.cay[nam][th][w].map(c => `
-                <div onclick="moCa('${esc(c.ma)}')" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:var(--sf2);border-radius:12px;margin-bottom:6px;cursor:pointer">
+                <div onclick="moCa('${esc(c.ma)}')" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:var(--sf2);border-radius:10px;margin-bottom:6px;cursor:pointer">
                   <div style="min-width:0">
                     <div style="font-weight:700;font-size:15px">${esc(c.ma)} · ${esc(c.ten)}</div>
                     <div style="font-size:12px;color:var(--mute);margin-top:3px">xuất phát ${esc(String(c.ngayBatDau || '').slice(8,10) + '/' + String(c.ngayBatDau || '').slice(5,7))} · tuần ${c.tuanHienTai}/6 · ngày ${c.ngayThu}/42</div>
@@ -2532,7 +2552,7 @@ function chucMung(o){
   document.body.appendChild(n);
   phaoHoa();
 }
-const oSo = (n, t) => `<div style="flex:1;background:var(--sf2);border-radius:12px;padding:10px"><div style="font-size:22px;font-weight:800;line-height:1">${n}</div><div style="font-size:11px;color:var(--mute);margin-top:4px">${t}</div></div>`;
+const oSo = (n, t) => `<div style="flex:1;background:var(--sf2);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800;line-height:1">${n}</div><div style="font-size:11px;color:var(--mute);margin-top:4px">${t}</div></div>`;
 function soatMoc(r){
   if (!r || !r.hv || r.xemBoi || r.hlv) return;
   const m = docMoc(), tuan = r.tuan || 1, tk = r.thongKe || {};
@@ -2867,8 +2887,8 @@ function veBieuDo(r){
   el.innerHTML = `<p class="k">Đường đua cân nặng</p>
   <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${grid}
     <path d="${path(mocs)}" fill="none" stroke="#ffc83d" stroke-width="1.5" stroke-dasharray="4 4"/>
-    <path d="${path(pts)}" fill="none" stroke="#a3ff5b" stroke-width="2.5" stroke-linejoin="round"/>
-    ${pts.map(p => `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="3.5" fill="#a3ff5b"/>`).join('')}
+    <path d="${path(pts)}" fill="none" stroke="var(--cam-ruc)" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.map(p => `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="3.5" fill="var(--cam-ruc)"/>`).join('')}
     <text x="${Math.min(sx(last.x), W-R-30)}" y="${sy(last.y)-8}" fill="#f3f6f2" font-size="11" font-weight="800">${last.y} kg</text>
   </svg>
   <small>— xanh: cân thực tế · - - vàng: mốc chặn theo lộ trình${h.mucTieu ? ` (đích ${(tk.canDau + h.mucTieu).toFixed(1)} kg)` : ''}</small>`;
