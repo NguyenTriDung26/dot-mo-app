@@ -417,6 +417,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 
   <!-- HLV -->
   <div id="v-hlv" class="hide">
+    <div class="card hide" id="the-nguyco" style="padding:14px 16px"></div>
     <div class="card"><p class="k">Bảng điều khiển HLV · hôm nay</p><div id="hlv-tong" style="font-size:14px;margin-bottom:8px"></div><div class="row" style="margin-bottom:8px"><input id="hlv-tim" placeholder="🔍 Gõ tên để tìm…" style="flex:2" autocomplete="off"><select id="hlv-loc" style="flex:1;margin-top:0"><option value="">Mọi ca</option></select></div><div style="overflow-x:auto"><table id="hlv-bang"></table></div><small>Bấm vào <b>ca</b> để xem học viên trong ca. Gõ tên vào ô tìm để nhảy thẳng tới một người.</small></div>
     <div class="card"><p class="k">Thêm học viên mới</p><div class="row"><input id="th-ten" placeholder="Tên đăng nhập, vd: Anh Nam" style="flex:1.6"><div class="seg" id="th-gioi" style="flex:1"><button data-g="Nam" class="on">Nam</button><button data-g="Nữ">Nữ</button></div></div><div style="margin-top:8px;font-size:12px;color:var(--mute)">Vào ca nào?</div>
       <div class="seg" id="th-khoa" style="margin-top:4px;flex-wrap:wrap;gap:6px"></div>
@@ -628,7 +629,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260923-170601';
+const APP_VER = '20260923-172226';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2186,6 +2187,52 @@ function veNutBaoTin(){
   }
 }
 
+// ---------- BỘ LỌC DỰ ĐOÁN (giai đoạn 2, Dũng chốt 23/09) ----------
+// Máy nhìn hộ xem ai đang tuột tay, xếp nặng nhất lên trước, kèm nút gọi luôn.
+// Tách hai nhóm vì hai việc khác hẳn nhau: người CHƯA TỪNG gửi bữa cần kích hoạt,
+// người đang chạy rồi im là người sắp mất — cái sau cấp hơn.
+let ncDaNap = 0;
+async function veNguyCo(){
+  const el = $('#the-nguyco'); if (!el || !S || !S.hlv) return;
+  if (ncDaNap) return;
+  ncDaNap = 1;
+  try {
+    const r = await goi('aiSapBoCuoc', ten, pin, {});
+    if (r.loi) return;
+    const hang = (x, mau) => {
+      const sdt = (x.sdt || '').replace(/\s/g, '');
+      const nut = sdt
+        ? `<a href="tel:${esc(sdt)}" style="flex:none;background:${mau};color:#fff;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:800;text-decoration:none">GỌI</a>`
+        : `<span style="flex:none;background:var(--sf2);color:var(--mute);border-radius:9px;padding:6px 9px;font-size:11px;font-weight:700" title="Chưa có số điện thoại">📵 chưa có số</span>`;
+      return `<div style="display:flex;align-items:center;gap:9px;background:var(--sf);border-radius:12px;padding:9px 11px;margin-bottom:6px">
+        ${avatar(x.ten)}
+        <div style="flex:1;min-width:0;cursor:pointer" onclick="xemHV('${esc(x.ten).replace(/'/g,'&#39;')}')">
+          <div style="font-size:14px;font-weight:700;color:var(--ink)">${esc(x.ten)} <span style="font-size:11px;color:var(--mute);font-weight:600">${esc(x.khoa)}</span></div>
+          <div style="font-size:12px;color:${mau};line-height:1.4">${esc((x.ly || []).join(' · '))}</div>
+        </div>${nut}</div>`;
+    };
+    let h = '';
+    if (r.sapMat && r.sapMat.length) {
+      h += `<div style="font-size:13px;font-weight:800;color:var(--do-chu);margin-bottom:8px">🔴 ${r.sapMat.length} NGƯỜI SẮP BỎ CUỘC — GỌI HÔM NAY</div>`
+        + r.sapMat.map(x => hang(x, 'var(--red)')).join('');
+    }
+    if (r.chuaKhoiDong && r.chuaKhoiDong.length) {
+      h += `<div style="font-size:13px;font-weight:800;color:var(--cam);margin:${h ? '12px' : '0'} 0 8px">🟠 ${r.chuaKhoiDong.length} NGƯỜI CHƯA GỬI BỮA NÀO</div>`
+        + r.chuaKhoiDong.slice(0, 6).map(x => hang(x, 'var(--cam)')).join('')
+        + (r.chuaKhoiDong.length > 6 ? `<div style="font-size:12px;color:var(--mute);padding:4px 2px">…và ${r.chuaKhoiDong.length - 6} người nữa</div>` : '');
+    }
+    if (!h) {
+      h = `<div style="font-size:14px;font-weight:700;color:var(--lime2)">✅ Không ai đang tuột tay</div>`;
+    }
+    const tot = (r.dangTot || []).length, mat = (r.deMat || []).length;
+    h += `<div style="font-size:12px;color:var(--mute);margin-top:10px;padding-top:9px;border-top:1px solid var(--line)">`
+      + `${r.soNguoi} người đang chạy · <b style="color:var(--lime2)">${tot} tốt</b> · ${mat} để mắt`
+      + (r.khongGoiDuoc ? ` · <b style="color:var(--red)">${r.khongGoiDuoc} người chưa có số điện thoại</b>` : '') + `</div>`;
+    el.innerHTML = h;
+    el.classList.remove('hide');
+  } catch(e){ ncDaNap = 0; }
+}
+
 // ---------- MỘT CHẠM (Dũng chốt 23/09, sau góp ý "nhiều nút quá") ----------
 // Việc học viên làm 126 lần trong 6 tuần phải gọn nhất có thể: một nút giữa màn,
 // máy tự biết là bữa nào theo giờ, chụp xong GỬI LUÔN — không bắt bấm GỬI riêng.
@@ -2672,6 +2719,7 @@ function nhan(r){
     $('#hlv-tong').innerHTML = `<b>${guiHomNay}/${tong}</b> người đã gửi bữa hôm nay · <b style="color:${coDo ? 'var(--red)' : 'var(--lime)'}">${coDo}</b> người có cờ đỏ`;
     hlvDS = r.hlv;
     napCaTheoMa();
+    veNguyCo();
     const sel = $('#hlv-loc');
     if (sel) {
       const cac = [...new Set(r.hlv.map(x => x.khoa || 'K1'))].sort();
