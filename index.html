@@ -549,7 +549,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260922-213127';
+const APP_VER = '20260923-122814';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2336,8 +2336,18 @@ function dongLog0(l, feed){
   if (l.bua === 'nuoc') return `<div class="log"><div class="ic">💧</div><div><div class="t">${gio}${ai}</div><div class="n">${l.nuoc} ml nước</div></div></div>`;
   if (l.den === 'cho') return `<div class="log"><div class="ic">⏳</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai} · <span style="color:var(--amber)">đang chấm</span></div><div class="n">${esc(l.moTa || 'Bữa đã gửi, chờ chấm')}</div>${l.ten === ten && l.maBua ? `<div style="margin-top:6px"><button class="chipbtn" onclick="chamLai('${esc(l.maBua)}')">🔁 Chấm lại ngay</button></div>` : ''}</div></div>`;
   const ic = {xanh:'🟢', vang:'🟡', do:'🔴'}[l.den] || '⚪';
-  const idAnh = /^https?:/.test(l.anh || '') ? ((l.anh.match(/\/d\/([^/?]+)/) || l.anh.match(/[?&]id=([^&]+)/) || [])[1] || '') : '';
-  const anhHtml = idAnh ? `<a href="${esc(l.anh)}" target="_blank" rel="noopener"><img class="la" alt="ảnh bữa" loading="lazy" src="https://drive.google.com/thumbnail?id=${idAnh}&sz=w480" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'📷 Ảnh đã lưu — bấm xem'}))"></a>` : '';
+  // Ảnh có hai đời: ảnh MỚI nằm ở kho Cloudflare (đường dẫn bắt đầu bằng /anh/), ảnh CŨ còn trên
+  // Google Drive (bắt đầu bằng http). Từ 22/09 chỉ còn sinh ảnh kiểu mới — quên nhánh này một ngày
+  // nên mọi ảnh gửi sau khi chuyển nhà đều không hiện, học viên tưởng app không lưu ảnh.
+  const anhLink = String(l.anh || '');
+  let anhHtml = '';
+  if (anhLink.startsWith('/anh/')) {
+    const u = EXEC_URL.replace(/\/$/, '') + anhLink.split('/').map(encodeURIComponent).join('/');
+    anhHtml = `<a href="${esc(u)}" target="_blank" rel="noopener"><img class="la" alt="ảnh bữa" loading="lazy" src="${esc(u)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'📷 Ảnh đã lưu — bấm xem'}))"></a>`;
+  } else if (/^https?:/.test(anhLink)) {
+    const idAnh = ((anhLink.match(/\/d\/([^/?]+)/) || anhLink.match(/[?&]id=([^&]+)/) || [])[1] || '');
+    if (idAnh) anhHtml = `<a href="${esc(anhLink)}" target="_blank" rel="noopener"><img class="la" alt="ảnh bữa" loading="lazy" src="https://drive.google.com/thumbnail?id=${idAnh}&sz=w480" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'📷 Ảnh đã lưu — bấm xem'}))"></a>`;
+  }
   const gramChip = /\d/.test(l.moTa || '') ? '' : '<span class="chip-g">⚖️ chưa ghi gram</span>';
   const moTaHtml = l.moTa && l.mon && l.moTa !== l.mon ? `<div class="x" style="font-size:13px;color:var(--mute)">📝 ${esc(l.moTa)}</div>` : '';
   return `<div class="log"><div class="ic">${ic}</div><div style="flex:1"><div class="t">${gio} · ${LBL[l.bua] || l.bua}${ai}${l.diem === null ? '' : ' · ' + l.diem + '/10'}</div><div class="n">${esc(l.mon || l.moTa)}${gramChip}</div>${moTaHtml}${anhHtml}<div class="x">${esc(l.nhanXet)}</div></div></div>`;
