@@ -388,7 +388,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
       <small id="can-hint" style="display:block;margin-top:6px"></small>
       <label style="margin-top:16px">Chụp Dữ Liệu Giấc Ngủ</label>
       <button type="button" class="pick" id="btn-ngu-anh">
-        <svg class="ic-s" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 9.6V12l1.7 1"/></svg>Chụp màn hình đồng hồ<span class="pk-sub">Garmin · Apple Watch · Oura — máy tự đọc số</span>
+        <svg class="ic-s" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 9.6V12l1.7 1"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0"><span style="white-space:nowrap">Chụp màn hình đồng hồ</span><span style="font-size:11px;color:var(--mute);font-weight:500">Garmin · Apple Watch · Oura</span></span>
       </button>
       <input id="in-ngu-anh" type="file" accept="image/*" style="display:none">
       <div id="ngu-doc" class="thay hide" style="margin-top:8px"></div>
@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260924-091737';
+const APP_VER = '20260924-091908';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
