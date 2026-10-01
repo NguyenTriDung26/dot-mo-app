@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261001-104135';
+const APP_VER = '20261001-163944';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1023,7 +1023,7 @@ function veTin(khung, ds, laCuaToi){
       ? `<div class="cx-bar">${Object.entries(gom).map(([b, n]) => `<span class="cx">${b}${n > 1 ? '<i>' + n + '</i>' : ''}</span>`).join('')}</div>` : '';
     const noi = t.noiDung ? damTag(t.noiDung) : '';
     const than = `${traHtml}${noi}${anhHtml}<div style="font-size:10px;color:var(--mute);margin-top:3px${toi ? ';text-align:right' : ''}">${gioNgan(t.luc)}</div>${cxHtml}`;
-    const bong = `<div class="bong ${toi ? 'toi' : 'ho'}" data-id="${t.id}" data-loai="${loai}">${than}</div>`;
+    const bong = `<div class="bong ${toi ? 'toi' : 'ho'}" data-id="${t.id}" data-loai="${loai}"${toi ? ' data-toi="1"' : ''}>${than}</div>`;
     if (toi) return `<div class="hang phai">${bong}</div>`;
     return `<div class="hang trai">${dauCum ? avatar(t.ten) : '<span class="av-cho"></span>'}<div style="max-width:82%">${dauCum ? `<b style="color:${t.ben === 'HLV' ? 'var(--gold)' : 'var(--lime)'};font-size:12px;display:block;margin-bottom:2px">${esc(t.ten)}${t.ben === 'HLV' ? ' · HLV' : ''}</b>` : ''}${bong}</div></div>`;
   }).join('');
@@ -1039,13 +1039,24 @@ function noiCamXuc(el){
       const cu = el.querySelector('.cx-chon'); if (cu) cu.remove();
       const hop = document.createElement('div');
       hop.className = 'cx-chon';
+      // Tin của mình thì được gỡ; HLV gỡ được tin bất kỳ để dọn phòng
+      const xoaDuoc = b.dataset.toi || (S && S.hlv);
       hop.innerHTML = BIEU_CX.map(x => `<button data-b="${x}">${x}</button>`).join('')
-        + '<button data-tra="1" title="Trả lời">↩︎</button>';
+        + '<button data-tra="1" title="Trả lời">↩︎</button>'
+        + (xoaDuoc ? '<button data-xoa="1" title="Xoá tin này">🗑</button>' : '');
       b.appendChild(hop);
       hop.querySelectorAll('button').forEach(n => n.onclick = async (ev) => {
         ev.stopPropagation(); hop.remove();
         const id = Number(b.dataset.id), loai = b.dataset.loai;
         if (n.dataset.tra) { datTraLoi(loai, id, b.textContent.slice(0, 40)); return; }
+        if (n.dataset.xoa) {
+          if (!confirm('Xoá tin này? Mọi người sẽ không thấy nữa.')) return;
+          try {
+            const r = await goi('xoaTin', ten, pin, loai, loai === 'nhom' ? nhomKhoa : (S.hlv ? (htAi || '') : ten), id);
+            if (r.loi) toast('⚠️ ' + r.loi, 2500); else { toast('🗑 Đã xoá tin'); lamMoiChat(true); }
+          } catch(err){ toast('⚠️ ' + err.message, 2500); }
+          return;
+        }
         try {
           const r = await goi('thaCamXuc', ten, pin, loai, loai === 'nhom' ? nhomKhoa : (S.hlv ? (htAi || '') : ten), id, n.dataset.b);
           if (r.loi) toast('⚠️ ' + r.loi, 2500); else lamMoiChat(true);
