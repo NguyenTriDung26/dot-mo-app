@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261001-103527';
+const APP_VER = '20261001-104135';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -3047,7 +3047,10 @@ async function xoaLog(k, imLang){
 let SUA_KEY = null; // dòng đang sửa: xoá dòng cũ chỉ sau khi dòng mới ghi thành công
 function hienSuaBar(){ const b = $('#sua-bar'); if (!b) return; if (SUA_KEY && LOGMAP[SUA_KEY]) { const l = LOGMAP[SUA_KEY]; $('#sua-txt').innerHTML = '✏️ Đang sửa: <b>' + esc(l.mon || l.moTa || l.bua) + '</b>. Ghi lại xong, dòng cũ tự được thay.'; b.classList.remove('hide'); } else b.classList.add('hide'); }
 function huySua(){ SUA_KEY = null; hienSuaBar(); }
-async function xongSua(){ if (!SUA_KEY) return; const k = SUA_KEY; SUA_KEY = null; hienSuaBar(); await xoaLog(k, true); toast('✓ Đã thay dòng cũ bằng nội dung mới', 3000); }
+async function xongSua(){ if (!SUA_KEY) return; const k = SUA_KEY; SUA_KEY = null; hienSuaBar();
+  // Xoá dòng cũ hỏng (rớt mạng) thì nói thật, đừng báo "đã thay" khi sổ còn hai bản.
+  let ok = await xoaLog(k, true); if (!ok) ok = await xoaLog(k, true);
+  toast(ok ? '✓ Đã thay dòng cũ bằng nội dung mới' : '⚠️ Đã ghi bản mới nhưng chưa xoá được bản cũ — bấm 🗑 Xoá dòng cũ ở tab Hôm nay', 5000); }
 async function suaLog(k){
   const l = LOGMAP[k]; if (!l) return;
   SUA_KEY = k; hienSuaBar();
