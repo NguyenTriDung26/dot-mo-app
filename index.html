@@ -616,7 +616,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <button data-v="gui" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Gửi bữa</button>
   <button data-v="homnay" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-11"/></svg></span>Hôm nay</button>
   <button data-v="chat" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H8l-4 3v-4.5A8 8 0 1 1 21 12z"/></svg></span>Chat<span id="chat-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 20px);width:9px;height:9px;border-radius:99px;background:var(--red)"></span></button>
-  <button data-v="hoc" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M3 6.5 12 4l9 2.5v11L12 20l-9-2.5z"/><path d="M12 4v16"/></svg></span>Học<span id="hoc-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 18px);width:8px;height:8px;border-radius:99px;background:var(--lime)"></span></button>
+  <button data-v="dua" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8"/></svg></span>Đua</button>
   <button data-v="them" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>Thêm<span id="them-cham" class="hide" style="position:absolute;top:2px;right:calc(50% - 20px);width:9px;height:9px;border-radius:99px;background:var(--red)"></span></button>
 </div>
 
@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261001-103008';
+const APP_VER = '20261001-103527';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -964,7 +964,7 @@ function veThem(r){
   const o = (icon, ten, mo, di, badge) =>
     `<div class="o" onclick="${di}">${badge ? `<span class="ob">${badge}</span>` : ''}<div class="ot">${icon}</div><div class="on">${ten}</div><div class="om">${mo}</div></div>`;
   let ds = [
-    o('🏁','Bảng đua','Thứ hạng cả khoá 7 ngày','hien(\'dua\')'),
+    o('📚','Học','Bài học theo tuần · dinh dưỡng, tập luyện','hien(\'hoc\')', hocDL && hocDL.conLai > 0 ? hocDL.conLai : ''),
     o('🍽','Hướng dẫn ăn uống','Định mức mỗi ngày · bộ luật · thực đơn','hien(\'anuong\')'),
     o('📈','Lộ trình','6 mốc cân · ảnh và video tiến độ','hien(\'lotrinh\')'),
     o('📝','Bài tập tuần','Trắc nghiệm ôn bài trong tuần','moBaiTap()', r.baiTapDat === false && r.coBaiTap ? '!' : ''),
@@ -1404,7 +1404,7 @@ async function taiHoc(){
     const r = await goi('dsBaiHoc', ten, pin);
     if (r.loi) return;
     hocDL = r; veHoc();
-    const cham = $('#hoc-cham'); if (cham) cham.classList.toggle('hide', !(r.conLai > 0));
+    if (manHien === 'them' && S) veThem(S); // số bài mới hiện ở ô Học trong mục Thêm
   } catch(e){}
 }
 function veHoc(){
