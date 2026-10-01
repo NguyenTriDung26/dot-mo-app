@@ -384,7 +384,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
     <div class="card">
       <p class="k">Ghi nhanh</p>
       <div class="row"><button class="btn ghost" data-ml="250" style="margin:0">+250 ml nước</button><button class="btn ghost" data-ml="500" style="margin:0">+500 ml nước</button></div>
-      <div id="o-can" class="hide"><div class="row" style="margin-top:16px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="Cân sáng lúc đói (kg), vd 63.0" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">Ghi cân</button></div></div>
+      <div id="o-can" class="hide"><div class="row" style="margin-top:16px;align-items:stretch"><input id="in-can" inputmode="decimal" placeholder="Cân nặng hôm nay (kg), vd 63.0" style="flex:1.4"><button class="btn ghost" id="btn-can" style="margin:0;flex:1">Ghi cân</button></div></div>
       <small id="can-hint" style="display:block;margin-top:6px"></small>
       <label style="margin-top:16px">Chụp Dữ Liệu Giấc Ngủ</label>
       <button type="button" class="pick" id="btn-ngu-anh">
@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20260924-091908';
+const APP_VER = '20261001-100616';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2282,15 +2282,13 @@ async function veNguyCo(){
   } catch(e){ ncDaNap = 0; }
 }
 
-// Ô cân chỉ hiện lúc cần: buổi sáng và hôm nay chưa cân (Dũng chốt 23/09 — bớt nút thừa).
-// Cân xong rồi hoặc đã quá trưa thì giấu đi, chiều tối không ai cân nữa.
+// Ô cân LUÔN hiện (Dũng chốt 30/09 — khôi phục).
+// Luật cũ giấu ô cân sau 12h trưa và sau khi đã cân, nên ai mở app buổi chiều là
+// không ghi được cân nữa. Máy chủ chưa bao giờ chặn theo giờ; chỉ giao diện chặn.
+// Dòng nhắc bên dưới do phần vẽ màn hình chính lo, ở đây chỉ mở ô ra.
 function veOCan(){
   const o = $('#o-can'); if (!o) return;
-  const g = new Date().getHours();
-  const daCan = !!(S && S.thongKe && S.thongKe.ngayCanMoi === homNayJS());
-  o.classList.toggle('hide', daCan || g >= 12);
-  const h = $('#can-hint');
-  if (h && daCan && S.thongKe.canMoi) h.textContent = '✓ Sáng nay đã cân ' + S.thongKe.canMoi + ' kg';
+  o.classList.remove('hide');
 }
 function homNayJS(){
   const d = new Date(Date.now() + 7 * 3600e3);
@@ -2886,7 +2884,23 @@ function nhan(r){
   $('#stat').innerHTML = ring(t.diem) + `<div class="big" style="flex:1"><b style="font-size:15px;font-weight:700;color:var(--ink2);line-height:1.5">${t.diem === null ? 'Chưa có bữa nào được chấm hôm nay' : 'Điểm trung bình ' + t.soBua + ' bữa hôm nay'}</b></div>`;
   const canTxt = tk.canMoi ? `<b>${tk.canMoi} kg</b> · xuất phát ${tk.canDau || '?'} kg · <b style="color:${tk.giam > 0 ? 'var(--lime)' : 'var(--amber)'}">${tk.giam > 0 ? '−' : '+'}${Math.abs(tk.giam)} kg</b>${h.mucTieu ? ` / mục tiêu ${h.mucTieu} kg` : ''}${tk.ngayCanMoi ? ` · cân ${tk.ngayCanMoi.slice(5).replace('-', '/')}` : ''}` : `<b>Chưa có số cân.</b> Sáng mai cân đói rồi ghi ở tab Gửi bữa.`;
   $('#can-card').innerHTML = `<p class="k">Cân nặng</p><div style="font-size:15px">${canTxt}</div>`;
-  $('#can-hint').textContent = tk.canMoi ? `Lần cân gần nhất: ${tk.canMoi} kg (${tk.ngayCanMoi})` : 'Cân mỗi sáng thứ 2, lúc đói, sau khi đi vệ sinh.';
+  {
+    // Nói thẳng hôm nay đã cân hay chưa — trước đây chỉ ghi "lần cân gần nhất",
+    // nhìn vào không biết mình còn nợ lần cân nào không.
+    const daCanHomNay = tk.ngayCanMoi === homNayJS();
+    $('#can-hint').textContent = !tk.canMoi
+      ? 'Cân lúc đói, sau khi đi vệ sinh — cùng một giờ mỗi ngày.'
+      : daCanHomNay
+        ? `✓ Hôm nay đã cân ${tk.canMoi} kg · ghi lại nếu cân sai`
+        : `Hôm nay chưa cân · lần gần nhất ${tk.canMoi} kg (${tk.ngayCanMoi})`;
+  }
+  {
+    // Giấc ngủ cũng nói rõ trạng thái, để nhìn một cái là biết còn thiếu gì.
+    const hn = $('#ngu-hint'), ng = t.ngu;
+    if (hn) hn.textContent = ng && ng.gio
+      ? `✓ Hôm nay đã ghi: ngủ ${ng.gio}h${ng.sau ? ' · sâu ' + ng.sau + '%' : ''}`
+      : 'Hôm nay chưa ghi giấc ngủ — chụp màn hình đồng hồ là xong.';
+  }
   const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
     return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
   $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + `` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
