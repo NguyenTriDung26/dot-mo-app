@@ -98,7 +98,7 @@ textarea{min-height:72px;resize:vertical}
 .pd.first{background:var(--vang-nen);box-shadow:inset 0 0 0 2px var(--gold);padding-top:18px}
 .pd .m{font-size:26px}.pd .t{font-weight:800;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pd .p{font-size:22px;font-weight:800;color:var(--gold);line-height:1.1}.pd .s{font-size:11px;color:var(--mute)}
 table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}td,th{padding:10px 6px;border-bottom:1px solid #1e2420;text-align:left}#moc table{font-size:15px}#moc td,#moc th{padding:10px 8px}th{color:var(--mute);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
-td.r,th.r{text-align:right}tr.me td{background:var(--lime-dim);font-weight:800}.bad{color:var(--red);font-size:12px;font-weight:600;margin-left:6px}.okk{color:var(--lime);font-weight:800}
+td.r,th.r{text-align:right}tr.me td{background:var(--lime-dim);font-weight:800}.tagk{display:inline-block;font-size:11px;font-weight:600;color:var(--mute);background:var(--sf2);border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:1px}.bad{color:var(--red);font-size:12px;font-weight:600;margin-left:6px}.okk{color:var(--lime);font-weight:800}
 .log{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log .ic{font-size:22px;line-height:1.2}.log .t{font-size:12px;color:var(--mute);font-weight:600}.log .n{font-weight:800;margin:2px 0}.log .x{font-size:14px;color:var(--ink2)}.tk-ok,.tk-no{margin:6px 0 0;padding-left:0;list-style:none;font-size:14px}.tk-ok li{padding:3px 0;color:var(--lime)}.tk-no li{padding:3px 0;color:var(--amber)}.tk-h{font-weight:800;margin-top:10px;font-size:13px;letter-spacing:.3px}.log .la{display:block;width:100%;max-width:220px;border-radius:10px;margin:6px 0;border:1px solid var(--line)}.log .act{display:flex;gap:6px;margin-top:6px}.log .act button{font:inherit;font-size:13px;font-weight:600;border:0;background:var(--sf2);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer}.log .act button.xoa{color:var(--do-chu2);border-color:var(--do-nen)}
 .lg{border:0;border-radius:10px;margin:8px 0;background:var(--sf2)}.lg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:14px;color:var(--lime);letter-spacing:.03em}.lg summary::-webkit-details-marker{display:none}.lg summary span{font-size:11px;color:var(--mute);font-weight:600}.lg summary::after{content:'▾';color:var(--mute);margin-left:8px}.lg[open] summary::after{content:'▴'}.lm{padding:0 14px 12px}.lt{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;color:var(--ink)}.ld{margin:0;padding-left:20px;font-size:15px;color:var(--ink3);line-height:1.55}.ld li{margin:2px 0}.muc{font-weight:800;margin:14px 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--lime)}.nd{white-space:pre-wrap;font-size:15px;color:var(--ink3);line-height:1.55}
 .err{background:rgba(255,90,90,.12);color:var(--do-chu);border:1px solid rgba(255,90,90,.3);padding:12px;border-radius:10px;margin-top:10px;font-size:14px;font-weight:600}
@@ -448,7 +448,7 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 
   <!-- BẢNG ĐUA -->
   <div id="v-dua" class="hide">
-    <div class="card"><p class="k" id="bang-title">Bảng đua · điểm 7 ngày gần nhất</p><div class="seg hide" id="dua-chon" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"></div><div id="dua-phu" style="font-size:12px;color:var(--mute);margin-bottom:8px"></div><div class="podium" id="podium"></div><table id="bang"></table></div>
+    <div class="card"><p class="k" id="bang-title">Bảng đua · điểm 7 ngày gần nhất</p><div class="seg hide" id="dua-chon" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"></div><div id="dua-phu" style="font-size:12px;color:var(--mute);margin-bottom:8px"></div><div id="dua-toi"></div><div class="podium" id="podium"></div><table id="bang"></table><div id="dua-an" class="nhac"></div></div>
   </div>
 
   <!-- HLV -->
@@ -665,7 +665,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261001-163944';
+const APP_VER = '20261003-103029';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -727,7 +727,6 @@ function hien(v, tuBack){
   if (v === 'chat') { try { lamMoiChat(); } catch(e){} }
   if (v === 'them' && S) { try { veThem(S); } catch(e){} }
   if (v === 'ca' && S) { try { taiCay(); } catch(e){} }
-  if (v === 'dua' && S && S.hlv) { try { xemDuaKhoa(duaKhoa || (S.hv && S.hv.khoa) || ''); } catch(e){} }
   if (v === 'doipin') { ($('#btn-dp-huy')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !!(S && S.hv.phaiDoiPin)); $('#doipin-sub').textContent = S && S.hv.phaiDoiPin ? 'Bạn đang dùng PIN chung. Đổi sang số của riêng bạn để không ai vào nhầm.' : 'Đổi PIN đăng nhập của bạn.'; $('#dp-cu').value = pin; $('#dp-moi').value = $('#dp-moi2').value = ''; ($('#dp-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); }
   if (v === 'huongdan') veHuongDan(); if (v === 'hoso') doHoSoVaoForm();
   window.scrollTo(0,0);
@@ -876,10 +875,24 @@ function veBangDua(DS, TOI){
   TOI = TOI || (S && S.hv ? S.hv.ten : '');
   const bd = DS; const medal = ['🥇','🥈','🥉'];
   const kg = x => x.giam ? (x.giam > 0 ? '−' : '+') + Math.abs(x.giam) + ' kg' : '';
-  const pd = i => bd[i] ? `<div class="pd ${i===0?'first':''}"><div class="m">${medal[i]}</div><div class="p">${bd[i].diemTuan}</div><div class="t">${esc(bd[i].ten)}</div><div class="s">🔥${bd[i].streak}${kg(bd[i]) ? ' · ' + kg(bd[i]) : ''}</div></div>` : '<div></div>';
+  const pd = i => bd[i] ? `<div class="pd ${i===0?'first':''}"><div class="m">${medal[i]}</div><div class="p">${bd[i].diemTuan}</div><div class="t">${esc(bd[i].ten)}</div><div class="s">${bd[i].khoa ? esc(bd[i].khoa) + ' · ' : ''}🔥${bd[i].streak}${kg(bd[i]) ? ' · ' + kg(bd[i]) : ''}</div></div>` : '<div></div>';
   $('#podium').innerHTML = pd(1) + pd(0) + pd(2);
   $('#bang').innerHTML = '<tr><th>#</th><th>Tên</th><th class="r">Điểm</th><th class="r">Chuỗi</th><th class="r">Kg</th><th class="r">Nay</th></tr>' +
-    bd.map((x, i) => `<tr class="${x.ten === TOI ? 'me' : ''}"><td>${i+1}</td><td>${esc(x.ten)}</td><td class="r">${x.diemTuan}</td><td class="r">🔥${x.streak}</td><td class="r">${kg(x) || '–'}</td><td class="r">${x.buaHomNay}/3</td></tr>`).join('');
+    bd.map((x, i) => `<tr class="${x.ten === TOI ? 'me' : ''}"><td>${i+1}</td><td style="white-space:nowrap">${esc(x.ten)}${x.khoa ? `<span class="tagk">${esc(x.khoa)}</span>` : ''}</td><td class="r">${x.diemTuan}</td><td class="r">🔥${x.streak}</td><td class="r">${kg(x).replace(' kg', '') || '–'}</td><td class="r">${x.buaHomNay}/3</td></tr>`).join('');
+}
+
+// ----- Bảng đua chung (03/10): mọi khoá một bảng · 7 ngày không gửi bữa thì ẩn · gửi đủ 3 ngày thì về -----
+function veDuaPhu(r){
+  const t = r.duaCuaToi, an = r.dsAnDua, soAn = an ? an.length : (r.soAnDua || 0);
+  const ddmm = s => String(s).slice(8,10) + '/' + String(s).slice(5,7);
+  $('#dua-phu').innerHTML = `Mọi khoá chung một bảng · <b>${(r.bangDua || []).length}</b> người đang đua`;
+  let toi = '';
+  if (t && t.an) toi = `<div class="warn">Bạn đang tạm rời đường đua vì ${t.nAn} ngày liền chưa gửi bữa. Gửi bữa đủ <b>${t.nVe} ngày</b> là trở lại bảng — đã có <b>${t.ve}/${t.nVe}</b>.<br><button class="btn sm" onclick="hien('gui')" style="margin:10px 0 0">Gửi bữa ngay</button></div>`;
+  else if (t && t.hanChot && t.nAn - t.vang <= 3) toi = `<div class="warn">⏳ ${t.vang} ngày chưa gửi bữa. Hạn chót giữ chỗ trên bảng: <b>hết ngày ${ddmm(t.hanChot)}</b>.</div>`;
+  $('#dua-toi').innerHTML = toi;
+  $('#dua-an').innerHTML = !soAn ? ''
+    : an ? `<b>Đang ẩn (${soAn})</b> · gửi bữa đủ 3 ngày là hiện lại<br>` + an.map(x => `<span style="white-space:nowrap">${esc(x.ten)}<span class="tagk">${esc(x.khoa)}</span> ${x.ve}/3</span>`).join(' · ')
+    : `${soAn} người đang tạm rời đường đua · ai gửi bữa đủ 3 ngày sẽ trở lại bảng.`;
 }
 
 // ----- HLV chuyển giữa các cuộc đua K1…K9 -----
@@ -1091,7 +1104,7 @@ function damTag(t){
 // Câu hỏi y tế (thuốc, bệnh nền, thai kỳ) máy tự từ chối và đẩy sang HLV.
 const AI_GOIY = ['Chững cân 4 ngày rồi, làm sao?', 'Tối nay đi ăn cưới thì sao?',
   'Không mua được đỗ thì thay gì?', 'Sáng nay đói quá, ăn thêm được không?',
-  'Tập gym xong có cần ăn thêm?', 'Sữa chua ăn lúc nào tốt nhất?'];
+  'Tập gym xong có cần ăn thêm?', 'Sáng ăn gì cho đủ 30 g protein?'];
 
 function veTinAI(ds){
   const el = $('#ai-khung'); if (!el) return;
@@ -1933,10 +1946,10 @@ function veDinhMuc(r){
       </div></div>
 
     <details class="lg" open><summary>Chia ra từng bữa<span>4 bữa</span></summary><div style="padding:0 14px 12px">
-    ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 1 hộp sữa chua không đường + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
+    ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 100 g đậu phụ + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
     ${bua('12:00', 'Trưa', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
     ${bua('17:00', 'Chiều (chỉ khi đi tập)', '100 g đậu + 100 g thịt nạc', '<b style="color:#c2410c">CHỈ ăn bữa này nếu hôm đó có đi tập.</b> Không tập thì bỏ hẳn, không ăn bù sang bữa khác.')}
-    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h. Thêm 1 hộp sữa chua không đường trước 21h.')}
+    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h. Sau 20h dừng ăn.')}
 
     </div></details>
     <details class="lg"><summary>Quy đổi nhanh<span>đổi món</span></summary>
@@ -2915,11 +2928,12 @@ function nhan(r){
   const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
     return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
   $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + `` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
-  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.soSuaChua >= 2 ? '✅' : t.soSuaChua ? '🟡' : '⬜'} Sữa chua không đường (${t.soSuaChua || 0}/2 hộp)${t.soSuaChua && !t.suaChuaSang ? ' · chưa có ở bữa sáng' : ''}</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span>${tk.gymTuan ? `<span>✅ Gym tuần này ${tk.gymTuan}/2</span>` : ''}<span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa chụp dữ liệu giấc ngủ (chuẩn 7 h · sâu 20% · REM 20%)'}</span>${h.kcalMucTieu ? `<span>🎯 Nạp tối đa ${h.kcalMucTieu} kcal/ngày</span>` : ''}</div>`;
+  $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span>${tk.gymTuan ? `<span>✅ Gym tuần này ${tk.gymTuan}/2</span>` : ''}<span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa chụp dữ liệu giấc ngủ (chuẩn 7 h · sâu 20% · REM 20%)'}</span>${h.kcalMucTieu ? `<span>🎯 Nạp tối đa ${h.kcalMucTieu} kcal/ngày</span>` : ''}</div>`;
   $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
 
   veBangDua(r.bangDua, h.ten);
-  { const bt = $('#bang-title'); if (bt) bt.textContent = 'Bảng đua' + (h.vaiTro === 'HLV' ? ' · tất cả khoá' : (h.khoa ? ' · ' + h.khoa : '')) + ' · điểm 7 ngày gần nhất'; }
+  veDuaPhu(r);
+  { const bt = $('#bang-title'); if (bt) bt.textContent = 'Bảng đua chung · điểm 7 ngày gần nhất'; }
   if (r.feedHomNay) { ($('#feed-card')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); $('#feed').innerHTML = r.feedHomNay.length ? r.feedHomNay.map(l => dongLog(l, true)).join('') : '<p><small>Chưa ai gửi bữa nào. Gửi trước để dẫn đầu!</small></p>'; }
 
   const thieu = h.hoSoDu === false || !(h.canNang && h.cao && h.namSinh && (h.phanTramMo || h.moNhap));
@@ -3016,7 +3030,6 @@ function tongKetNgay(h, t, tk, gio){
   const soBua = t.soBua || 0, m = x => Math.max(x, 1);
   (soBua >= 3 ? ok : no).push(soBua >= 3 ? 'Đủ 3 bữa ghi sổ' : 'Mới ghi ' + soBua + '/3 bữa — mai ghi đủ, chấm mới đúng');
   if (soBua) (t.damSang >= 30 ? ok : no).push(t.damSang >= 30 ? 'Bữa sáng đủ ' + t.damSang + ' g protein' : 'Bữa sáng mới ' + t.damSang + ' g protein (cần 30 g)');
-  (t.suaChua ? ok : no).push(t.suaChua ? 'Có sữa chua không đường' : 'Chưa có sữa chua không đường bữa sáng');
   (t.protein >= h.dam ? ok : no).push(t.protein >= h.dam ? 'Protein đủ ' + t.protein + '/' + h.dam + ' g' : 'Protein ' + t.protein + '/' + h.dam + ' g — thiếu ' + (h.dam - t.protein) + ' g');
   (t.dau >= h.dau ? ok : no).push(t.dau >= h.dau ? 'Đậu đủ ' + t.dau + ' g' : 'Đậu ' + t.dau + '/' + h.dau + ' g');
   (t.rau >= h.rau ? ok : no).push(t.rau >= h.rau ? 'Rau đủ ' + t.rau + ' g' : 'Rau ' + t.rau + '/' + h.rau + ' g');
@@ -3139,9 +3152,10 @@ const MOCK = (() => {
   const hv = {ten:'Anh Tú', pin:'1002', vaiTro:'HV', gioiTinh:'Nam', canNang:74, mucTieu:-5, dam:163, dau:150, rau:400, tinhBot:0, nuoc:3, luuY:'', mo:18.5, moNhap:0, cao:170, namSinh:1992, phanTramMo:25, thamHut:1258, bmr:1637, tdee:2292, kcalMucTieu:1637, giamTuanDuKien:1.14, giamTuanMucTieu:0.83, bmi:25.6, canDich:69, moDich:18, anhBody:'', videoBody:'', hoSoDu:false, vongEo:0, bapTay:0, bapDui:0, hoTen:'', dinhMuc:null, phaiDoiPin:false};
   let logs = [{thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'sang', moTa:'2 trứng, 200g đậu đũa, 200g đu đủ', den:'do', mon:'Trứng + đậu đũa + đu đủ', nhanXet:'Đu đủ là hoa quả ngọt b ơi, insulin lên cao là mỡ bị khoá lại. Trứng với đậu đũa ổn.', thayThe:'Bỏ đu đủ, thêm 2 trứng hoặc 100g ức gà. Muốn ngọt thì dưa chuột, cà chua.', dam:110, dau:0, rau:200, tinhBot:0, nuoc:0, viPham:'hoa quả ngọt', diem:3, protein:14}];
   const st = (kq) => { const t = {ngu:null,kcal:0,dam:0,protein:0,dau:0,rau:0,tinhBot:0,nuoc:0,soBua:0,diem:null,damSang:0,nuocChanh:0,diBo:0,nhai:0,gym:0,suaChua:false}; const ds=[]; logs.forEach(l=>{t.dam+=l.dam;t.protein+=(l.protein||0);t.dau+=l.dau;t.rau+=l.rau;t.tinhBot+=l.tinhBot;t.nuoc+=l.nuoc; if(l.bua==='gym'){t.gym++;return;} if(l.bua==='ngu'){t.ngu={gio:l.nguGio,sau:l.nguSau,rem:l.nguRem,den:l.den};return;} if(l.bua!=='nuoc'){t.soBua++; if(l.diem!=null) ds.push(l.diem); if(l.bua==='sang') t.damSang+=(l.protein||0); if(l.nuocChanh) t.nuocChanh++; if(l.diBo) t.diBo++; if(l.nhai) t.nhai++;}}); if(ds.length) t.diem=Math.round(ds.reduce((a,b)=>a+b,0)/ds.length*10)/10;
-    return {feedHomNay: [...logs, {thoiGian:new Date(Date.now()-3600e3).toISOString(), ten:'Thái Hưng', ngay:'2026-09-03', bua:'sang', moTa:'4 trứng luộc, sữa chua không đường, 150g đỗ đen', den:'xanh', mon:'Trứng + đỗ đen + sữa chua', nhanXet:'Chuẩn đĩa sáng rồi b. Đủ 30g protein, có sữa chua.', thayThe:'', diem:9, anh:'https://drive.google.com/file/d/1AbCdEf/view'}, {thoiGian:new Date(Date.now()-7200e3).toISOString(), ten:'Tiến Dũng', ngay:'2026-09-03', bua:'sang', moTa:'trứng ốp và rau', den:'vang', mon:'Trứng ốp + rau', nhanXet:'Ổn nhưng mình không biết bao nhiêu trứng b ạ. Lần sau cân từng món bằng cân bếp rồi ghi gram nhé.', thayThe:'', diem:6}].reverse(), hv, tuan:1, tuanCoAnh: Object.fromEntries(Object.keys(MOCK_ANH).map(k => [k, '2026-09-04'])), tuanCoVideo: MOCK_VIDEO, homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
+    return {feedHomNay: [...logs, {thoiGian:new Date(Date.now()-3600e3).toISOString(), ten:'Thái Hưng', ngay:'2026-09-03', bua:'sang', moTa:'4 trứng luộc, 100g đậu phụ, 150g đỗ đen', den:'xanh', mon:'Trứng + đậu phụ + đỗ đen', nhanXet:'Chuẩn đĩa sáng rồi b. Đủ 30g protein.', thayThe:'', diem:9, anh:'https://drive.google.com/file/d/1AbCdEf/view'}, {thoiGian:new Date(Date.now()-7200e3).toISOString(), ten:'Tiến Dũng', ngay:'2026-09-03', bua:'sang', moTa:'trứng ốp và rau', den:'vang', mon:'Trứng ốp + rau', nhanXet:'Ổn nhưng mình không biết bao nhiêu trứng b ạ. Lần sau cân từng món bằng cân bếp rồi ghi gram nhé.', thayThe:'', diem:6}].reverse(), hv, tuan:1, tuanCoAnh: Object.fromEntries(Object.keys(MOCK_ANH).map(k => [k, '2026-09-04'])), tuanCoVideo: MOCK_VIDEO, homNay:'2026-09-03', ngayBatDau:'2026-09-01', buocTuan:0.83, lichSu:Array.from({length:42},(_,i)=>({i:i+1, ngay:'2026-'+(i<29?'09-'+String(i+1).padStart(2,'0'):'10-'+String(i-28).padStart(2,'0')), diem:i<2?[7.5,9][i]:i===2?t.diem:null, soBua:i<2?3:i===2?t.soBua:0, kcal:0, protein:0, can:i===0?74:i===2?72.6:0, tuongLai:i>2, homNay:i===2})), loTrinh:[1,2,3,4,5,6].map(k=>({tuan:k, ngay:'2026-09-'+String(1+7*k).padStart(2,'0'), moc:Math.round((74-0.83*k)*10)/10, thucTe:k===1?72.6:0, dat:k===1?true:null, daQua:false})), tenGame:'Game Đốt Mỡ 6 Tuần (bản xem thử)', coKhoa:true, thongKe:{streak:2, diemTuan:14.5, ngayCoDiem:2, gymTuan:t.gym, canDau:74, canMoi:72.6, giam:1.4, soLanCan:2, ngayCanMoi:'2026-09-03', cans:[{ngay:'2026-09-01',kg:74},{ngay:'2026-09-03',kg:72.6}], homNay:t}, logsHomNay:[...logs].reverse(),
       luat:[{muc:'5 quy tắc',tuan:0,noiDung:'1) BỎ tinh bột. 2) Lặp lại bữa ăn phù hợp. 3) Không uống calo. 4) Không hoa quả ngọt. 5) Một ngày ăn xả mỗi 7–10 ngày.'},{muc:'Thói quen 2 · Sau ăn',tuan:0,noiDung:'SAU mỗi bữa: 1 ly nước chanh loãng + đi bộ 100 bước.'},{muc:'Cam kết tuần',tuan:0,noiDung:'Mỗi tuần bạn tự viết cam kết trong tab Lộ trình.'}], camKet: CAMKET.slice(),
-      bangDua:[{ten:'Thái Hưng',diemTuan:26,streak:3,buaHomNay:2,giam:4},{ten:'Anh Tú',diemTuan:14.5,streak:2,buaHomNay:t.soBua,giam:1.4},{ten:'Tiến Dũng',diemTuan:12,streak:1,buaHomNay:2},{ten:'Chị Ngát',diemTuan:0,streak:0,buaHomNay:0}], ketQua:kq}; };
+      bangDua:[{ten:'Thái Hưng',khoa:'K1',diemTuan:26,streak:3,buaHomNay:2,giam:4},{ten:'Anh Tú',khoa:'K1',diemTuan:14.5,streak:2,buaHomNay:t.soBua,giam:1.4},{ten:'Tiến Dũng',khoa:'K2',diemTuan:12,streak:1,buaHomNay:2},{ten:'Chị Ngát',khoa:'K3',diemTuan:0,streak:0,buaHomNay:0}],
+      soAnDua:2, duaCuaToi:{an:false,vang:0,ve:0,nAn:7,nVe:3,hanChot:''}, ketQua:kq}; };
   const cham = (bua, moTa) => { const x = /kfc|xúc xích|chiên xù|cơm|bún|phở|trà sữa|bánh ngọt/i.test(moTa); const kq = x ? {den:'do',diem:2,mon:'Đồ chiên/tinh bột trắng',nhanXet:'Cái này dính luật đạm rồi b: chiên xù + tinh bột, dầu chiên lại. Ăn xong insulin lên, mỡ không đốt được.',thayThe:'Gà luộc hoặc áp chảo dầu oliu 150g + 100g đỗ đen + rau cải.',conThieu:'đạm 110g, đậu 150g, rau 200g',dam:80,protein:18,dau:0,rau:0,tinhBot:60,may:'mock · 1s'} : {den:'xanh',diem:9,mon:'Đạm + đậu + rau',nhanXet:'Chuẩn đĩa rồi b. Đạm đủ, có đậu, có rau.',thayThe:'',conThieu:'đạm 60g',dam:150,protein:35,dau:100,rau:200,tinhBot:0,may:'mock · 1s'};
     logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua, moTa, den:kq.den, mon:kq.mon, nhanXet:kq.nhanXet, thayThe:kq.thayThe, dam:kq.dam, protein:kq.protein, dau:kq.dau, rau:kq.rau, tinhBot:kq.tinhBot, nuoc:0, viPham:'', diem:kq.diem}); return kq; };
   const CAMKET = []; const MOCK_ANH = {}; const MOCK_CHO = {}; const MOCK_VIDEO = {}; let mockVidTuan = 0;
@@ -3170,7 +3184,7 @@ const MOCK = (() => {
     guiAnhTuan:(t,p,anh) => { MOCK_ANH[1] = anh; const x = st(); x.anhVuaLuu = 1; return wait(x); },
     layAnhTienDo:(t,p) => wait({ ten: hv.ten, tuanHienTai: 1, ds: Object.keys(MOCK_ANH).map(k => ({ tuan: Number(k), ngay: '2026-09-04', thumb: { truoc: 'data:image/jpeg;base64,' + MOCK_ANH[k].truoc.thumb, nghieng: 'data:image/jpeg;base64,' + MOCK_ANH[k].nghieng.thumb, sau: 'data:image/jpeg;base64,' + MOCK_ANH[k].sau.thumb }, url: {} })) }),
     capNhatHoSo:(t,p,hs) => { if (hs.anh) MOCK_ANH[0] = hs.anh; Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anh ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
-      Object.assign(hv, tranGiamJS(hv.canNang, hv.cao, hv.namSinh, /n[uữ]/i.test(hv.gioiTinh), hv.phanTramMo, hv.mo)); hv.kcalMucTieu = Math.max(hv.bmr, hv.tdee - hv.thamHut); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 1 hộp sữa chua không đường + 100 g rau',protein:32,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
+      Object.assign(hv, tranGiamJS(hv.canNang, hv.cao, hv.namSinh, /n[uữ]/i.test(hv.gioiTinh), hv.phanTramMo, hv.mo)); hv.kcalMucTieu = Math.max(hv.bmr, hv.tdee - hv.thamHut); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 100 g đậu phụ + 100 g rau',protein:34,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
       const x = st(); x.hoSoVuaLuu = true; return wait(x); },
     ghiNgu:(t,p,g,sa,re) => { g=Number(g); const ph=Math.round(g*60); const sp=Number(sa)||0, rp=Number(re)||0; const sa2=Math.round(sp/ph*100), re2=Math.round(rp/ph*100); const dat=(g>=7?1:0)+(sa2>=20?1:0)+(re2>=20?1:0); logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'ngu', moTa:'Ngủ '+g+' h · sâu '+sp+' phút ('+sa2+'%) · REM '+rp+' phút ('+re2+'%)', nhanXet:'Chất lượng giấc ngủ: '+(dat===3?'TỐT':dat===2?'KHÁ':'KÉM')+' ('+dat+'/3 tiêu chí).', den: dat===3?'xanh':dat>=1?'vang':'do', nguGio:g, nguSau:sa2, nguRem:re2, dam:0,dau:0,rau:0,tinhBot:0,nuoc:0}); return wait(st()); },
     ghiGym:() => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'gym', dam:0,dau:0,rau:0,tinhBot:0,nuoc:0, diem:null}); return wait(st()); },
