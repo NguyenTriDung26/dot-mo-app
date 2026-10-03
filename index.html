@@ -190,6 +190,14 @@ small{color:var(--mute)}
 .card.thu>*:not(.k){display:none!important}
 .card.thu-duoc>.k .tt{font-size:13px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:500;margin-left:auto;white-space:nowrap;flex:0 0 auto}
 .toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--tren-nhan);font-weight:800;padding:10px 18px;border-radius:999px;z-index:30;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+/* Pháo hoa chúc mừng phá kỷ lục cân (03/10) — phủ cả màn hình, không chặn bấm */
+#phao-hoa{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9500;display:none}
+.bang-phao{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 12px);max-width:520px;margin:0 auto;z-index:9600;background:var(--sf);border-radius:14px;border-left:5px solid var(--cam);box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px 14px 12px 12px;display:flex;gap:10px;align-items:flex-start;transform:translateY(-160%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);cursor:pointer}
+.bang-phao.on{transform:none}
+.bang-phao .bp-ic{font-size:26px;line-height:1}
+.bang-phao .bp-t{font-weight:800;font-size:15px;line-height:1.3;color:var(--ink)}
+.bang-phao .bp-s{font-size:13px;color:var(--ink2);margin-top:2px}
+.bang-phao .bp-s b{color:var(--cam);font-family:var(--font-so);font-size:15px}
 .toast.on{opacity:1}
 @media (max-width:400px){.brand{font-size:18px}.chip{padding:0 10px;font-size:11px}}
 
@@ -612,6 +620,8 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
   <button data-m="dangxuat" class="do" id="mn-dx">Đăng xuất</button>
 </div>
 <div class="toast" id="toast"></div>
+<canvas id="phao-hoa"></canvas>
+<div class="bang-phao" id="bang-phao"><div class="bp-ic">🎆</div><div><div class="bp-t" id="bp-t"></div><div class="bp-s" id="bp-s"></div></div></div>
 <div class="tabs hide" id="tabs">
   <button data-v="gui" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Gửi bữa</button>
   <button data-v="homnay" style="position:relative"><span class="ic"><svg class="ic-s" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-11"/></svg></span>Hôm nay</button>
@@ -665,7 +675,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261003-103029';
+const APP_VER = '20261003-183428';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2614,6 +2624,317 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// ---------- PHÁO HOA chúc mừng phá kỷ lục cân — Dũng duyệt bản xem thử 03/10 (xem-thu-phao-hoa.html) ----------
+// Kiểu "bắn chùm" như các đại hội pháo hoa (Dũng gửi ảnh mẫu 03/10):
+//   · cúc lớn nở chồng lên nhau thành chùm — tia sáng dài toả từ tâm, viền một màu, lõi một màu
+//   · quả "mẹ bồng con": nổ ra một chùm hạt, mỗi hạt bay ra rồi tự nở thành bông nhỏ khác màu
+//   · kim tuyến vàng rắc tàn lửa
+// Kịch bản 3 giây: mở màn 3 bông → mẹ bồng con + chữ số kg → hai cánh → chữ vỡ đúng lúc chùm kết 8 quả nổ.
+// Không dùng thư viện ngoài. Có trần số hạt, máy yếu tự hạ để khỏi giật.
+let dangBan = false;
+function banPhaoHoa(o){
+  o = o || {};
+  const ms = o.ms || 3000;
+  if (dangBan) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#phao-hoa'); cv.style.display = 'block';
+  const W = cv.clientWidth, H = cv.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (!W || !H) { cv.style.display = 'none'; return; }   // màn hình chưa hiện (tab ẩn, đang thu nhỏ) thì thôi
+  dangBan = true;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const tam = () => { const c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); return [c, x]; };
+  const [lop, f] = tam();   // lớp lưu ảnh: tia lửa, kim tuyến, đầu quả pháo — phai dần nên có đuôi
+  const [vet, v] = tam();   // lớp tia: tia cúc toả từ tâm — vẽ lại mỗi khung
+  // Lớp chói: thu nhỏ còn 1/4 rồi phóng to lại → nhoè ra như ánh sáng chói vào mắt
+  const loa = document.createElement('canvas'); loa.width = Math.ceil(W / 4); loa.height = Math.ceil(H / 4);
+  const fl = loa.getContext('2d');
+  // Cỡ pháo theo cả bề ngang lẫn bề cao: màn thấp (điện thoại xoay ngang) thì bông nhỏ lại, không tràn lên chữ
+  const co = Math.max(0.7, Math.min(Math.min(W, 520) / 375, H / 700));
+  const ngau = (a, b) => a + Math.random() * (b - a);
+  const yeu = (navigator.hardwareConcurrency || 4) <= 4;
+  let tran = yeu ? 1600 : 2600, tranSao = yeu ? 1700 : 2600;
+
+  // Màu theo hoá chất pháo thật: đỏ stronti, cam canxi, vàng natri, xanh bari, lam đồng, tím, bạc
+  const MAU = { do: [255, 52, 40], cam: [255, 128, 28], vang: [255, 196, 64], xanh: [70, 255, 140],
+    lam: [70, 150, 255], tim: [180, 90, 255], hong: [255, 80, 170], bac: [235, 240, 255], trang: [255, 250, 235] };
+  const BO = ['do', 'cam', 'vang', 'xanh', 'lam', 'tim', 'hong'];
+  // Cặp màu viền – lõi lấy theo ảnh mẫu: hồng/tím, đỏ/bạc, cam/vàng, xanh/hồng…
+  const CAP = [['hong', 'tim'], ['do', 'bac'], ['cam', 'vang'], ['xanh', 'hong'], ['lam', 'bac'], ['tim', 'vang'], ['do', 'tim'], ['vang', 'lam']];
+  const dom = {};
+  const domMau = m => {
+    if (dom[m]) return dom[m];
+    const c = document.createElement('canvas'), s = 48; c.width = c.height = s;
+    const x = c.getContext('2d'), [r, gg, b] = MAU[m];
+    const gr = x.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,1)');
+    gr.addColorStop(0.16, `rgba(${r},${gg},${b},1)`);
+    gr.addColorStop(0.42, `rgba(${r},${gg},${b},.32)`);
+    gr.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+    x.fillStyle = gr; x.fillRect(0, 0, s, s);
+    return (dom[m] = c);
+  };
+  const rung = x => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(x); } catch (e) {} };
+
+  const Q = (t, x, kieu, cao, to) => ({ t, kieu, to: to || 1, x0: W * (x + ngau(-0.025, 0.025)), y0: H + 8, y1: H * cao,
+    d: ngau(330, 420), lech: ngau(-8, 8) * co, no: false, cap: CAP[(Math.random() * CAP.length) | 0] });
+  // Sân khấu chia tầng: dải trời 0,2–0,34 để dành cho CHỮ từ 0,8 s tới 1,8 s — không quả nào nổ đè lên.
+  // Chùm kết bắn lúc chữ đã hiện rõ, nổ đúng lúc chữ vỡ ra thành mưa lửa.
+  const qua = [
+    Q(0, 0.22, 'cuc', 0.5), Q(60, 0.78, 'cuc', 0.48), Q(120, 0.5, 'kim', 0.52),                  // mở màn: 3 bông tầng giữa
+    Q(300, 0.5, 'chum', 0.64),                                                                    // mẹ bồng con tầng dưới
+    Q(380, 0.5, o.chu ? 'chu' : 'cuc', Math.max(0.27, 175 / H), 1.1),                            // chữ số kg tầng trên, luôn dưới băng thông báo
+    Q(700, 0.14, 'cuc', 0.56, 0.85), Q(760, 0.86, 'cuc', 0.56, 0.85),                             // hai cánh
+    Q(1300, 0.2, 'cuc', 0.3, 1.15), Q(1340, 0.8, 'cuc', 0.3, 1.15), Q(1380, 0.5, 'kim', 0.22, 1.1),   // chùm kết
+    Q(1420, 0.36, 'cuc', 0.5), Q(1460, 0.5, 'chum', 0.62), Q(1500, 0.64, 'cuc', 0.48),
+    Q(1540, 0.08, 'kim', 0.56, 0.9), Q(1580, 0.92, 'cuc', 0.56, 0.9),
+  ];
+  const hat = [], sao = [], giong = [], loe = [], chu = [];
+  const them = (x, y, vx, vy, mau, tc) => { if (hat.length < tran) hat.push(Object.assign({ x, y, vx, vy, mau, sinh: 0, song: 400, keo: 0.92, nang: 0.04, to: 5 }, tc)); };
+  const themSao = (x, y, vx, vy, mau, tc) => { if (sao.length < tranSao) sao.push(Object.assign({ x, y, ox: x, oy: y, vx, vy, mau, sinh: 0, song: 1200, keo: 0.955, nang: 0.028, w: 2 }, tc)); };
+  // Hướng ngẫu nhiên trên mặt cầu rồi chiếu xuống: mép dày, giữa thưa — y như bông cúc thật
+  const cau = (x, y, t, n, vmax, mau, tc) => {
+    for (let i = 0; i < n; i++) {
+      const z = ngau(-1, 1), goc = ngau(0, Math.PI * 2), r = Math.sqrt(1 - z * z), s = vmax * ngau(0.92, 1);
+      themSao(x, y, Math.cos(goc) * r * s, Math.sin(goc) * r * s, mau, Object.assign({ sinh: t, song: ngau(1000, 1350), dau: Math.random() < 0.25 }, tc));
+    }
+  };
+  const loeLen = (x, y, t, r, mau, manh) => loe.push({ x, y, sinh: t, r: r * co, mau, manh: manh || 1 });
+
+  // Quả viết chữ: vẽ chữ ra một tấm ẩn, lấy toạ độ các điểm sáng làm đích cho từng hạt
+  const vietChu = (x, y, t) => {
+    const s = String(o.chu || '').trim(); if (!s) return;
+    const c = document.createElement('canvas'), x2 = c.getContext('2d');
+    const kieuChu = px => `700 ${px}px "Barlow Condensed", Barlow, Arial, sans-serif`;
+    x2.font = kieuChu(100);
+    const fs = Math.min(H * 0.15, 100 * (W * 0.86) / Math.max(1, x2.measureText(s).width));
+    c.width = Math.ceil(W); c.height = Math.ceil(fs * 1.3);
+    x2.font = kieuChu(fs); x2.textAlign = 'center'; x2.textBaseline = 'middle'; x2.fillStyle = '#fff';
+    x2.fillText(s, c.width / 2, c.height / 2);
+    const d = x2.getImageData(0, 0, c.width, c.height).data;
+    let buoc = 3, diem;
+    do {
+      diem = [];
+      for (let yy = 0; yy < c.height; yy += buoc) for (let xx = 0; xx < c.width; xx += buoc)
+        if (d[(yy * c.width + xx) * 4 + 3] > 140) diem.push([xx, yy]);
+      buoc++;
+    } while (diem.length > 520 && buoc < 12);
+    const ox = W / 2 - c.width / 2, oy = y - c.height / 2;
+    for (const [xx, yy] of diem) chu.push({ tx: ox + xx, ty: oy + yy, sx: x, sy: y, x, y, sinh: t,
+      toi: ngau(360, 480), giu: t + ngau(980, 1080), mau: Math.random() < 0.22 ? 'cam' : 'vang', pha: ngau(0, 6.28) });
+  };
+
+  const no = (q, t, x, y) => {
+    const [m1, m2] = q.cap;
+    rung(q.to > 1 || q.kieu === 'chu' ? 30 : 16);
+    if (q.kieu === 'cuc') {
+      loeLen(x, y, t, 130 * q.to, m1, q.to);
+      const v0 = ngau(4.6, 5.3) * co * q.to;
+      cau(x, y, t, 130, v0, m1, { lap: Math.random() < 0.5 });             // viền: tia dài, nửa số bông lấp lánh ở mép
+      cau(x, y, t, 44, v0 * 0.45, m2, { song: ngau(700, 900) });          // lõi khác màu
+    } else if (q.kieu === 'kim') {
+      loeLen(x, y, t, 140 * q.to, 'vang', 1.2);
+      cau(x, y, t, 150, ngau(4.8, 5.4) * co * q.to, 'vang', { song: ngau(1400, 1800), keo: 0.95, nang: 0.034, tan: true });
+    } else if (q.kieu === 'chum') {
+      loeLen(x, y, t, 90, 'bac', 0.8);
+      const n = 7, lech = ngau(0, 6.28);
+      for (let i = 0; i < n; i++) {
+        const a = lech + i / n * Math.PI * 2, s = ngau(3.2, 3.8) * co;
+        giong.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, sinh: t, tach: ngau(300, 380), mau: BO[(Math.random() * BO.length) | 0] });
+      }
+    } else if (q.kieu === 'chu') {
+      loeLen(x, y, t, 160, 'vang', 1.5);
+      vietChu(x, y, t);
+      // Tia của chính quả này tắt nhanh (≈ 0,45 s) để lúc chữ thành hình thì trời quanh chữ đã sạch
+      cau(x, y, t, 110, ngau(5.2, 5.8) * co, 'vang', { song: ngau(380, 520) });
+      cau(x, y, t, 40, 2.6 * co, m1, { song: ngau(320, 450) });
+    }
+  };
+
+  // Gom các nét cùng màu, cùng độ sáng vào một lượt vẽ — vài trăm nghìn nét vẫn mượt trên điện thoại
+  const xo = new Map();
+  const ve = (mau, a, w, x1, y1, x2, y2) => {
+    const ai = Math.min(8, Math.round(a * 8)); if (ai <= 0) return;
+    const key = mau + '|' + ai + '|' + w;
+    let m = xo.get(key); if (!m) xo.set(key, (m = []));
+    m.push(x1, y1, x2, y2);
+  };
+
+  let t0 = 0, truoc = 0;
+  const khung = now => {
+    if (!t0) { t0 = now; truoc = now; }
+    const t = now - t0, k = Math.min(3, (now - truoc) / 16.67); truoc = now;
+    const mo = t < 240 ? t / 240 : t > ms - 550 ? Math.max(0, (ms - t) / 550) : 1;
+    if (k > 1.7 && t > 200) { tran = Math.max(800, tran - 120); tranSao = Math.max(1000, tranSao - 120); }
+
+    // ---- 1. Lớp lưu ảnh ----
+    f.globalCompositeOperation = 'destination-out';
+    f.fillStyle = 'rgba(0,0,0,' + Math.min(1, 0.2 * k) + ')'; f.fillRect(0, 0, W, H);
+    f.globalCompositeOperation = 'lighter';
+
+    for (const q of qua) {
+      if (q.no || t < q.t) continue;
+      const p = Math.min(1, (t - q.t) / q.d), e = 1 - Math.pow(1 - p, 2.4);
+      const x = q.x0 + q.lech * e + Math.sin(p * 18) * 0.6 * co, y = q.y0 + (q.y1 - q.y0) * e;
+      // Đuôi lửa liền mạch như sao chổi
+      const px = q.px === undefined ? x : q.px, py = q.py === undefined ? y : q.py; q.px = x; q.py = y;
+      for (let j = 0; j < 4; j++) {
+        const u = j / 4, sx = px + (x - px) * u, sy = py + (y - py) * u;
+        f.drawImage(domMau('trang'), sx - 3 * co, sy - 3 * co, 6 * co, 6 * co);
+        if (Math.random() < 0.6) them(sx, sy, ngau(-0.6, 0.6) * co, ngau(0.2, 1.2) * co, 'vang', { sinh: t, song: ngau(150, 320), keo: 0.9, nang: 0.05, to: 4.5 });
+      }
+      f.drawImage(domMau('vang'), x - 7 * co, y - 7 * co, 14 * co, 14 * co);
+      if (p >= 1) { q.no = true; no(q, t, x, y); }
+    }
+
+    // Hạt giống của quả mẹ bồng con: bay ra, rắc tàn, tới giờ thì nở thành bông nhỏ
+    for (let i = giong.length - 1; i >= 0; i--) {
+      const s = giong[i], tuoi = t - s.sinh, kk = Math.pow(0.95, k);
+      s.vx *= kk; s.vy = s.vy * kk + 0.03 * co * k; s.x += s.vx * k; s.y += s.vy * k;
+      f.drawImage(domMau('trang'), s.x - 5 * co, s.y - 5 * co, 10 * co, 10 * co);
+      them(s.x, s.y, ngau(-0.3, 0.3) * co, ngau(0, 0.4) * co, 'vang', { sinh: t, song: ngau(150, 300), to: 4 });
+      if (tuoi >= s.tach) {
+        loeLen(s.x, s.y, t, 70, s.mau, 0.6);
+        const v0 = ngau(2.3, 2.7) * co;
+        cau(s.x, s.y, t, 46, v0, s.mau, { song: ngau(800, 1000), lap: Math.random() < 0.4 });
+        cau(s.x, s.y, t, 14, v0 * 0.4, 'bac', { song: ngau(600, 800) });
+        giong.splice(i, 1);
+      }
+    }
+
+    for (let i = sao.length - 1; i >= 0; i--) {
+      const s = sao[i], tuoi = t - s.sinh;
+      if (tuoi > s.song) { sao.splice(i, 1); continue; }
+      const kk = Math.pow(s.keo, k);
+      s.vx *= kk; s.vy = s.vy * kk + s.nang * co * k; s.x += s.vx * k; s.y += s.vy * k;
+      const p = tuoi / s.song, a = p < 0.65 ? 1 : 1 - (p - 0.65) / 0.35;
+      const mau = tuoi < 110 ? 'trang' : s.mau;              // vừa nổ thì cháy trắng rồi mới ra màu
+      // Tia cúc: vệt thẳng từ gần tâm ra tới đầu hạt, đuôi mờ — như ảnh chụp phơi sáng
+      const f0 = 0.25 + 0.6 * p, f1 = f0 + (1 - f0) * 0.55;
+      const ax = s.ox + (s.x - s.ox) * f0, ay = s.oy + (s.y - s.oy) * f0;
+      const bx = s.ox + (s.x - s.ox) * f1, by = s.oy + (s.y - s.oy) * f1;
+      ve(mau, a * 0.3, s.w, ax, ay, bx, by);
+      ve(mau, a, s.w, bx, by, s.x, s.y);
+      if (s.dau) { f.globalAlpha = a; f.drawImage(domMau(mau), s.x - 4 * co, s.y - 4 * co, 8 * co, 8 * co); }
+      // Mép lấp lánh như viền chấm bạc trong ảnh mẫu
+      if (s.lap && p > 0.6 && Math.random() < 0.3 * k) { f.globalAlpha = a; f.drawImage(domMau('trang'), s.x - 3 * co, s.y - 3 * co, 6 * co, 6 * co); }
+      if (s.tan && Math.random() < 0.12 * k) them(s.x, s.y, ngau(-0.3, 0.3) * co, ngau(0, 0.5) * co, 'vang', { sinh: t, song: ngau(250, 450), to: 4 });
+    }
+    f.globalAlpha = 1;
+
+    for (let i = hat.length - 1; i >= 0; i--) {
+      const h = hat[i], tuoi = t - h.sinh;
+      if (tuoi > h.song) { hat.splice(i, 1); continue; }
+      const kk = Math.pow(h.keo, k);
+      h.vx *= kk; h.vy = h.vy * kk + h.nang * co * k; h.x += h.vx * k; h.y += h.vy * k;
+      const p = tuoi / h.song, s = h.to * co * (1 - 0.5 * p);
+      f.globalAlpha = 1 - p;
+      f.drawImage(domMau(h.mau), h.x - s / 2, h.y - s / 2, s, s);
+    }
+    f.globalAlpha = 1;
+
+    // ---- 2. Lớp tia ----
+    v.clearRect(0, 0, W, H); v.globalCompositeOperation = 'lighter'; v.lineCap = 'round';
+    for (const [key, m] of xo) {
+      const [mau, ai, w] = key.split('|'), [r, gg, b] = MAU[mau];
+      v.strokeStyle = `rgba(${r},${gg},${b},${ai / 8})`; v.lineWidth = w * 0.9 * co;
+      v.beginPath();
+      for (let i = 0; i < m.length; i += 4) { v.moveTo(m[i], m[i + 1]); v.lineTo(m[i + 2], m[i + 3]); }
+      v.stroke();
+    }
+    xo.clear();
+
+    // ---- 3. Màn hình chính: trời đêm loé sáng mỗi lần nổ + hai lớp + quầng chói + chữ ----
+    let sang = 0;
+    for (const l of loe) { const p = (t - l.sinh) / 200; if (p < 1) sang += 0.1 * l.manh * (1 - p); }
+    g.clearRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+    g.fillStyle = 'rgba(4,6,18,' + Math.max(0, 0.86 * mo - sang) + ')'; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = mo; g.drawImage(lop, 0, 0, W, H); g.drawImage(vet, 0, 0, W, H);
+    fl.globalCompositeOperation = 'source-over'; fl.clearRect(0, 0, loa.width, loa.height);
+    fl.globalCompositeOperation = 'lighter';
+    fl.drawImage(lop, 0, 0, loa.width, loa.height); fl.drawImage(vet, 0, 0, loa.width, loa.height);
+    g.globalAlpha = 0.7 * mo; g.drawImage(loa, 0, 0, W, H);
+    for (const l of loe) {
+      const p = (t - l.sinh) / 200; if (p >= 1) continue;
+      const [r, gg, b] = MAU[l.mau], R = l.r * (0.5 + p * 0.9), gr = g.createRadialGradient(l.x, l.y, 0, l.x, l.y, R);
+      gr.addColorStop(0, 'rgba(255,252,240,' + 0.9 * (1 - p) + ')');
+      gr.addColorStop(0.25, `rgba(${r},${gg},${b},${0.4 * (1 - p)})`);
+      gr.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+      g.globalAlpha = mo; g.fillStyle = gr; g.fillRect(l.x - R, l.y - R, R * 2, R * 2);
+    }
+    // Chữ: vẽ thẳng lên màn chính để nét chữ sắc, không loá thành mảng
+    for (let i = chu.length - 1; i >= 0; i--) {
+      const c = chu[i], tuoi = t - c.sinh;
+      if (t > c.giu) {   // hết giờ treo: chữ vỡ ra, rơi thành mưa tàn lửa
+        them(c.x, c.y, ngau(-0.6, 0.6) * co, ngau(-0.4, 0.5) * co, c.mau, { sinh: t, song: ngau(600, 900), keo: 0.96, nang: 0.05, to: 7 });
+        chu.splice(i, 1); continue;
+      }
+      if (tuoi < c.toi) {
+        const p = tuoi / c.toi, e = 1 + 2.70158 * Math.pow(p - 1, 3) + 1.70158 * Math.pow(p - 1, 2);   // bay tới, hơi vượt rồi bật về
+        c.x = c.sx + (c.tx - c.sx) * e; c.y = c.sy + (c.ty - c.sy) * e;
+      } else { c.x = c.tx + Math.sin(t / 90 + c.pha) * 0.6 * co; c.y = c.ty + Math.cos(t / 110 + c.pha) * 0.6 * co; }
+      const lap = tuoi > c.toi && Math.random() < 0.08, s = (lap ? 11 : 8) * co;
+      g.globalAlpha = mo * (tuoi < c.toi ? 1 : 0.82 + 0.18 * Math.sin(t / 60 + c.pha));
+      g.drawImage(domMau(lap || tuoi < 100 ? 'trang' : c.mau), c.x - s / 2, c.y - s / 2, s, s);
+    }
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+
+    if (t < ms) requestAnimationFrame(khung);
+    else { g.clearRect(0, 0, W, H); cv.style.display = 'none'; dangBan = false; }
+  };
+  requestAnimationFrame(khung);
+}
+
+// Băng chữ trên đầu: ở lâu hơn pháo hoa một chút để kịp đọc tên. Chạm vào là tắt.
+function bangPhao(tieuDe, phu, ms){
+  $('#bp-t').innerHTML = tieuDe; $('#bp-s').innerHTML = phu;
+  const b = $('#bang-phao'); b.classList.add('on');
+  clearTimeout(b._h); b._h = setTimeout(() => b.classList.remove('on'), ms || 4200);
+}
+$('#bang-phao').onclick = () => $('#bang-phao').classList.remove('on');
+
+// Máy chủ gửi kèm mọi kỷ lục trong 24 giờ; máy này nhớ id lớn nhất đã bắn để mỗi kỷ lục chỉ bắn một lần.
+// Nhiều người cùng lúc (mở app buổi trưa) thì gom lại bắn MỘT lượt.
+const PHAO_KEY = 'dm_phao_xem';
+let phaoCho = null;                 // đang ẩn app thì giữ lại, quay về mới bắn
+function xemPhaoHoa(r){
+  if (!r || !r.hv || r.xemBoi || !Array.isArray(r.phaoHoa) || !r.phaoHoa.length) return;
+  let da = 0; try { da = Number(localStorage.getItem(PHAO_KEY)) || 0; } catch(e){}
+  const moi = r.phaoHoa.filter(x => Number(x.id) > da);
+  if (!moi.length) return;
+  try { localStorage.setItem(PHAO_KEY, String(Math.max(...r.phaoHoa.map(x => Number(x.id) || 0)))); } catch(e){}
+  const kgVN = x => String(Math.round(Number(x) * 10) / 10).replace('.', ',');
+  const toi = moi.find(x => x.ten === r.hv.ten);
+  let chu, tieuDe, phu;
+  if (toi) {
+    // Số cân LÚC phá kỷ lục = cân đầu − số đã giảm (lần cân mới nhất có thể là lần gõ nhầm sau đó)
+    const dau = r.thongKe && Number(r.thongKe.canDau), can = dau ? dau - Number(toi.giam) : 0;
+    chu = '−' + kgVN(toi.giam) + ' KG';
+    tieuDe = can ? 'Bạn vừa xuống ' + kgVN(can) + ' kg!' : 'Bạn vừa phá kỷ lục cân!';
+    phu = 'Thấp nhất từ đầu khoá · đã giảm <b>' + kgVN(toi.giam) + ' kg</b>. Cả nhà đang thấy pháo hoa của bạn 🎉';
+  } else if (moi.length === 1) {
+    chu = '−' + kgVN(moi[0].giam) + ' KG';
+    tieuDe = esc(moi[0].ten) + ' vừa phá kỷ lục cân!';
+    phu = 'Thấp nhất từ đầu khoá · đã giảm <b>' + kgVN(moi[0].giam) + ' kg</b>. Vào chúc mừng nhé 👏';
+  } else {
+    chu = moi.length + ' KỶ LỤC';
+    tieuDe = moi.length + ' người vừa phá kỷ lục cân!';
+    phu = moi.slice(0, 3).map(x => esc(x.ten) + ' <b>−' + kgVN(x.giam) + '</b>').join(' · ') + ' kg' + (moi.length > 3 ? ' · +' + (moi.length - 3) + ' người' : '');
+  }
+  phaoCho = { chu, tieuDe, phu, lau: moi.length > 1 ? 5200 : 4200 };
+  if (document.visibilityState === 'visible') setTimeout(banPhaoCho, 400);
+}
+function banPhaoCho(){
+  if (!phaoCho || document.visibilityState !== 'visible') return;
+  const p = phaoCho; phaoCho = null;
+  banPhaoHoa({ chu: p.chu }); bangPhao(p.tieuDe, p.phu, p.lau);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setTimeout(banPhaoCho, 300); });
+// Người đưa tin chạy nền (sw.js) báo có kỷ lục mới khi app đang mở → hỏi lại máy chủ là bắn ngay
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.loai === 'phaohoa' && S && ten) lamMoi(true); });
+
 // ---------- Chúc mừng các mốc: vào đường đua · qua từng tuần · về đích ----------
 const MOC_KEY = 'dm_moc';
 function docMoc(){ try { return JSON.parse(localStorage.getItem(MOC_KEY) || '{}'); } catch(e){ return {}; } }
@@ -2859,6 +3180,7 @@ function nhan(r){
   try { taiHoc(); if (r.hlv) ($('#hoc-soan')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); } catch(e){}
   try { veThucDon(h); } catch(e){}
   try { setTimeout(() => soatMoc(r), 600); } catch(e){}
+  try { xemPhaoHoa(r); } catch(e){}        // ai phá kỷ lục cân → pháo hoa (03/10)
   try {
     const oMota = $('#in-mota');
     if (!daChonBuaTay && (!oMota || !oMota.value.trim())) chonBua(buaTheoGio());

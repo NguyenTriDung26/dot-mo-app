@@ -27,7 +27,14 @@ self.addEventListener('push', (e) => {
     // Rung nhẹ hai nhịp — đủ để biết có tin, không giật mình
     vibrate: [90, 50, 90],
   };
-  e.waitUntil(self.registration.showNotification(tieuDe, tuyChon));
+  e.waitUntil((async () => {
+    await self.registration.showNotification(tieuDe, tuyChon);
+    // Pháo hoa (03/10): app nào đang mở thì báo nó hỏi lại máy chủ để bắn ngay, khỏi đợi
+    if (d.nhan === 'phaohoa') {
+      const cua = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      cua.forEach(c => { try { c.postMessage({ loai: 'phaohoa' }); } catch (err) {} });
+    }
+  })());
 });
 
 self.addEventListener('notificationclick', (e) => {
