@@ -675,7 +675,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261003-183428';
+const APP_VER = '20261005-135558';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1901,11 +1901,10 @@ function veLuatHtml(luat, laHLV){
 function veDinhMuc(r){
   const h = r.hv, d = h.dinhMuc, el = $('#dinhmuc');
   if (!d) { el.innerHTML = `<p class="k">Định mức ăn mỗi ngày</p><small>Chưa có vì hồ sơ thiếu cân nặng.</small><br><button class="btn sm" onclick="hien('hoso')">Điền hồ sơ</button>`; return; }
-  const P = h.dam, dauN = h.dau, rauN = h.rau, nuoc = h.nuoc, kcal = h.kcalMucTieu || 0;
-  const pSang = 32, pDau = Math.round(dauN * 0.08);
-  const thitTong = Math.round(Math.max(0, P - pSang - pDau) / 0.23 / 10) * 10;
-  const thit = Math.round(thitTong / 2 / 10) * 10, dauBua = Math.round(dauN / 2 / 10) * 10;
-  const rauBua = Math.max(100, Math.round((rauN - 100) / 2 / 50) * 50);
+  // 05/10/2026: KHÔNG tự tính lại ở đây nữa — mọi con số lấy từ h.dinhMuc của máy chủ (nguồn duy nhất).
+  // Trước đây trang này tự tính một bộ riêng (đậu 80 g/bữa) nên cộng các bữa lệch với ô tổng.
+  const P = h.dam, nuoc = h.nuoc, kcal = h.kcalMucTieu || 0;
+  const dauN = d.dau || h.dau, rauN = (d.rauBua || 0) * 2 || h.rau, thit = d.thit || 0, thitTong = d.thitTong || 0;
   // Quy ra bình và chai cho dễ hình dung — "10 ly 250 ml" không ai đếm nổi trong ngày
   const quyNuoc = (L) => {
     const ml = Math.round(L * 1000);
@@ -1927,7 +1926,7 @@ function veDinhMuc(r){
   const MAU_BUA = {
     'Sáng':  { nen: 'rgba(234,179,8,.12)',  cham: '#b8860b', icon: '🌅' },
     'Trưa':  { nen: 'var(--lime-dim)',      cham: 'var(--lime)', icon: '☀️' },
-    'Chiều (chỉ khi đi tập)': { nen: 'rgba(234,88,12,.10)', cham: '#c2410c', icon: '🏋️' },
+    'Chiều': { nen: 'rgba(234,88,12,.10)', cham: '#c2410c', icon: '🫘' },
     'Tối':   { nen: 'rgba(99,102,241,.10)', cham: '#4f46e5', icon: '🌙' },
   };
   const bua = (gio, ten, mon, ghi) => { const m = MAU_BUA[ten] || MAU_BUA['Trưa']; return `
@@ -1939,27 +1938,34 @@ function veDinhMuc(r){
       ${ghi ? `<div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5">${ghi}</div>` : ''}</div>`; };
   el.innerHTML = `<p class="k">Định mức ăn mỗi ngày · ${esc(h.ten)}</p>
     <div style="background:var(--lime-dim);border-radius:14px;padding:16px;text-align:center">
-      <div style="font-size:42px;font-weight:800;line-height:1;color:var(--lime)">${kcal || '—'}</div>
-      <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày — KHÔNG ăn dưới mức này</div>
-      <div style="font-size:11px;color:var(--mute);margin-top:4px">Ăn thấp hơn là mất cơ, tụt trao đổi chất, rồi đói cồn cào ăn bù</div></div>
+      <div style="font-size:13px;color:var(--ink2);font-weight:600;margin-bottom:6px">Mốc năng lượng tham khảo</div>
+      <div style="font-size:42px;font-weight:800;line-height:1;color:var(--lime)">~${kcal || '—'}</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:6px;font-weight:600">kcal mỗi ngày${d.kcalThucDon ? ' · thực đơn bên dưới ≈ ' + d.kcalThucDon + ' kcal' : ''}</div>
+      <div style="font-size:12px;color:var(--mute);margin-top:4px;line-height:1.5">Lắng nghe cơ thể: không ăn quá no, không để đói. Còn đói thì ăn thêm theo thứ tự Rau → Thịt → Đậu.</div></div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
-      ${o(P, ' g', 'Protein', 'var(--lime)')}
+      <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
+        <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Protein</div>
+        <div style="font-size:30px;font-weight:800;line-height:1;color:var(--lime)">${P}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> g</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.4">từ trứng + ${thit} g thịt/bữa</div>
+      </div>
       <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
         <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Rau</div>
         <div style="font-size:30px;font-weight:800;line-height:1">${rauN}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> g+</span></div>
         <div style="font-size:12px;color:var(--lime);margin-top:6px;font-weight:600;line-height:1.4">ăn thoải mái</div>
-      </div>${o(dauN, ' g', 'Đậu')}
+      </div>
+      <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
+        <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Đậu · ăn thêm</div>
+        <div style="font-size:30px;font-weight:800;line-height:1">≤${dauN}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> g</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.4">tối đa · bữa chiều · không bắt buộc</div>
+      </div>
       <div style="background:var(--sf2);border-radius:14px;padding:16px 12px">
         <div style="font-size:13px;color:var(--mute);font-weight:600;margin-bottom:6px">Nước</div>
         <div style="font-size:30px;font-weight:800;line-height:1">${nuoc}<span style="font-size:14px;font-weight:600;color:var(--mute);margin-left:2px"> L</span></div>
         <div style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.4">${quyNuoc(nuoc)}</div>
       </div></div>
 
-    <details class="lg" open><summary>Chia ra từng bữa<span>4 bữa</span></summary><div style="padding:0 14px 12px">
-    ${bua('07:00–08:00', 'Sáng', '4 quả trứng + 100 g đậu phụ + 100 g rau', 'Đủ 30 g protein. Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
-    ${bua('12:00', 'Trưa', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Sau ăn: nước chanh loãng + đi bộ 100 bước.')}
-    ${bua('17:00', 'Chiều (chỉ khi đi tập)', '100 g đậu + 100 g thịt nạc', '<b style="color:#c2410c">CHỈ ăn bữa này nếu hôm đó có đi tập.</b> Không tập thì bỏ hẳn, không ăn bù sang bữa khác.')}
-    ${bua('19:00–20:00', 'Tối', `${thit} g thịt nạc/cá + ${dauBua} g đậu + ${rauBua} g rau`, 'Xong trước 20h. Sau 20h dừng ăn.')}
+    <details class="lg" open><summary>Chia ra từng bữa<span>${(d.bua || []).length} bữa</span></summary><div style="padding:0 14px 12px">
+    ${(d.bua || []).map(b => bua(esc(b.gio) + (b.kcal ? ' · ≈' + b.kcal + ' kcal' : ''), b.ten, esc(b.mon), esc(b.ghiChu || ''))).join('')}
 
     </div></details>
     <details class="lg"><summary>Quy đổi nhanh<span>đổi món</span></summary>
@@ -2480,7 +2486,7 @@ function chepTuMau(){
   const ten = { sang: 'Sáng', trua: 'Trưa', chieu: 'Chiều', toi: 'Tối' }[bua];
   const b = d.bua.find(x => x.ten === ten);
   if (!b) { toast('Thực đơn mẫu không có bữa này.', 2500); return; }
-  chepVaoMoTa(b.mon);
+  chepVaoMoTa(b.chep || b.mon);
 }
 function chepHomQua(){
   const g = S && (S.buaGanNhat || {})[bua];
@@ -3248,8 +3254,8 @@ function nhan(r){
       : 'Hôm nay chưa ghi giấc ngủ — chụp màn hình đồng hồ là xong.';
   }
   const thanh = (nhan, co, muc, dv, nguoc) => { const p = muc ? Math.min(100, Math.round(co / muc * 100)) : 0; const over = nguoc && co > muc; const ok = !nguoc && muc && co >= muc;
-    return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? ' tối đa' : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
-  $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', true) : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu', t.dau, h.dau, 'g') + thanh('Rau', t.rau, h.rau, 'g') + `` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
+    return `<div class="meta"><span>${nhan}</span><span><b>${co}${dv}</b> / ${muc}${dv}${nguoc ? (typeof nguoc === 'string' ? ' ' + nguoc : ' tối đa') : ''}${ok ? ' ✅' : ''}${over ? ' ⚠️' : ''}</span></div><div class="bar"><i class="${over ? 'over' : ''}" style="width:${p}%"></i></div>`; };
+  $('#tien-do').innerHTML = `<p class="k">Chỉ tiêu của ${esc(h.ten)}</p>` + (h.kcalMucTieu ? thanh('Năng lượng', t.kcal, h.kcalMucTieu, ' kcal', 'mốc') : '') + thanh('Protein', t.protein, h.dam, 'g') + thanh('Đậu (ăn thêm)', t.dau, h.dau, 'g', true) + thanh('Rau', t.rau, h.rau, 'g') + `` + thanh('Nước', (t.nuoc/1000).toFixed(2).replace(/\.?0+$/,''), h.nuoc, 'L');
   $('#thoiquen').innerHTML = `<p class="k">Thói quen hôm nay</p><div class="tq"><span>${t.damSang >= 30 ? '✅' : '⬜'} Sáng đủ 30g protein (${t.damSang}g)</span><span>${t.nhai ? '✅' : '⬜'} Nhai 20 lần · bữa 20 phút (${t.nhai || 0}/${Math.max(t.soBua,1)} bữa)</span><span>${t.nuocChanh ? '✅' : '⬜'} Nước chanh trong bữa (${t.nuocChanh}/${Math.max(t.soBua,1)} bữa)</span><span>${t.diBo ? '✅' : '⬜'} Đi bộ 100 bước sau ăn (${t.diBo}/${Math.max(t.soBua,1)} bữa)</span>${tk.gymTuan ? `<span>✅ Gym tuần này ${tk.gymTuan}/2</span>` : ''}<span>${t.ngu ? (t.ngu.den === 'xanh' ? '✅' : t.ngu.den === 'vang' ? '🟡' : '❌') + ` Ngủ ${Math.floor(t.ngu.gio)} h · sâu ${t.ngu.sau}% · REM ${t.ngu.rem}%` : '⬜ Chưa chụp dữ liệu giấc ngủ (chuẩn 7 h · sâu 20% · REM 20%)'}</span>${h.kcalMucTieu ? `<span>🎯 Nạp tối đa ${h.kcalMucTieu} kcal/ngày</span>` : ''}</div>`;
   $('#logs').innerHTML = r.logsHomNay.length ? r.logsHomNay.map(dongLog).join('') : '<p><small>Chưa có bữa nào. Gửi bữa đầu tiên đi!</small></p>';
 
@@ -3287,7 +3293,7 @@ function nhan(r){
     ${dd('Mỡ thừa', h.mo ? h.mo + ' kg' : '')}
     ${dd('Mục tiêu 6 tuần', h.mucTieu ? `${h.mucTieu} kg${canDich ? ' → ' + canDich + ' kg' : ''}${h.moDich ? ` · mỡ ${h.phanTramMo || '?'}% → ${h.moDich}%` : ''}` : 'chưa đặt')}
     ${dd('Trần giảm 6 tuần', h.tranGiam6Tuan ? `${h.tranGiam6Tuan} kg · nhóm ${esc(h.nhomMo || '')}, ${h.tocDoTuan}% cân mỗi tuần` : '')}
-    ${dd('Định mức ngày', `${h.kcalMucTieu ? 'tối đa ' + h.kcalMucTieu + ' kcal · ' : ''}nước ${h.nuoc} L · đậu ${h.dau} g · rau ${h.rau} g`)}
+    ${dd('Định mức ngày', `${h.kcalMucTieu ? 'mốc ~' + h.kcalMucTieu + ' kcal · ' : ''}nước ${h.nuoc} L · đậu ăn thêm ≤ ${h.dau} g · rau ≥ ${h.rau} g`)}
     ${dd('TDEE', h.tdee ? 'khoảng ' + h.tdee + ' kcal' : '')}
     ${dd('Ảnh body xuất phát', h.anhBody ? 'đã có' + linkA(h.anhBody, 'mở ảnh') : '<span style="color:var(--amber)">chưa có</span>')}
     ${dd('Video xuất phát', h.videoBody ? 'đã có' + linkA(h.videoBody, 'mở video') : '<span style="color:var(--amber)">chưa có</span> <small>(tuỳ chọn, thêm trong Sửa hồ sơ)</small>')}
@@ -3353,10 +3359,12 @@ function tongKetNgay(h, t, tk, gio){
   (soBua >= 3 ? ok : no).push(soBua >= 3 ? 'Đủ 3 bữa ghi sổ' : 'Mới ghi ' + soBua + '/3 bữa — mai ghi đủ, chấm mới đúng');
   if (soBua) (t.damSang >= 30 ? ok : no).push(t.damSang >= 30 ? 'Bữa sáng đủ ' + t.damSang + ' g protein' : 'Bữa sáng mới ' + t.damSang + ' g protein (cần 30 g)');
   (t.protein >= h.dam ? ok : no).push(t.protein >= h.dam ? 'Protein đủ ' + t.protein + '/' + h.dam + ' g' : 'Protein ' + t.protein + '/' + h.dam + ' g — thiếu ' + (h.dam - t.protein) + ' g');
-  (t.dau >= h.dau ? ok : no).push(t.dau >= h.dau ? 'Đậu đủ ' + t.dau + ' g' : 'Đậu ' + t.dau + '/' + h.dau + ' g');
+  // 05/10: đậu là phần ăn thêm có mức tối đa — không chê thiếu, chỉ gợi ý khi vượt
+  if (t.dau > h.dau) no.push('Đậu ' + t.dau + ' g, quá mức ' + h.dau + ' g — gợi ý: rau → thịt trước, còn đói mới thêm đậu');
+  else if (t.dau) ok.push('Đậu ' + t.dau + '/' + h.dau + ' g, trong mức');
   (t.rau >= h.rau ? ok : no).push(t.rau >= h.rau ? 'Rau đủ ' + t.rau + ' g' : 'Rau ' + t.rau + '/' + h.rau + ' g');
   (!t.tinhBot ? ok : no).push(!t.tinhBot ? 'Không tinh bột ✔' : 'Dính ' + t.tinhBot + ' g tinh bột — mai bỏ hẳn');
-  if (h.kcalMucTieu) (t.kcal <= h.kcalMucTieu ? ok : no).push(t.kcal <= h.kcalMucTieu ? 'Năng lượng ' + t.kcal + '/' + h.kcalMucTieu + ' kcal, trong mức' : 'Vượt ' + (t.kcal - h.kcalMucTieu) + ' kcal so với mục tiêu');
+  if (h.kcalMucTieu) (t.kcal <= h.kcalMucTieu ? ok : no).push(t.kcal <= h.kcalMucTieu ? 'Năng lượng ' + t.kcal + '/' + h.kcalMucTieu + ' kcal, trong mức' : 'Cao hơn mốc tham khảo ' + (t.kcal - h.kcalMucTieu) + ' kcal — lắng nghe cơ thể, không ăn quá no');
   const nuocL = Math.round(t.nuoc / 100) / 10; (nuocL >= h.nuoc ? ok : no).push(nuocL >= h.nuoc ? 'Nước đủ ' + nuocL + ' L' : 'Nước ' + nuocL + '/' + h.nuoc + ' L');
   if (soBua) {
     (t.nhai >= soBua ? ok : no).push(t.nhai >= soBua ? 'Nhai 20 lần · bữa 20 phút cả ' + soBua + ' bữa' : 'Nhai 20 lần mới ' + (t.nhai || 0) + '/' + soBua + ' bữa');
@@ -3506,7 +3514,7 @@ const MOCK = (() => {
     guiAnhTuan:(t,p,anh) => { MOCK_ANH[1] = anh; const x = st(); x.anhVuaLuu = 1; return wait(x); },
     layAnhTienDo:(t,p) => wait({ ten: hv.ten, tuanHienTai: 1, ds: Object.keys(MOCK_ANH).map(k => ({ tuan: Number(k), ngay: '2026-09-04', thumb: { truoc: 'data:image/jpeg;base64,' + MOCK_ANH[k].truoc.thumb, nghieng: 'data:image/jpeg;base64,' + MOCK_ANH[k].nghieng.thumb, sau: 'data:image/jpeg;base64,' + MOCK_ANH[k].sau.thumb }, url: {} })) }),
     capNhatHoSo:(t,p,hs) => { if (hs.anh) MOCK_ANH[0] = hs.anh; Object.assign(hv, {hoTen:hs.hoTen, namSinh:hs.namSinh, gioiTinh:hs.gioiTinh, cao:hs.cao, canNang:hs.canNang, phanTramMo:hs.phanTramMo, moNhap:hs.moKg, vongEo:hs.vongEo, bapTay:hs.bapTay, bapDui:hs.bapDui, canDich:hs.canDich, moDich:hs.moDich, anhBody: hs.anh ? 'https://drive.google.com/mock' : hv.anhBody, mucTieu:Math.round((hs.canDich-hs.canNang)*10)/10, hoSoDu:true, tuoi:2026-hs.namSinh, mo:hs.moKg, dam:Math.round(2.2*hs.canNang)});
-      Object.assign(hv, tranGiamJS(hv.canNang, hv.cao, hv.namSinh, /n[uữ]/i.test(hv.gioiTinh), hv.phanTramMo, hv.mo)); hv.kcalMucTieu = Math.max(hv.bmr, hv.tdee - hv.thamHut); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein · 150 g đậu · 400 g rau · KHÔNG tinh bột · 3 L nước · ≤ 1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 100 g đậu phụ + 100 g rau',protein:34,kcal:410,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:660,ghiChu:'Sau ăn: nước chanh loãng + đi bộ 100 bước.'},{ten:'Chiều',gio:'17:00 (chỉ ngày tập)',mon:'100 g đậu + 100 g thịt nạc',protein:31,kcal:0,ghiChu:'Chỉ khi tập.'},{ten:'Tối',gio:'19:00–20:00',mon:'260 g thịt nạc/cá + 80 g đậu + 150 g rau',protein:66,kcal:570,ghiChu:'Xong trước 20h.'}], thitTong:520, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
+      Object.assign(hv, tranGiamJS(hv.canNang, hv.cao, hv.namSinh, /n[uữ]/i.test(hv.gioiTinh), hv.phanTramMo, hv.mo)); hv.kcalMucTieu = Math.max(hv.bmr, hv.tdee - hv.thamHut); hv.dinhMuc = {tomTat:'Mỗi ngày: '+hv.dam+' g protein (trứng + thịt) · rau ≥ 400 g · đậu ăn thêm tối đa 150 g · KHÔNG tinh bột · 3 L nước · mốc tham khảo ~1638 kcal', bua:[{ten:'Sáng',gio:'07:00–08:00',mon:'4 quả trứng (~220 g) + 100 g bơ',chep:'4 quả trứng, 100 g bơ',protein:30,kcal:501,ghiChu:'Đủ 30 g protein.'},{ten:'Trưa',gio:'12:00',mon:'200 g rau → 300 g thịt nạc/cá/hải sản',chep:'200 g rau, 300 g thịt nạc',protein:69,kcal:470,ghiChu:'Ăn theo thứ tự Rau → Thịt.'},{ten:'Chiều',gio:'16:00–17:00',mon:'Đậu (đỗ đen/đỏ/lăng/xanh) tối đa 150 g — ăn thêm, không bắt buộc',chep:'150 g đậu',protein:12,kcal:192,ghiChu:'Còn đói mới ăn.'},{ten:'Tối',gio:'19:00–20:00',mon:'200 g rau → 300 g thịt nạc/cá/hải sản',chep:'200 g rau, 300 g thịt nạc',protein:69,kcal:470,ghiChu:'Xong trước 20h.'}], thit:300, rauBua:200, dau:150, kcalThucDon:1633, thitTong:600, tinhBot:'BỎ HẲN trong 6 tuần: không cơm, bún, phở, bánh mì, yến mạch, khoai.', nuoc:'3 L ≈ 12 ly 250 ml.', khong:'Không: tinh bột trắng, đồ ngọt, hoa quả ngọt, nước ngọt, bia rượu, chiên xù, đồ chế biến sẵn.'};
       const x = st(); x.hoSoVuaLuu = true; return wait(x); },
     ghiNgu:(t,p,g,sa,re) => { g=Number(g); const ph=Math.round(g*60); const sp=Number(sa)||0, rp=Number(re)||0; const sa2=Math.round(sp/ph*100), re2=Math.round(rp/ph*100); const dat=(g>=7?1:0)+(sa2>=20?1:0)+(re2>=20?1:0); logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'ngu', moTa:'Ngủ '+g+' h · sâu '+sp+' phút ('+sa2+'%) · REM '+rp+' phút ('+re2+'%)', nhanXet:'Chất lượng giấc ngủ: '+(dat===3?'TỐT':dat===2?'KHÁ':'KÉM')+' ('+dat+'/3 tiêu chí).', den: dat===3?'xanh':dat>=1?'vang':'do', nguGio:g, nguSau:sa2, nguRem:re2, dam:0,dau:0,rau:0,tinhBot:0,nuoc:0}); return wait(st()); },
     ghiGym:() => { logs.push({thoiGian:new Date().toISOString(), ten:'Anh Tú', ngay:'2026-09-03', bua:'gym', dam:0,dau:0,rau:0,tinhBot:0,nuoc:0, diem:null}); return wait(st()); },
