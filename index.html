@@ -679,7 +679,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261006-105136';
+const APP_VER = '20261006-110711';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -3452,9 +3452,24 @@ async function suaLog(k){
   if (l.bua === 'ngu') { toast('Phần ghi giấc ngủ đã bỏ. Dòng cũ vẫn giữ trong sổ.', 3000); return; }
   if (l.bua === 'can') { const c = $('#in-can'); if (c) { c.value = l.can || ''; c.focus(); } toast('✏️ Chỉnh lại số cân rồi bấm GHI CÂN', 3000); return; }
   bua = l.bua; document.querySelectorAll('#seg-bua button').forEach(x => x.classList.toggle('on', x.dataset.b === bua)); capNhatNutGui();
-  $('#in-mota').value = l.moTa || ''; $('#ck-nhai').checked = !!l.nhai; $('#ck-chanh').checked = !!l.nuocChanh; $('#ck-dibo').checked = !!l.diBo;
-  const nb = document.querySelector('button[data-v="gui"]'); if (nb) nb.click();
-  toast('✏️ Chỉnh lại rồi bấm GỬI ĐỂ CHẤM', 3000); $('#in-mota').focus();
+  const o = $('#in-mota');
+  o.value = l.moTa || ''; $('#ck-nhai').checked = !!l.nhai; $('#ck-chanh').checked = !!l.nuocChanh; $('#ck-dibo').checked = !!l.diBo;
+  // Mở sẵn khối chi tiết — không mở thì nội dung đổ vào ô đang ẩn, bấm Sửa như không có gì xảy ra
+  const kct = $('#khoi-chitiet');
+  if (kct && kct.classList.contains('hide')) {
+    kct.classList.remove('hide');
+    const mo = $('#mc-mo'); if (mo) mo.textContent = 'Thu gọn ▴';
+    veBamMon();
+  }
+  // Đưa ô mô tả vào giữa màn hình MỘT LẦN, có kiểm soát. Trước đây bấm tab "Gửi bữa"
+  // hai lần rồi focus() — trình duyệt tự cuộn theo cách của nó, màn hình giật lên
+  // giật xuống, người dùng phải kéo lại (Dũng 06/10). preventScroll giữ nguyên chỗ
+  // đang nhìn, con trỏ đặt ở cuối chữ để sửa tiếp luôn.
+  setTimeout(() => {
+    try { o.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    try { o.focus({ preventScroll: true }); o.setSelectionRange(o.value.length, o.value.length); } catch (e) { o.focus(); }
+  }, 60);
+  toast('✏️ Chỉnh lại rồi bấm GỬI ĐỂ CHẤM', 3000);
 }
 function dongLog0(l, feed){
   const gio = l.thoiGian ? new Date(l.thoiGian).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ho_Chi_Minh'}) : '';
