@@ -382,6 +382,10 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
 <p class="k" style="margin-top:4px">Thói quen bữa này</p><div class="row hbs"><label class="chk"><input type="checkbox" id="ck-nhai"> Nhai mỗi miếng 20 lần</label><label class="chk"><input type="checkbox" id="ck-chanh"> Uống nước chanh trong bữa</label><label class="chk"><input type="checkbox" id="ck-dibo"> Đi bộ 100 bước sau ăn</label></div>
             <label>Mô tả và số gram từng món</label>
       <div class="row" id="chep-nhanh" style="gap:6px;margin-bottom:8px"><button type="button" class="chipbtn" id="chep-mau" style="flex:1">🍽 Theo thực đơn mẫu</button><button type="button" class="chipbtn hide" id="chep-homqua" style="flex:1">🔁 Giống hôm qua</button></div>
+      <div id="bam-mon" style="margin-bottom:8px">
+        <div style="display:flex;gap:6px;margin-bottom:6px" id="bam-nhom"></div>
+        <div id="bam-the" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
       <textarea id="in-mota" placeholder="Ức gà 150g, đỗ đen 100g, rau cải 150g, 4 quả trứng"></textarea>
       <small id="gram-hint" style="display:block;margin-top:8px">Ghi số gram thì máy chấm đúng hơn.</small>
       <div class="warn hide" id="gram-xacnhan" style="margin:10px 0 0"><b>Chưa thấy số gram.</b> Cân từng món rồi ghi (vd: ức gà 150g, đỗ đen 100g) để chấm đúng. Không có cân thì ghi số lượng (4 quả trứng, 1 bát rau).<div class="row" style="margin-top:10px"><button class="btn sm" id="gram-bosung" style="margin:0;flex:1.2">Bổ sung gram</button><button class="btn ghost sm" id="gram-guiluon" style="margin:0;flex:1">Gửi luôn, máy ước lượng</button></div></div>
@@ -675,7 +679,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261005-135558';
+const APP_VER = '20261006-103607';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -2159,12 +2163,45 @@ function chonAnhBua(e){
         k.classList.remove('hide');
         const mo = $('#mc-mo'); if (mo) mo.textContent = 'Thu gọn ▴';
       }
+      veBamMon();
       setTimeout(() => {
         const o = $('#in-mota');
         if (o) { o.focus(); o.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
       }, 120);
     } ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.remove('hide'); toast('✓ Đã chọn ảnh', 1500); luuNhap(); }, 0.75);
 }
+// ---------- Bảng bấm món: ghi xong bữa trong 3 lần bấm ----------
+// Dũng 06/10: "tìm cách để chấm điểm bữa ăn 3 giây thôi". Gõ tay mất 20–30 giây,
+// và khi học viên chỉ chụp ảnh không gõ gì thì máy phải nhờ Gemini — chậm, có lúc
+// chết hẳn. Bấm thẻ thì mô tả có sẵn gram, kho thực phẩm chấm tại chỗ ~1 giây.
+// Món và gram lấy từ 357 bữa thật của chính nhóm, không bịa.
+const BAM_MON = {
+  'Đạm': [['Ức gà',200],['Thịt lợn',100],['Thịt bò',150],['Thịt gà',200],['Thịt xay',250],['Tôm',200],['Cá',150],['Cá hồi',150],['Trứng',2,'quả'],['Vịt',100],['Lươn',150],['Mực',150]],
+  'Đậu': [['Đậu đỏ',150],['Đậu đen',100],['Đậu xanh',100],['Đậu lăng',100],['Đậu phụ',100],['Đậu',50]],
+  'Rau': [['Rau',150],['Rau cải',150],['Dưa chuột',100],['Ớt chuông',150],['Súp lơ',150],['Cà chua',100],['Xà lách',100],['Bí xanh',150],['Măng tây',100],['Nấm',100]],
+  'Khác': [['Sữa chua không đường',100],['Bơ',100],['Dầu ô liu',5],['Lạc',30],['Hạnh nhân',30],['Whey',30]],
+};
+let bamNhom = 'Đạm';
+function veBamMon(){
+  const on = $('#bam-nhom'), the = $('#bam-the');
+  if (!on || !the) return;
+  on.innerHTML = Object.keys(BAM_MON).map(k =>
+    `<button type="button" class="chipbtn${k === bamNhom ? ' on' : ''}" data-n="${k}" style="flex:1;font-size:13px">${k}</button>`).join('');
+  on.querySelectorAll('button').forEach(b => b.onclick = () => { bamNhom = b.dataset.n; veBamMon(); });
+  the.innerHTML = BAM_MON[bamNhom].map(([t, g, dv]) =>
+    `<button type="button" class="chipbtn" data-t="${esc(t)}" data-g="${g}" data-dv="${dv || 'g'}" style="font-size:13px">${esc(t)} ${g}${dv ? ' ' + dv : 'g'}</button>`).join('');
+  the.querySelectorAll('button').forEach(b => b.onclick = () => themMonVaoMoTa(b.dataset.t, b.dataset.g, b.dataset.dv));
+}
+function themMonVaoMoTa(ten, gram, dv){
+  const o = $('#in-mota'); if (!o) return;
+  const cum = dv === 'quả' ? gram + ' quả ' + ten.toLowerCase() : ten + ' ' + gram + 'g';
+  o.value = o.value.trim() ? o.value.replace(/[,\s]+$/, '') + ', ' + cum : cum;
+  o.dispatchEvent(new Event('input'));
+  // Rung nhẹ để biết đã bấm trúng, như bàn phím điện thoại
+  if (navigator.vibrate) { try { navigator.vibrate(12); } catch(e){} }
+  luuNhap();
+}
+
 function boAnhBua(){ anhB64 = null; $('#preview').src = ''; $('#preview').style.display = 'none'; ($('#anh-act')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide'); $('#in-anh').value = ''; $('#in-anh2').value = ''; luuNhap(); }
 $('#in-anh').onchange = chonAnhBua; $('#in-anh2').onchange = chonAnhBua;
 $('#btn-anh-xoa').onclick = boAnhBua;
@@ -2440,6 +2477,7 @@ function veMotCham(){
       const dangAn = k.classList.contains('hide');
       k.classList.toggle('hide', !dangAn);
       mo.textContent = dangAn ? 'Thu gọn ▴' : 'Mở chi tiết ▾';
+      if (dangAn) veBamMon();
       // Nút "Thêm ảnh" bình thường giấu đi vì nút tròn đã lo việc đó. Nhưng ai mở chi
       // tiết ra mà chưa chụp gì thì vẫn phải có đường thêm ảnh ở trong này.
       { const ba = $('#btn-anh'), na = $('#nhan-anh'), can = dangAn && !anhB64;
