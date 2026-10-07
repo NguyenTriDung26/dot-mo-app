@@ -64,7 +64,15 @@ textarea{min-height:72px;resize:vertical}
 .btn:active{transform:scale(.98)}.btn:disabled{opacity:.55}
 .btn.ghost{background:var(--sf2);color:var(--ink);border:0;font-weight:600}
 .row{display:flex;gap:8px}.row>*{flex:1}
-.seg{display:flex;gap:8px}.seg button{flex:1;font:inherit;font-weight:600;font-size:15px;padding:0 4px;height:44px;border:0;background:var(--sf2);color:var(--mute);border-radius:10px;cursor:pointer}
+.seg{display:flex;gap:8px}
+/* Dãy nhiều lựa chọn thì xuống dòng, KHÔNG cuộn ngang — Dũng 06/10: "đừng nhảy các ô
+   ngang khiến khách hàng hay tôi phải kéo lại". Trên điện thoại 4–5 nút một hàng là
+   chữ bé tí và phải vuốt mới thấy hết. */
+.kc-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:14px}
+.kc-h span{color:var(--ink2)}
+.kc-n{font-size:12px;color:var(--mute);margin:2px 0 6px;line-height:1.45}
+.seg-doc{flex-wrap:wrap}
+.seg-doc button{flex:1 1 calc(50% - 4px);min-width:140px;font-size:14px;padding:0 8px}.seg button{flex:1;font:inherit;font-weight:600;font-size:15px;padding:0 4px;height:44px;border:0;background:var(--sf2);color:var(--mute);border-radius:10px;cursor:pointer}
 .seg button.on{background:var(--lime-dim);color:var(--lime);box-shadow:inset 0 0 0 1.5px var(--lime)}
 .pick{display:flex;align-items:center;justify-content:flex-start;gap:12px;border:0;border-radius:10px;padding:0 16px;min-height:56px;width:100%;font-family:inherit;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;background:var(--sf2)}.pick .ic-s{color:var(--lime)}.pick .pk-sub{margin-left:auto;color:var(--mute);font-weight:500;font-size:12px;white-space:nowrap}#btn-anh{white-space:nowrap}
 .pick input{display:none}.anh-chon{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:8px;border:0;border-radius:10px;background:var(--sf2)}.anh-chon button{font:inherit;font-weight:600;font-size:15px;padding:12px;border-radius:10px;border:0;background:var(--sf);color:var(--ink);cursor:pointer}.anh-chon button.huy{background:transparent;color:var(--mute);font-weight:600;padding:10px}.anh3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pick.sm{padding:10px 4px;font-size:13px;flex-direction:column;justify-content:center;gap:6px;position:relative;overflow:hidden;min-height:110px;color:var(--mute)}.pick.sm span{display:flex;flex-direction:column;align-items:center;gap:6px}.chips{display:flex;gap:8px;flex-wrap:wrap}.pick.sm img{display:none;width:100%;border-radius:8px;max-height:150px;object-fit:cover}.pick.sm.co{box-shadow:inset 0 0 0 1.5px var(--lime);color:var(--lime)}.pick.sm.co img{display:block}.pick.sm.co span{font-size:11px}.td-grid{display:grid;grid-template-columns:52px repeat(3,1fr);gap:6px;align-items:center;margin-top:8px}.td-grid img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}.td-grid .w{font-size:12px;font-weight:800;color:var(--mute)}.vid-pick{margin-top:10px;padding:14px}.vid-pick.co{box-shadow:inset 0 0 0 1.5px var(--lime)}#hs-video-xem,#tdv-xem{width:100%;max-height:260px;border-radius:10px;margin-top:8px;display:none;background:var(--nen-anh);border:1px solid var(--line)}#hs-video-xem.co,#tdv-xem.co{display:block}#tdv-frame{display:block;width:100%;aspect-ratio:9/16;max-height:65vh;border:0;border-radius:10px;background:var(--nen-anh);margin-top:8px}.vid-info{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--ink3)}.vid-info button{font:inherit;font-weight:800;font-size:13px;background:transparent;border:1px solid #3a463d;color:var(--mute);border-radius:10px;padding:6px 10px;cursor:pointer}
@@ -287,6 +295,25 @@ details.more summary::-webkit-details-marker{display:none}details.more summary .
         <div class="fld"><label>% mỡ cơ thể<span class="sao">*</span></label><input id="hs-mo" inputmode="decimal" placeholder="25"><small>Đo bằng cân điện tử / InBody. Không biết thì ước: nam 20–30, nữ 28–38.</small></div>
         <div class="fld"><label>Số kg mỡ <small style="color:var(--mute);font-weight:400">(nếu biết)</small></label><input id="hs-mokg" inputmode="decimal" placeholder="tự tính"><small>Máy tự tính = cân × %mỡ. Có số InBody thì sửa.</small></div>
       </div>
+      <p class="k" style="margin-top:16px">Công việc và vận động — để tính đúng calo của bạn</p>
+      <div class="fld"><label>Công việc hàng ngày<span class="sao">*</span></label>
+        <div class="seg seg-doc" id="hs-congviec">
+          <button data-cv="ngoi">Ngồi văn phòng</button><button data-cv="vua">Vừa ngồi vừa đi</button><button data-cv="dilai">Đi lại cả ngày</button><button data-cv="nang">Lao động nặng</button>
+        </div>
+        <small>Ngồi bàn giấy · bán hàng, giáo viên · shipper, y tá, bếp · bốc vác, thợ xây.</small>
+      </div>
+      <div class="fld"><label>Tập thể dục<span class="sao">*</span></label>
+        <div class="seg seg-doc" id="hs-tapluyen">
+          <button data-tl="khong">Không tập</button><button data-tl="it">1–2 buổi/tuần</button><button data-tl="vua">3–4 buổi/tuần</button><button data-tl="nhieu">5–7 buổi/tuần</button><button data-tl="ratnhieu">Ngày 2 buổi</button>
+        </div>
+        <small>Tính buổi tập từ 30 phút trở lên, có ra mồ hôi.</small>
+      </div>
+      <div class="fld"><label>Calo đốt mỗi ngày theo đồng hồ <small style="color:var(--mute);font-weight:400">(nếu có)</small></label>
+        <input id="hs-tdeedo" inputmode="numeric" placeholder="2178">
+        <small>Garmin / Apple Watch / Oura — mở phần tổng calo, lấy số trung bình 7 ngày. Có số này thì máy dùng nó thay công thức, vì đồng hồ đo nhịp tim cả ngày nên sát thực tế hơn.</small>
+      </div>
+      <div id="hs-ketqua" class="hide" style="background:var(--sf2);border-radius:12px;padding:12px;margin-top:10px"></div>
+
       <p class="k" style="margin-top:16px">Số đo (cm) — để so trước / sau</p>
       <div class="row">
         <div class="fld"><label>Vòng eo <small style="color:var(--mute);font-weight:400">(nên đo)</small></label><input id="hs-eo" inputmode="decimal" placeholder="88"></div>
@@ -679,7 +706,7 @@ try { ten = localStorage.getItem('dm_ten') || ''; pin = localStorage.getItem('dm
 (function(){ const h = new Date().getHours(); bua = h < 10 ? 'sang' : h < 15 ? 'trua' : h < 18 ? 'chieu' : 'toi'; })();
 
 // ---------- tự cập nhật: so phiên bản với version.txt trên máy chủ, khác thì tải lại ----------
-const APP_VER = '20261006-110711';
+const APP_VER = '20261007-151057';
 async function kiemTraCapNhat(){
   if (APP_VER.startsWith('__')) return; // bản Apps Script / xem thử: bỏ qua
   try {
@@ -1755,6 +1782,8 @@ async function datLaiPinHV(tenHV){ if (!confirm('Đặt lại PIN của ' + tenH
 // ---------- bước 2: hồ sơ cá nhân → máy tự tính lộ trình ----------
 let hsGioi = 'Nam';
 document.querySelectorAll('#hs-gioi button').forEach(b => b.onclick = () => { hsGioi = b.dataset.g; document.querySelectorAll('#hs-gioi button').forEach(x => x.classList.toggle('on', x === b)); });
+document.querySelectorAll('#hs-congviec button').forEach(b => b.onclick = () => { hsCongViec = b.dataset.cv; document.querySelectorAll('#hs-congviec button').forEach(x => x.classList.toggle('on', x === b)); tinhHS(); });
+document.querySelectorAll('#hs-tapluyen button').forEach(b => b.onclick = () => { hsTapLuyen = b.dataset.tl; document.querySelectorAll('#hs-tapluyen button').forEach(x => x.classList.toggle('on', x === b)); tinhHS(); });
 function soF(id){ const v = Number(String($(id).value).replace(',', '.')); return isFinite(v) ? v : 0; }
 function doHoSoVaoForm(){
   if (!S) return; const h = S.hv;
@@ -1765,18 +1794,43 @@ function doHoSoVaoForm(){
   $('#hs-video-note').textContent = h.videoBody ? '✅ Đã có video xuất phát. Chỉ chọn lại nếu muốn thay.' : 'Không bắt buộc, nhưng có video thì HLV nhìn dáng đứng, tư thế và đối chiếu sau 6 tuần chính xác hơn nhiều.';
   $('#hs-anh-note').textContent = h.anhBody ? '✅ Đã có ảnh tuần 0. Chỉ chọn lại nếu muốn thay cả 3.' : 'Chỉ HLV xem được ảnh này. Mỗi tuần app sẽ nhắc bạn chụp lại đúng 3 góc để so.';
   hsGioi = /n[uữ]/i.test(String(h.gioiTinh || '')) ? 'Nữ' : 'Nam'; document.querySelectorAll('#hs-gioi button').forEach(x => x.classList.toggle('on', x.dataset.g === hsGioi));
+  hsCongViec = h.congViec || ''; hsTapLuyen = h.tapLuyen || ''; $('#hs-tdeedo').value = h.tdeeDo || '';
+  document.querySelectorAll('#hs-congviec button').forEach(x => x.classList.toggle('on', x.dataset.cv === hsCongViec));
+  document.querySelectorAll('#hs-tapluyen button').forEach(x => x.classList.toggle('on', x.dataset.tl === hsTapLuyen));
   ($('#btn-hs-huy')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.toggle('hide', !h.hoSoDu); ($('#hs-err')||{classList:{toggle(){},add(){},remove(){},contains(){return false}}}).classList.add('hide');
   $('#hoso-loi-thieu').textContent = h.hoSoDu ? 'Sửa số rồi bấm LƯU — lộ trình và định mức tính lại ngay.' : 'Điền 1 lần (2 phút). Máy tự tính định mức ăn và 6 mốc cân theo công thức của HLV Dũng.';
   tinhHS();
 }
+// Bảng hệ số vận động — PHẢI khớp BANG_HE_SO trong tinhtoan.js, nếu lệch thì số hiện
+// lúc điền hồ sơ khác số máy chủ chấm, học viên mất lòng tin ngay.
+const BANG_HE_SO_JS = {
+  ngoi:  [1.20, 1.35, 1.45, 1.55, 1.70],
+  vua:   [1.30, 1.45, 1.55, 1.65, 1.80],
+  dilai: [1.45, 1.55, 1.65, 1.75, 1.90],
+  nang:  [1.60, 1.70, 1.80, 1.90, 2.00],
+};
+const TAP_JS = ['khong','it','vua','nhieu','ratnhieu'];
+let hsCongViec = '', hsTapLuyen = '';
+function heSoJS(){
+  const t = TAP_JS.indexOf(hsTapLuyen);
+  if (!BANG_HE_SO_JS[hsCongViec] || t < 0) return 1.4;   // chưa điền thì giữ như cũ
+  return BANG_HE_SO_JS[hsCongViec][t];
+}
+
 function tranGiamJS(can, cao, namSinh, nu, pct, moKg) {
   const o = { nhomMo: '', tocDoTuan: 0, tranNhom: 0, thamHut: 0, moGiam6Tuan: 0, nuocTuan1: 0, tranGiam6Tuan: 0, bmr: 0, tdee: 0 };
   if (!can || !pct) return o;
   const tuoi = namSinh ? new Date().getFullYear() - namSinh : 0;
-  o.bmr = (cao && tuoi) ? Math.round(10 * can + 6.25 * cao - 5 * tuoi + (nu ? -161 : 5)) : 0; o.tdee = o.bmr ? Math.round(o.bmr * 1.4) : 0;
+  o.bmr = (cao && tuoi) ? Math.round(10 * can + 6.25 * cao - 5 * tuoi + (nu ? -161 : 5)) : 0;
+  o.heSo = heSoJS();
+  o.tdeeCongThuc = o.bmr ? Math.round(o.bmr * o.heSo) : 0;
+  o.tdeeDo = soF('#hs-tdeedo');
+  o.tdee = o.tdeeDo || o.tdeeCongThuc;                   // đồng hồ đo thật thắng công thức
+  o.nguon = o.tdeeDo ? 'đồng hồ đo' : 'công thức';
   const nhom = nu ? (pct < 28 ? 1 : pct <= 35 ? 2 : 3) : (pct < 20 ? 1 : pct <= 28 ? 2 : 3);
   o.nhomMo = ['', 'Ít mỡ', 'Vừa', 'Nhiều mỡ'][nhom]; o.tocDoTuan = [0, 0.5, 0.75, 1][nhom]; o.tranNhom = [0, 600, 600, 600][nhom]; // khớp tranGiam_ trong Code.gs — Dũng chốt 19/09/2026
   const uv = [o.tranNhom]; // máy chủ đã bỏ điều kiện tocDoTuan x can x 1100 từ 17/09 — bỏ luôn ở đây cho hai bên ra cùng một số
+  if (o.tdee) uv.push(Math.round(o.tdee * 0.2));         // thâm hụt 20% TDEE (Dũng 07/10)
   if (o.tdee) uv.push(o.tdee - o.bmr);
   if (moKg) uv.push(Math.round(68 * moKg));
   o.thamHut = Math.max(0, Math.min.apply(null, uv));
@@ -1799,11 +1853,31 @@ function tinhHS(){
   else if (tr.tranGiam6Tuan) canhBao = `<div style="color:var(--lime);margin-top:6px">✅ Trong trần cho phép: nhóm ${tr.nhomMo} giảm tối đa ${tr.tranGiam6Tuan} kg/6 tuần.</div>`;
   const moTxt = (mo && moDich) ? (moDich >= mo ? ` · <span style="color:var(--red)">% mỡ muốn về phải nhỏ hơn ${mo}%</span>` : ` · mỡ <b>${mo}% → ${moDich}%</b> (−${Math.round((mo - moDich) * 10) / 10} điểm)`) : '';
   el.innerHTML = `🎯 Giảm <b>${giam} kg</b> trong 6 tuần = <b>−${tuan} kg/tuần</b>${moTxt}${tr.tdee ? ` · nạp tối đa <b>${Math.max(tr.bmr, tr.tdee - tr.thamHut)} kcal/ngày</b>` : ''}${canhBao}`;
+
+  // Bảng calo: cho học viên thấy con số từ đâu ra, không phải máy phán bừa.
+  // Dũng 07/10: "hướng dẫn ăn uống của tôi ghi thêm bmr và tdee của tôi và gợi ý thâm hụt 20%".
+  const bk = $('#hs-ketqua');
+  if (bk && tr.bmr) {
+    const an = Math.max(tr.bmr, tr.tdee - tr.thamHut);
+    const pct = tr.tdee ? Math.round(tr.thamHut / tr.tdee * 100) : 0;
+    const chenh = (tr.tdeeDo && tr.tdeeCongThuc) ? tr.tdeeDo - tr.tdeeCongThuc : 0;
+    bk.classList.remove('hide');
+    bk.innerHTML =
+      `<div style="font-weight:800;margin-bottom:8px">Calo của bạn</div>` +
+      `<div class="kc-h"><span>Nằm yên cả ngày cũng đốt (BMR)</span><b>${tr.bmr} kcal</b></div>` +
+      `<div class="kc-h"><span>Đốt thật cả ngày (TDEE · ${tr.nguon})</span><b>${tr.tdee} kcal</b></div>` +
+      (chenh ? `<div class="kc-n">Công thức đoán ${tr.tdeeCongThuc} kcal — đồng hồ đo ${chenh > 0 ? 'cao' : 'thấp'} hơn ${Math.abs(chenh)} kcal. Máy dùng số đồng hồ.</div>` : '') +
+      (!tr.tdeeDo && tr.heSo !== 1.4 ? `<div class="kc-n">Hệ số vận động ${tr.heSo} từ công việc + lịch tập bạn chọn.</div>` : '') +
+      (!tr.tdeeDo && tr.heSo === 1.4 ? `<div class="kc-n">Chưa chọn công việc và lịch tập — máy đang dùng mức trung bình 1,4. Chọn vào để tính đúng hơn.</div>` : '') +
+      `<div class="kc-h"><span>Trừ đi ${pct}% để giảm mỡ</span><b style="color:var(--red)">−${tr.thamHut} kcal</b></div>` +
+      `<div class="kc-h" style="border-top:1px solid var(--vien);padding-top:8px;margin-top:4px"><span style="font-weight:700">Ăn vào mỗi ngày</span><b style="color:var(--lime2);font-size:17px">${an} kcal</b></div>` +
+      `<div class="kc-n">Giảm dự kiến ${Math.round(tr.thamHut * 7 / 7700 * 100) / 100} kg mỡ/tuần. Ăn dưới ${tr.bmr} kcal là dưới mức nằm yên — mất cơ, chững cân.</div>`;
+  } else if (bk) bk.classList.add('hide');
 }
-['#hs-can','#hs-mo','#hs-dich','#hs-mokg','#hs-modich','#hs-cao','#hs-namsinh'].forEach(id => $(id).addEventListener('input', tinhHS));
+['#hs-can','#hs-mo','#hs-dich','#hs-mokg','#hs-modich','#hs-cao','#hs-namsinh','#hs-tdeedo'].forEach(id => $(id).addEventListener('input', tinhHS));
 $('#btn-hs-huy').onclick = quayLai;
 $('#btn-hs-luu').onclick = async () => {
-  const hs = { hoTen: $('#hs-hoten').value.trim(), namSinh: soF('#hs-namsinh'), gioiTinh: hsGioi, cao: soF('#hs-cao'), canNang: soF('#hs-can'), phanTramMo: soF('#hs-mo'), moKg: soF('#hs-mokg'), vongEo: soF('#hs-eo'), bapTay: soF('#hs-tay'), bapDui: soF('#hs-dui'), canDich: soF('#hs-dich'), moDich: soF('#hs-modich'), anh: du3(hsAnh3) ? hsAnh3 : null };
+  const hs = { hoTen: $('#hs-hoten').value.trim(), namSinh: soF('#hs-namsinh'), gioiTinh: hsGioi, cao: soF('#hs-cao'), canNang: soF('#hs-can'), phanTramMo: soF('#hs-mo'), moKg: soF('#hs-mokg'), vongEo: soF('#hs-eo'), bapTay: soF('#hs-tay'), bapDui: soF('#hs-dui'), canDich: soF('#hs-dich'), moDich: soF('#hs-modich'), congViec: hsCongViec, tapLuyen: hsTapLuyen, tdeeDo: soF('#hs-tdeedo'), anh: du3(hsAnh3) ? hsAnh3 : null };
   const err = $('#hs-err'); err.classList.add('hide');
   const thieu = !hs.namSinh ? 'năm sinh' : !hs.cao ? 'chiều cao' : !hs.canNang ? 'cân nặng' : !hs.phanTramMo ? '% mỡ' : !hs.canDich ? 'cân muốn về' : !hs.moDich ? '% mỡ muốn về' : '';
   if (thieu) { err.textContent = 'Còn thiếu: ' + thieu + '.'; err.classList.remove('hide'); return; }
